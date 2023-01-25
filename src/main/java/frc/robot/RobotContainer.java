@@ -25,6 +25,7 @@ import frc.robot.autos.*;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final Joystick driver = new Joystick(0);
+  private static final Joystick operator = new Joystick(1);
 
   /* Drive Controls */
   private final int translationAxis = XboxController.Axis.kLeftY.value;
@@ -36,9 +37,14 @@ public class RobotContainer {
       new JoystickButton(driver, XboxController.Button.kY.value);
   private final JoystickButton robotCentric =
       new JoystickButton(driver, XboxController.Button.kLeftBumper.value);
+  private final JoystickButton followObject =
+      new JoystickButton(driver, XboxController.Button.kA.value);
+  private final JoystickButton followTape =
+      new JoystickButton(driver, XboxController.Button.kB.value);
 
   /* Subsystems */
   private final SwerveDrive s_Swerve = new SwerveDrive();
+  private final Intake intake = new Intake();
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -56,6 +62,12 @@ public class RobotContainer {
   private void configureButtonBindings() {
     /* Driver Buttons */
     zeroGyro.onTrue(new InstantCommand(() -> s_Swerve.zeroGyro()));
+    followObject.whileTrue(new FollowObject(s_Swerve));
+    followTape.whileTrue(new FollowTape(s_Swerve));
+  }
+
+  public static Joystick getOperatorJoystick() {
+    return operator;
   }
   
   /**
@@ -66,6 +78,6 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
     // An example command will be run in autonomous
    // return new exampleAuto(s_Swerve);
-   return new BaseAuto(); //TODO place holder for now, replace once we have auto modes
+   return new BaseAuto(s_Swerve); //TODO place holder for now, replace once we have auto modes
   }
 }

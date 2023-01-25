@@ -4,29 +4,83 @@
 
 package frc.robot.autos;
 
+import java.util.List;
+
+import com.pathplanner.lib.PathConstraints;
+import com.pathplanner.lib.PathPlanner;
+import com.pathplanner.lib.PathPlannerTrajectory;
+import com.pathplanner.lib.commands.PPSwerveControllerCommand;
+
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.trajectory.TrajectoryConfig;
+import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
+import frc.robot.Constants;
+import frc.robot.RobotContainer;
+import frc.robot.subsystems.SwerveDrive;
 
-public class BaseAuto extends CommandBase {
-  /** Creates a new BaseAuto. */
-  public BaseAuto() {
-    // Use addRequirements() here to declare subsystem dependencies.
-  }
+public class BaseAuto extends SequentialCommandGroup {
+  public BaseAuto(SwerveDrive s_Swerve) {
+    PathPlannerTrajectory examplePath = PathPlanner.loadPath("New New New Path", new PathConstraints(4, 3.5));
+    /*  TrajectoryConfig config =
+        new TrajectoryConfig(
+                Constants.AutoConstants.kMaxSpeedMetersPerSecond,
+                Constants.AutoConstants.kMaxAccelerationMetersPerSecondSquared)
+            .setKinematics(Constants.Swerve.swerveKinematics);
+    Trajectory exampleTrajectory =
+        TrajectoryGenerator.generateTrajectory(
+            // Start at the origin facing the +X direction
+            new Pose2d(0, 0, new Rotation2d(0)),
+            // Pass through these two interior waypoints, making an 's' curve path
+            List.of(new Translation2d(1, 1), new Translation2d(2, -1)),
+            // End 3 meters straight ahead of where we started, facing forward
+            new Pose2d(3, 0, new Rotation2d(0)),
+            config);*/
 
-  // Called when the command is initially scheduled.
-  @Override
-  public void initialize() {}
+    var thetaController =
+    new ProfiledPIDController(
+      Constants.AutoConstants.kPThetaController,
+        1,
+        0.1,
+        Constants.AutoConstants.kThetaControllerConstraints);
+thetaController.enableContinuousInput(-Math.PI, Math.PI);
 
-  // Called every time the scheduler runs while the command is scheduled.
-  @Override
-  public void execute() {}
+/*SwerveControllerCommand swerveControllerCommand =
+    new SwerveControllerCommand(
+      examplePath,
+        s_Swerve::getPose,
+        Constants.Swerve.swerveKinematics,
+        new PIDController(Constants.AutoConstants.kPXController, 1, 0.1),
+        new PIDController(Constants.AutoConstants.kPYController, 1, 0.1),
+        thetaController,
+        s_Swerve::setModuleStates,
+        s_Swerve);*/
+  PPSwerveControllerCommand swerveControllerCommand =
+    new PPSwerveControllerCommand(
+      examplePath, 
+      s_Swerve::getPose, // Pose supplier
+      Constants.Swerve.swerveKinematics, // SwerveDriveKinematics
+      new PIDController(5, 1, 0.7), // X controller. Tune these values for your robot. Leaving them 0 will only use feedforwards.
+      new PIDController(5, 1, 0.7), // Y controller (usually the same values as X controller)
+      new PIDController(4, 1, 0.7), // Rotation controller. Tune these values for your robot. Leaving them 0 will only use feedforwards.
+      s_Swerve::setModuleStates, // Module states consumer
+      false,
+      s_Swerve // Requires this drive subsystem
+);
 
-  // Called once the command ends or is interrupted.
-  @Override
-  public void end(boolean interrupted) {}
 
-  // Returns true when the command should end.
-  @Override
-  public boolean isFinished() {
-    return false;
+//addCommands(
+     // s_Swerve.followTrajectoryCommand(examplePath, true));
+     addCommands(
+         new InstantCommand(() -> s_Swerve.resetOdometry(examplePath.getInitialHolonomicPose())),
+         swerveControllerCommand);
   }
 }

@@ -153,13 +153,15 @@ public class SwerveModule {
     return Rotation2d.fromDegrees(angleEncoderTemp.getAbsolutePosition() * 360); //TODO may need the if statements with the offsets here like we had in the other code
     //return Rotation2d.fromDegrees(angleEncoder.getAbsolutePosition()); //TODO uncomment once we have can coders
   }
-
+  public double getDriveEncoderPosition() {
+    return driveEncoder.getPosition();
+  }
   public SwerveModuleState getState() {
     return new SwerveModuleState(driveEncoder.getVelocity(), getAngle());
   }
   public SwerveModulePosition getPosition(){
     return new SwerveModulePosition(
-        driveEncoder.getPosition() * (Constants.Swerve.wheelCircumference / (Constants.Swerve.driveGearRatio * 2048.0)), //TODO this line is kinda sus, its for falcons might need to change for neos
+        driveEncoder.getPosition(), //* (Constants.Swerve.wheelCircumference / (Constants.Swerve.driveGearRatio * 2048.0)), //TODO this line is kinda sus, its for falcons might need to change for neos
         getAngle()
     );
 }
