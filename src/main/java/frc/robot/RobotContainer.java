@@ -41,6 +41,8 @@ public class RobotContainer {
       new JoystickButton(driver, XboxController.Button.kA.value);
   private final JoystickButton followTape =
       new JoystickButton(driver, XboxController.Button.kB.value);
+  private final JoystickButton autoBalance =
+      new JoystickButton(driver, XboxController.Button.kX.value);
 
   /* Subsystems */
   private final SwerveDrive s_Swerve = new SwerveDrive();
@@ -64,6 +66,7 @@ public class RobotContainer {
     zeroGyro.onTrue(new InstantCommand(() -> s_Swerve.zeroGyro()));
     followObject.whileTrue(new FollowObject(s_Swerve));
     followTape.whileTrue(new FollowTape(s_Swerve));
+    autoBalance.whileTrue(new AutoBalance(s_Swerve));
   }
 
   public static Joystick getOperatorJoystick() {

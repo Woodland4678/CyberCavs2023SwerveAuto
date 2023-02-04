@@ -41,6 +41,7 @@ public class SwerveDrive extends SubsystemBase {
     limelight.getEntry("pipeline").setNumber(1);
     gyro = new AHRS(SPI.Port.kMXP, (byte) 200); // NavX connected over MXP
     //gyro.restoreFactoryDefaults(); //for Pigeon
+    gyro.calibrate();
     zeroGyro();
     
 
@@ -148,8 +149,12 @@ public class SwerveDrive extends SubsystemBase {
         }
     //
     //    // We have to invert the angle of the NavX so that rotating the robot counter-clockwise makes the angle increase.
-        return Rotation2d.fromDegrees(360.0 - gyro.getYaw());
+        return Rotation2d.fromDegrees(- gyro.getYaw());
   }
+  public float getGyroRoll() {
+    return gyro.getRoll();
+  }
+  
   public Command followTrajectoryCommand(PathPlannerTrajectory traj, boolean isFirstPath) {
     return new SequentialCommandGroup(
          new InstantCommand(() -> {
@@ -200,5 +205,15 @@ public class SwerveDrive extends SubsystemBase {
                 "Limelight obj size", getLimelightObjectSize());
     SmartDashboard.putNumber(
                   "Swerve Yaw", getYaw().getDegrees());
+    SmartDashboard.putNumber(
+                  "gyro pitch", gyro.getPitch());
+    SmartDashboard.putNumber(
+                  "gyro Roll", gyro.getRoll());
+                  SmartDashboard.putNumber(
+                  "gyro Accel X", gyro.getRawAccelX());
+                  SmartDashboard.putNumber(
+                  "gyro Accel Y", gyro.getRawAccelY());
+                  SmartDashboard.putNumber(
+                  "gyro Accel Z", gyro.getRawAccelZ());
   }
 }

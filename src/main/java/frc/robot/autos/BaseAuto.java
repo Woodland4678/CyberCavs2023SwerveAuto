@@ -25,11 +25,16 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
+import frc.robot.commands.FollowObject;
+import frc.robot.commands.FollowTape;
 import frc.robot.subsystems.SwerveDrive;
 
 public class BaseAuto extends SequentialCommandGroup {
   public BaseAuto(SwerveDrive s_Swerve) {
-    PathPlannerTrajectory examplePath = PathPlanner.loadPath("New New New Path", new PathConstraints(4, 3.5));
+    PathPlannerTrajectory examplePath = PathPlanner.loadPath("Test Path 3", new PathConstraints(4, 4));
+    PathPlannerTrajectory path2 = PathPlanner.loadPath("Test Path 4", new PathConstraints(4, 4));
+    PathPlannerTrajectory path3 = PathPlanner.loadPath("Test Path 5", new PathConstraints(4, 4));
+    PathPlannerTrajectory path4 = PathPlanner.loadPath("Test Path 6", new PathConstraints(4, 4));
     /*  TrajectoryConfig config =
         new TrajectoryConfig(
                 Constants.AutoConstants.kMaxSpeedMetersPerSecond,
@@ -75,12 +80,56 @@ thetaController.enableContinuousInput(-Math.PI, Math.PI);
       false,
       s_Swerve // Requires this drive subsystem
 );
+PPSwerveControllerCommand swerveControllerCommand2 =
+new PPSwerveControllerCommand(
+  path2, 
+  s_Swerve::getPose, // Pose supplier
+  Constants.Swerve.swerveKinematics, // SwerveDriveKinematics
+  new PIDController(5, 1, 0.7), // X controller. Tune these values for your robot. Leaving them 0 will only use feedforwards.
+  new PIDController(5, 1, 0.7), // Y controller (usually the same values as X controller)
+  new PIDController(4, 1, 0.7), // Rotation controller. Tune these values for your robot. Leaving them 0 will only use feedforwards.
+  s_Swerve::setModuleStates, // Module states consumer
+  false,
+  s_Swerve // Requires this drive subsystem
+);
+PPSwerveControllerCommand swerveControllerCommand3 =
+new PPSwerveControllerCommand(
+  path3, 
+  s_Swerve::getPose, // Pose supplier
+  Constants.Swerve.swerveKinematics, // SwerveDriveKinematics
+  new PIDController(5, 1, 0.7), // X controller. Tune these values for your robot. Leaving them 0 will only use feedforwards.
+  new PIDController(5, 1, 0.7), // Y controller (usually the same values as X controller)
+  new PIDController(4, 1, 0.7), // Rotation controller. Tune these values for your robot. Leaving them 0 will only use feedforwards.
+  s_Swerve::setModuleStates, // Module states consumer
+  false,
+  s_Swerve // Requires this drive subsystem
+);
+PPSwerveControllerCommand swerveControllerCommand4 =
+new PPSwerveControllerCommand(
+  path4, 
+  s_Swerve::getPose, // Pose supplier
+  Constants.Swerve.swerveKinematics, // SwerveDriveKinematics
+  new PIDController(5, 1, 0.7), // X controller. Tune these values for your robot. Leaving them 0 will only use feedforwards.
+  new PIDController(5, 1, 0.7), // Y controller (usually the same values as X controller)
+  new PIDController(4, 1, 0.7), // Rotation controller. Tune these values for your robot. Leaving them 0 will only use feedforwards.
+  s_Swerve::setModuleStates, // Module states consumer
+  false,
+  s_Swerve // Requires this drive subsystem
+);
 
 
 //addCommands(
      // s_Swerve.followTrajectoryCommand(examplePath, true));
      addCommands(
          new InstantCommand(() -> s_Swerve.resetOdometry(examplePath.getInitialHolonomicPose())),
-         swerveControllerCommand);
+         swerveControllerCommand,
+         new FollowObject(s_Swerve),
+         swerveControllerCommand2,
+         new FollowTape(s_Swerve),
+         swerveControllerCommand3,
+         new FollowObject(s_Swerve),
+         swerveControllerCommand4,
+         new FollowTape(s_Swerve)
+         );
   }
 }

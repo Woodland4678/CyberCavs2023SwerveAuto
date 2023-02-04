@@ -16,7 +16,7 @@ import frc.robot.Constants.Swerve;
 import frc.robot.subsystems.SwerveDrive;
 
 public class FollowObject extends CommandBase {
-  private static final TrapezoidProfile.Constraints X_CONSTRAINTS = new TrapezoidProfile.Constraints(1, 1);
+  private static final TrapezoidProfile.Constraints X_CONSTRAINTS = new TrapezoidProfile.Constraints(2, 3);
   private final ProfiledPIDController xController = new ProfiledPIDController(0.1, 0.001, 0, X_CONSTRAINTS);
 
  // private static final TrapezoidProfile.Constraints R_CONSTRAINTS = new TrapezoidProfile.Constraints(1, 1);
@@ -28,6 +28,8 @@ public class FollowObject extends CommandBase {
   PIDController rController = new PIDController(0.1, 0.0001, 0);
   private SlewRateLimiter rLimiter = new SlewRateLimiter(0.5);
  SwerveDrive s_Swerve;
+ boolean isDone = false;
+ int isInPosCnt = 0;
   /** Creates a new FollowObject. */
   public FollowObject(SwerveDrive s_Swerve) {
     this.s_Swerve = s_Swerve;
@@ -38,9 +40,11 @@ public class FollowObject extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    isDone = false;
+    isInPosCnt = 0;
     xController.setGoal(0);
     //yController.setGoal(0);
-    rController.setSetpoint(360);
+    rController.setSetpoint(0);
     yController.setSetpoint(0);
     xController.setTolerance(1);
     yController.setTolerance(1);
@@ -51,8 +55,11 @@ public class FollowObject extends CommandBase {
   @Override
   public void execute() {
     var robotPose = new Pose2d();
-    
-    //var rSpeed = rController.calculate(s_Swerve.getYaw().getDegrees());
+    var degrees =s_Swerve.getYaw().getDegrees();
+    //if (degrees < 0) {
+     // degrees += 360;
+   // }
+    var rSpeed = rController.calculate(degrees);
     var xSpeed = xController.calculate(s_Swerve.getLimelightX());
     var ySpeed = yController.calculate(s_Swerve.getLimelightY());
     // if (Math.abs(rSpeed) < 0.7) {
@@ -70,7 +77,16 @@ public class FollowObject extends CommandBase {
     // SmartDashboard.putNumber(
     //               "rSpeed",0);
     
-    s_Swerve.drive(translation, 0, false, true);
+    s_Swerve.drive(translation, rSpeed, false, true);
+    if (s_Swerve.getLimelightY() < 0.2) {
+      isInPosCnt++;
+    }
+    else {
+      isInPosCnt = 0;
+    }
+    if (isInPosCnt > 15) {
+      isDone = true;
+    }
   }
 
   // Called once the command ends or is interrupted.
@@ -82,6 +98,6 @@ public class FollowObject extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return isDone;
   }
 }

@@ -18,7 +18,7 @@ import frc.robot.Constants.Swerve;
 import frc.robot.subsystems.SwerveDrive;
 
 public class FollowTape extends CommandBase {
-  private static final TrapezoidProfile.Constraints X_CONSTRAINTS = new TrapezoidProfile.Constraints(2, 1);
+  private static final TrapezoidProfile.Constraints X_CONSTRAINTS = new TrapezoidProfile.Constraints(2, 2);
   private final ProfiledPIDController xController = new ProfiledPIDController(0.1, 0.001, 0, X_CONSTRAINTS);
 
  // private static final TrapezoidProfile.Constraints R_CONSTRAINTS = new TrapezoidProfile.Constraints(1, 1);
@@ -27,9 +27,11 @@ public class FollowTape extends CommandBase {
   //private static final TrapezoidProfile.Constraints Y_CONSTRAINTS = new TrapezoidProfile.Constraints(1, 1);
  // private final ProfiledPIDController yController = new ProfiledPIDController(0.1, 0.1, 0.01, Y_CONSTRAINTS);
   PIDController yController = new PIDController(0.15, 0.005, 0);
-  PIDController rController = new PIDController(0.1, 0.0001, 0);
+  PIDController rController = new PIDController(0.15, 0.0005, 0);
   private SlewRateLimiter rLimiter = new SlewRateLimiter(2);
  SwerveDrive s_Swerve;
+ boolean isDone = false;
+ int isInPosCnt = 0;
   /** Creates a new FollowObject. */
   public FollowTape(SwerveDrive s_Swerve) {
     this.s_Swerve = s_Swerve;
@@ -42,7 +44,7 @@ public class FollowTape extends CommandBase {
   public void initialize() {
     xController.setGoal(0);
     //yController.setGoal(0);
-    rController.setSetpoint(360);
+    rController.setSetpoint(180);
     yController.setSetpoint(23.3);
     xController.setTolerance(1);
     yController.setTolerance(1);
@@ -54,7 +56,11 @@ public class FollowTape extends CommandBase {
   public void execute() {
     var robotPose = new Pose2d();
     if (s_Swerve.limelightHasTarget() == 1) {
-      var rSpeed = rController.calculate(s_Swerve.getYaw().getDegrees());
+      var degrees =s_Swerve.getYaw().getDegrees();
+      if (degrees < 0) {
+        degrees += 360;
+      }
+      var rSpeed = rController.calculate(degrees);
       var xSpeed = xController.calculate(s_Swerve.getLimelightX());
       var ySpeed = yController.calculate(s_Swerve.getLimelightY());
       // if (Math.abs(rSpeed) < 0.7) {
@@ -73,6 +79,15 @@ public class FollowTape extends CommandBase {
                     "rSpeed",rSpeed);
       
       s_Swerve.drive(translation, rSpeed, false, true);
+      if (s_Swerve.getLimelightY() > 23) {
+        isInPosCnt++;
+      }
+      else {
+        isInPosCnt = 0;
+      }
+      if (isInPosCnt > 20) {
+        isDone = true;
+      }
     }
     else {
       s_Swerve.stop();
@@ -88,6 +103,6 @@ public class FollowTape extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return isDone;
   }
 }
