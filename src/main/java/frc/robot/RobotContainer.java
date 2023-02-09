@@ -43,10 +43,12 @@ public class RobotContainer {
       new JoystickButton(driver, XboxController.Button.kB.value);
   private final JoystickButton autoBalance =
       new JoystickButton(driver, XboxController.Button.kX.value);
-
+  private final JoystickButton openClaw = 
+      new JoystickButton(driver, XboxController.Button.kRightBumper.value);
   /* Subsystems */
   private final SwerveDrive s_Swerve = new SwerveDrive();
   private final Intake intake = new Intake();
+  private final Arm armSubsystem = new Arm();
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -67,6 +69,7 @@ public class RobotContainer {
     followObject.whileTrue(new FollowObject(s_Swerve));
     followTape.whileTrue(new FollowTape(s_Swerve));
     autoBalance.whileTrue(new AutoBalance(s_Swerve));
+    openClaw.onTrue(new OpenClaw(armSubsystem));
   }
 
   public static Joystick getOperatorJoystick() {

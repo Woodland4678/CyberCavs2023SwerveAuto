@@ -59,6 +59,7 @@ public class FollowObject extends CommandBase {
     //if (degrees < 0) {
      // degrees += 360;
    // }
+   var coneAngle = s_Swerve.getConeAngle();
     var rSpeed = rController.calculate(degrees);
     var xSpeed = xController.calculate(s_Swerve.getLimelightX());
     var ySpeed = yController.calculate(s_Swerve.getLimelightY());
@@ -76,6 +77,8 @@ public class FollowObject extends CommandBase {
                   "ySpeed",ySpeed);
     // SmartDashboard.putNumber(
     //               "rSpeed",0);
+    //SmartDashboard.putNumber(
+    //              "coneAngle",coneAngle);
     
     s_Swerve.drive(translation, rSpeed, false, true);
     if (s_Swerve.getLimelightY() < 0.2) {

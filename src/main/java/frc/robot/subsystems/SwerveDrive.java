@@ -33,10 +33,12 @@ public class SwerveDrive extends SubsystemBase {
   private SwerveModule[] mSwerveMods;
 
   private NetworkTable limelight;
+  private NetworkTable rpi;
 
   private Field2d field;
 
   public SwerveDrive() {
+    rpi = NetworkTableInstance.getDefault().getTable("rpi");
     limelight = NetworkTableInstance.getDefault().getTable("limelight");
     limelight.getEntry("pipeline").setNumber(1);
     gyro = new AHRS(SPI.Port.kMXP, (byte) 200); // NavX connected over MXP
@@ -100,7 +102,9 @@ public class SwerveDrive extends SubsystemBase {
   public double getLimelightObjectSize() {
     return limelight.getEntry("ta").getDouble(0);
   }
-
+  public double getConeAngle() {
+    return rpi.getEntry("tv_angle").getDouble(0);
+  }
   public double getLimelightY() {
     return limelight.getEntry("ty").getDouble(0);
   }
@@ -215,5 +219,7 @@ public class SwerveDrive extends SubsystemBase {
                   "gyro Accel Y", gyro.getRawAccelY());
                   SmartDashboard.putNumber(
                   "gyro Accel Z", gyro.getRawAccelZ());
+                  SmartDashboard.putNumber(
+                    "Cone angle", getConeAngle());
   }
 }
