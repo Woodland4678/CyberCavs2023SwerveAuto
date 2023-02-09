@@ -161,7 +161,56 @@ public final class Constants {
             kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared);
   }
   public static final class IntakeConstants{
-    public static final int leftMotorCanId = 9;
-    public static final int rightMotorCanId = 10;
+    public static final int leftMotorCanId = -1; //TODO if we add intake change these
+    public static final int rightMotorCanId = -1;
+  }
+
+  public static final class ArmConstants{
+    public static final int shoulderLeaderMotorCanId = 9;
+    public static final int shoulderFollowerMotorCanId = 10;
+
+    public static final int elbowLeaderMotorCanId = 11;
+    public static final int elbowFollowerMotorCanId = 12;
+
+    public static final int wristVerticalCanId = 13;
+    public static final int wristHorizontalCanId = 14;
+
+    public static final int pneumaticClawChannel = 1;
+
+    public static final double shoulderGearRatio = (60 / 1.0); // TODO what is the actual ratio?
+    public static final double elbowGearRatio = (60 / 1.0); // TODO what is the actual rati0
+    public static final double wristHorizontalGearRatio = (60 / 1.0); // TODO what is the actual ratio
+    public static final double wristVerticalGearRatio = (60 / 1.0); // TODO what is the actual ratio
+
+    public static final double shoulderAngleConversionFactor = 360 / shoulderGearRatio;
+    public static final double elbowAngleConversionFactor = 360 / elbowGearRatio;
+    public static final double wristHorizontalAngleConversionFactor = 360 / wristHorizontalGearRatio;
+    public static final double wristVerticalAngleConversionFactor = 360 / wristVerticalGearRatio;
+
+    public static final double shoulderLength = 37;
+    public static final double elbowLength = 36;
+
+    public static final int shoulderEncoderAbsoluteID = 4;
+    public static final int elbowEncoderAbsoluteID = 5;
+
+    public static final double shoulderP = 0.1;
+    public static final double shoulderI = 0.0;
+    public static final double shoulderD = 0.0;
+    public static final double shoulderFF = 0.0;
+
+    public static final double elbowP = 0.1;
+    public static final double elbowI = 0.0;
+    public static final double elbowD = 0.0;
+    public static final double elbowFF = 0.0;
+
+    public static final double wristVerticalP = 0.1;
+    public static final double wristVerticalI = 0.0;
+    public static final double wristVerticalD = 0.0;
+    public static final double wristVerticalFF = 0.0;
+
+    public static final double wristHorizontalP = 0.1;
+    public static final double wristHorizontalI = 0.0;
+    public static final double wristHorizontalD = 0.0;
+    public static final double wristHorizontalFF = 0.0;
   }
 }
