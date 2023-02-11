@@ -113,7 +113,7 @@ public class Arm extends SubsystemBase {
   }
 
   public void MoveArm(int x, int y) {
-    double elbowAngle =  - Math.acos(((x * x) + (y * y) - (Constants.ArmConstants.shoulderLength * Constants.ArmConstants.shoulderLength) - (Constants.ArmConstants.elbowLength * Constants.ArmConstants.elbowLength)) / (2 * Constants.ArmConstants.shoulderLength * Constants.ArmConstants.elbowLength));
+    double elbowAngle =  - Math.acos(((x * x) + (y * y) - (Math.pow(Constants.ArmConstants.shoulderLength, 2)) - (Math.pow(Constants.ArmConstants.elbowLength, 2))) / (2 * Constants.ArmConstants.shoulderLength * Constants.ArmConstants.elbowLength));
     double shoulderAngle = Math.atan(y / x) + Math.atan((Constants.ArmConstants.elbowLength * Math.sin(elbowAngle)) / (Constants.ArmConstants.elbowLength + Constants.ArmConstants.shoulderLength * Math.cos(elbowAngle)));
     elbowAngle = shoulderAngle - elbowAngle; //get elbow angle relative to horizontal rather than relative to shoulder angle.
     shoulderController.setReference(shoulderAngle, com.revrobotics.CANSparkMax.ControlType.kPosition);
@@ -139,7 +139,7 @@ public class Arm extends SubsystemBase {
         elbowController.setSmartMotionMaxVelocity(maxVelocityElbow, 0);
         elbowController.setSmartMotionMaxAccel(accelElbow, 0);
 
-        elbowTargetAngle =  - Math.acos(((x * x) + (y * y) - (Constants.ArmConstants.shoulderLength * Constants.ArmConstants.shoulderLength) - (Constants.ArmConstants.elbowLength * Constants.ArmConstants.elbowLength)) / (2 * Constants.ArmConstants.shoulderLength * Constants.ArmConstants.elbowLength));
+        elbowTargetAngle =   - Math.acos(((x * x) + (y * y) - (Math.pow(Constants.ArmConstants.shoulderLength, 2)) - (Math.pow(Constants.ArmConstants.elbowLength, 2))) / (2 * Constants.ArmConstants.shoulderLength * Constants.ArmConstants.elbowLength));
         shoulderTargetAngle = Math.atan(y / x) + Math.atan((Constants.ArmConstants.elbowLength * Math.sin(elbowTargetAngle)) / (Constants.ArmConstants.elbowLength + Constants.ArmConstants.shoulderLength * Math.cos(elbowTargetAngle)));
         elbowTargetAngle = shoulderTargetAngle - elbowTargetAngle; //get the elbow target relative to horizontal rather than relative to the shoulder angle
         smartMovementState++;
