@@ -24,7 +24,7 @@ public class FollowObject extends CommandBase {
 
   //private static final TrapezoidProfile.Constraints Y_CONSTRAINTS = new TrapezoidProfile.Constraints(1, 1);
  // private final ProfiledPIDController yController = new ProfiledPIDController(0.1, 0.1, 0.01, Y_CONSTRAINTS);
-  PIDController yController = new PIDController(0.5, 0.001, 0);
+  PIDController yController = new PIDController(0.1, 0.001, 0);
   PIDController rController = new PIDController(0.1, 0.0001, 0);
   private SlewRateLimiter rLimiter = new SlewRateLimiter(0.5);
  SwerveDrive s_Swerve;
@@ -45,10 +45,10 @@ public class FollowObject extends CommandBase {
     xController.setGoal(0);
     //yController.setGoal(0);
     rController.setSetpoint(0);
-    yController.setSetpoint(0);
+    yController.setSetpoint(14.7);
     xController.setTolerance(1);
     yController.setTolerance(1);
-    s_Swerve.setLimelightPipeline(1);
+    s_Swerve.setLimelightPipeline(0);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -59,10 +59,11 @@ public class FollowObject extends CommandBase {
     //if (degrees < 0) {
      // degrees += 360;
    // }
+   var boundingBoxXY = s_Swerve.getBoundingBoxX();
    var coneAngle = s_Swerve.getConeAngle();
     var rSpeed = rController.calculate(degrees);
     var xSpeed = xController.calculate(s_Swerve.getLimelightX());
-    var ySpeed = yController.calculate(s_Swerve.getLimelightY());
+    var ySpeed = yController.calculate(s_Swerve.getLimelightObjectSize());
     // if (Math.abs(rSpeed) < 0.7) {
     //   xSpeed = rLimiter.calculate(rController.calculate(s_Swerve.getYaw().getDegrees()));
     // }
@@ -70,7 +71,7 @@ public class FollowObject extends CommandBase {
     //   ySpeed = ySpeed * 0.5;
     //   xSpeed = 0;
     // }
-    Translation2d translation = new Translation2d(-ySpeed, xSpeed);
+    Translation2d translation = new Translation2d(ySpeed, xSpeed);
     SmartDashboard.putNumber(
                 "xSpeed",xSpeed);
     SmartDashboard.putNumber(
@@ -80,7 +81,7 @@ public class FollowObject extends CommandBase {
     //SmartDashboard.putNumber(
     //              "coneAngle",coneAngle);
     
-    s_Swerve.drive(translation, rSpeed, false, true);
+    s_Swerve.drive(translation, 0, false, true);
     if (s_Swerve.getLimelightY() < 0.2) {
       isInPosCnt++;
     }

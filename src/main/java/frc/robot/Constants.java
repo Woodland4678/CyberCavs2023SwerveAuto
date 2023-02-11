@@ -110,7 +110,7 @@ public final class Constants {
       public static final int driveMotorID = 1;
       public static final int angleMotorID = 2;
       public static final int canCoderID = 2;
-      public static final Rotation2d angleOffset = Rotation2d.fromDegrees(325.13);
+      public static final Rotation2d angleOffset = Rotation2d.fromDegrees( 211.4);
       public static final SwerveModuleConstants constants =
           new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
     }
@@ -120,7 +120,7 @@ public final class Constants {
       public static final int driveMotorID = 3;
       public static final int angleMotorID = 4;
       public static final int canCoderID = 3;
-      public static final Rotation2d angleOffset = Rotation2d.fromDegrees(237.5);
+      public static final Rotation2d angleOffset = Rotation2d.fromDegrees(350);
       public static final SwerveModuleConstants constants =
           new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
     }
@@ -130,7 +130,7 @@ public final class Constants {
       public static final int driveMotorID = 7;
       public static final int angleMotorID = 8;
       public static final int canCoderID = 0;
-      public static final Rotation2d angleOffset = Rotation2d.fromDegrees(33.87);
+      public static final Rotation2d angleOffset = Rotation2d.fromDegrees(319.0);
       public static final SwerveModuleConstants constants =
           new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
     }
@@ -140,7 +140,7 @@ public final class Constants {
       public static final int driveMotorID = 5;
       public static final int angleMotorID = 6;
       public static final int canCoderID = 1;
-      public static final Rotation2d angleOffset = Rotation2d.fromDegrees(294.181);
+      public static final Rotation2d angleOffset = Rotation2d.fromDegrees(303);
       public static final SwerveModuleConstants constants =
           new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
     }
@@ -161,8 +161,8 @@ public final class Constants {
             kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared);
   }
   public static final class IntakeConstants{
-    public static final int leftMotorCanId = -1; //TODO if we add intake change these
-    public static final int rightMotorCanId = -1;
+    public static final int leftMotorCanId = 69; //TODO if we add intake change these
+    public static final int rightMotorCanId = 420;
   }
 
   public static final class ArmConstants{
@@ -181,6 +181,9 @@ public final class Constants {
     public static final double elbowGearRatio = (60 / 1.0); // TODO what is the actual rati0
     public static final double wristHorizontalGearRatio = (60 / 1.0); // TODO what is the actual ratio
     public static final double wristVerticalGearRatio = (60 / 1.0); // TODO what is the actual ratio
+
+    public static final double elbowAngleOffset = 0;
+    public static final double shoulderAngleOffset = 0;
 
     public static final double shoulderAngleConversionFactor = 360 / shoulderGearRatio;
     public static final double elbowAngleConversionFactor = 360 / elbowGearRatio;

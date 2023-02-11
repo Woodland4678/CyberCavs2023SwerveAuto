@@ -40,7 +40,7 @@ public class SwerveDrive extends SubsystemBase {
   public SwerveDrive() {
     rpi = NetworkTableInstance.getDefault().getTable("rpi");
     limelight = NetworkTableInstance.getDefault().getTable("limelight");
-    limelight.getEntry("pipeline").setNumber(1);
+    //limelight.getEntry("pipeline").setNumber(1);
     gyro = new AHRS(SPI.Port.kMXP, (byte) 200); // NavX connected over MXP
     //gyro.restoreFactoryDefaults(); //for Pigeon
     gyro.calibrate();
@@ -114,6 +114,36 @@ public class SwerveDrive extends SubsystemBase {
   public double limelightHasTarget() {
     return limelight.getEntry("tv").getDouble(0);
   }
+  public double[] getBoundingBoxX() {
+    Number[] defVal = {0,0};
+    double[] defaultReturn = {0,0};
+    var corners = limelight.getEntry("tcornxy").getNumberArray(defVal);
+    if (corners.length < 2) return defaultReturn;
+    double minX = corners[0].doubleValue();
+    double minY = corners[1].doubleValue();
+    double maxX = corners[0].doubleValue();
+    double maxY = corners[1].doubleValue();
+    for (int i = 2; i< corners.length; i += 2) {
+      double xCorner = corners[i].doubleValue();
+      double yCorner = corners[i + 1].doubleValue();
+      if (xCorner < minX) {
+        minX = xCorner;
+      }
+      if (yCorner < minY) {
+        minY = yCorner;
+      }
+      if (xCorner > maxX) {
+        maxX = xCorner;
+      }
+      if (yCorner > maxY) {
+        maxY = yCorner;
+      }
+    }
+    double xMidpoint = (maxX + minX) / 2;
+    double yMidpoint = (maxY + minY) / 2;
+    double [] midpoint = {yMidpoint, xMidpoint};
+    return midpoint;
+  }
   public void setLimelightLED(boolean state) {
     if(state == false)
       limelight.getEntry("ledMode").setNumber(1);
@@ -184,7 +214,7 @@ public class SwerveDrive extends SubsystemBase {
   public void periodic() {
     swerveOdometry.update(getYaw(), getModulePositions());
     field.setRobotPose(getPose());
-
+    double [] boundingBox = getBoundingBoxX();
     for (SwerveModule mod : mSwerveMods) {
       SmartDashboard.putNumber(
           "Mod " + mod.moduleNumber + " Cancoder", mod.getCanCoder().getDegrees());
@@ -195,6 +225,10 @@ public class SwerveDrive extends SubsystemBase {
       SmartDashboard.putNumber(
           "Drive Enc " + mod.moduleNumber, mod.getDriveEncoderPosition());
     }
+    SmartDashboard.putNumber(
+          "Bounding box Y", boundingBox[0]);
+    SmartDashboard.putNumber(
+        "Bounding box X", boundingBox[1]);
     SmartDashboard.putNumber(
           "Gyro", gyro.getAngle());
     SmartDashboard.putNumber(
