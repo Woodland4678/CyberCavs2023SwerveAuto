@@ -125,11 +125,11 @@ new PPSwerveControllerCommand(
          swerveControllerCommand,
          new FollowObject(s_Swerve),
          swerveControllerCommand2,
-         new FollowTape(s_Swerve),
+         //new FollowTape(s_Swerve),
          swerveControllerCommand3,
          new FollowObject(s_Swerve),
-         swerveControllerCommand4,
-         new FollowTape(s_Swerve)
+         swerveControllerCommand4
+         //new FollowTape(s_Swerve)
          );
   }
 }

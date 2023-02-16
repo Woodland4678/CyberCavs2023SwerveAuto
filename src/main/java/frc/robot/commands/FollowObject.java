@@ -16,16 +16,17 @@ import frc.robot.Constants.Swerve;
 import frc.robot.subsystems.SwerveDrive;
 
 public class FollowObject extends CommandBase {
-  private static final TrapezoidProfile.Constraints X_CONSTRAINTS = new TrapezoidProfile.Constraints(2, 3);
-  private final ProfiledPIDController xController = new ProfiledPIDController(0.1, 0.001, 0, X_CONSTRAINTS);
+  //private static final TrapezoidProfile.Constraints X_CONSTRAINTS = new TrapezoidProfile.Constraints(2, 3);
+  //private final ProfiledPIDController xController = new ProfiledPIDController(0.04, 0.001, 0, X_CONSTRAINTS);
 
  // private static final TrapezoidProfile.Constraints R_CONSTRAINTS = new TrapezoidProfile.Constraints(1, 1);
   //private final ProfiledPIDController rController = new ProfiledPIDController(0.1, 0.001, 0, R_CONSTRAINTS);
 
   //private static final TrapezoidProfile.Constraints Y_CONSTRAINTS = new TrapezoidProfile.Constraints(1, 1);
  // private final ProfiledPIDController yController = new ProfiledPIDController(0.1, 0.1, 0.01, Y_CONSTRAINTS);
-  PIDController yController = new PIDController(0.1, 0.001, 0);
-  PIDController rController = new PIDController(0.1, 0.0001, 0);
+  PIDController yController = new PIDController(0.03, 0, 0);
+   PIDController xController = new PIDController(0.1, 0, 0);
+  PIDController rController = new PIDController(0.04, 0.0001, 0);
   private SlewRateLimiter rLimiter = new SlewRateLimiter(0.5);
  SwerveDrive s_Swerve;
  boolean isDone = false;
@@ -42,13 +43,15 @@ public class FollowObject extends CommandBase {
   public void initialize() {
     isDone = false;
     isInPosCnt = 0;
-    xController.setGoal(0);
+    //xController.setGoal(0);
     //yController.setGoal(0);
-    rController.setSetpoint(0);
-    yController.setSetpoint(14.7);
-    xController.setTolerance(1);
-    yController.setTolerance(1);
-    s_Swerve.setLimelightPipeline(0);
+    rController.setSetpoint(s_Swerve.getYaw().getDegrees());
+    yController.setSetpoint(119.5);
+    xController.setSetpoint(0);
+    xController.setTolerance(5);
+    yController.setTolerance(3);
+    rController.setTolerance(2);
+    s_Swerve.setLimelightPipeline(1);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -63,7 +66,9 @@ public class FollowObject extends CommandBase {
    var coneAngle = s_Swerve.getConeAngle();
     var rSpeed = rController.calculate(degrees);
     var xSpeed = xController.calculate(s_Swerve.getLimelightX());
-    var ySpeed = yController.calculate(s_Swerve.getLimelightObjectSize());
+    var ySpeed = yController.calculate(s_Swerve.getBoundingBoxX()[0]);
+    //var ySpeed = yController.calculate(s_Swerve.getLimelightObjectSize());
+    //var ySpeed = yController.calculate(s_Swerve.getLimelightObjectSize());
     // if (Math.abs(rSpeed) < 0.7) {
     //   xSpeed = rLimiter.calculate(rController.calculate(s_Swerve.getYaw().getDegrees()));
     // }
@@ -81,7 +86,7 @@ public class FollowObject extends CommandBase {
     //SmartDashboard.putNumber(
     //              "coneAngle",coneAngle);
     
-    s_Swerve.drive(translation, 0, false, true);
+    s_Swerve.drive(translation, rSpeed, false, true);
     if (s_Swerve.getLimelightY() < 0.2) {
       isInPosCnt++;
     }

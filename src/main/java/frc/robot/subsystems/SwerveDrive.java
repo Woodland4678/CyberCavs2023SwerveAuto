@@ -25,6 +25,9 @@ import com.pathplanner.lib.commands.PPSwerveControllerCommand;
 
 import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
+import frc.robot.LimelightHelpers;
+import frc.robot.RobotContainer;
+import frc.robot.LimelightHelpers.LimelightResults;
 
 public class SwerveDrive extends SubsystemBase {
   private final AHRS gyro;
@@ -91,7 +94,9 @@ public class SwerveDrive extends SubsystemBase {
   public Pose2d getPose() {
     return swerveOdometry.getPoseMeters();
   }
-
+  public LimelightResults getLimelightResults() {
+    return LimelightHelpers.getLatestResults("limelight");
+  }
   public void resetOdometry(Pose2d pose) {
     swerveOdometry.resetPosition(getYaw(), getModulePositions(), pose);
   }
@@ -212,6 +217,10 @@ public class SwerveDrive extends SubsystemBase {
 
   @Override
   public void periodic() {
+    int targetToGet = 0;
+    if (RobotContainer.getDriverJoystick().getRawButton(6)) {
+      targetToGet = 1;
+    }
     swerveOdometry.update(getYaw(), getModulePositions());
     field.setRobotPose(getPose());
     double [] boundingBox = getBoundingBoxX();
@@ -255,5 +264,7 @@ public class SwerveDrive extends SubsystemBase {
                   "gyro Accel Z", gyro.getRawAccelZ());
                   SmartDashboard.putNumber(
                     "Cone angle", getConeAngle());
+                  SmartDashboard.putNumber( 
+                  "limelight result x", getLimelightResults().targetingResults.targets_Retro.length);
   }
 }

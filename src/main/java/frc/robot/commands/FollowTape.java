@@ -12,6 +12,7 @@ import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.Swerve;
@@ -30,11 +31,13 @@ public class FollowTape extends CommandBase {
   PIDController rController = new PIDController(0.15, 0.0005, 0);
   private SlewRateLimiter rLimiter = new SlewRateLimiter(2);
  SwerveDrive s_Swerve;
+ Joystick driverJoystick;
  boolean isDone = false;
  int isInPosCnt = 0;
   /** Creates a new FollowObject. */
-  public FollowTape(SwerveDrive s_Swerve) {
+  public FollowTape(SwerveDrive s_Swerve, Joystick driverJoystick) {
     this.s_Swerve = s_Swerve;
+    this.driverJoystick = driverJoystick;
     addRequirements(s_Swerve);
     // Use addRequirements() here to declare subsystem dependencies.
   }

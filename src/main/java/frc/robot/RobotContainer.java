@@ -24,7 +24,7 @@ import frc.robot.autos.*;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
-  private final Joystick driver = new Joystick(0);
+  private static final Joystick driver = new Joystick(0);
   private static final Joystick operator = new Joystick(1);
 
   /* Drive Controls */
@@ -67,7 +67,7 @@ public class RobotContainer {
     /* Driver Buttons */
     zeroGyro.onTrue(new InstantCommand(() -> s_Swerve.zeroGyro()));
     followObject.whileTrue(new FollowObject(s_Swerve));
-    followTape.whileTrue(new FollowTape(s_Swerve));
+    followTape.whileTrue(new FollowTape(s_Swerve, driver));
     autoBalance.whileTrue(new AutoBalance(s_Swerve));
     moveArm.whileTrue(new MoveArm(s_Arm));
   }
@@ -75,7 +75,9 @@ public class RobotContainer {
   public static Joystick getOperatorJoystick() {
     return operator;
   }
-  
+  public static Joystick getDriverJoystick() {
+    return driver;
+  }
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
    *
