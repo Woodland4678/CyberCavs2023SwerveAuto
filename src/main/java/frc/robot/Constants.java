@@ -177,10 +177,10 @@ public final class Constants {
 
     public static final int pneumaticClawChannel = 1;
 
-    public static final double shoulderGearRatio = (60 / 1.0); // TODO what is the actual ratio?
-    public static final double elbowGearRatio = (60 / 1.0); // TODO what is the actual rati0
-    public static final double wristHorizontalGearRatio = (60 / 1.0); // TODO what is the actual ratio
-    public static final double wristVerticalGearRatio = (60 / 1.0); // TODO what is the actual ratio
+    public static final double shoulderGearRatio = (60.0 / 1.0); 
+    public static final double elbowGearRatio = ((((64/12) * 70) / 30) * 5); 
+    public static final double wristHorizontalGearRatio = (10.0 / 1.0); 
+    public static final double wristVerticalGearRatio = (75.0/ 1.0);
 
     public static final double elbowAngleOffset = 0;
     public static final double shoulderAngleOffset = 0;
@@ -215,5 +215,19 @@ public final class Constants {
     public static final double wristHorizontalI = 0.0;
     public static final double wristHorizontalD = 0.0;
     public static final double wristHorizontalFF = 0.0;
+
+    public static final double position1X = 10; //inches
+    public static final double position1Y = 10;
+
+    public static final double position2X = 30;
+    public static final double position2Y = 20;
+  }
+  public class ArmPosition{
+    public double elbowTarget = 0;
+    public double shoulderTarget = 0;
+    public ArmPosition(double elbowTarget, double shoulderTarget) {
+      this.elbowTarget = elbowTarget;
+      this.shoulderTarget = shoulderTarget;
+    }
   }
 }
