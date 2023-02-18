@@ -27,7 +27,7 @@ public class FollowTape extends CommandBase {
 
   //private static final TrapezoidProfile.Constraints Y_CONSTRAINTS = new TrapezoidProfile.Constraints(1, 1);
  // private final ProfiledPIDController yController = new ProfiledPIDController(0.1, 0.1, 0.01, Y_CONSTRAINTS);
-  PIDController yController = new PIDController(0.15, 0.005, 0);
+  PIDController yController = new PIDController(0.2, 0.01, 0);
   PIDController rController = new PIDController(0.15, 0.0005, 0);
   private SlewRateLimiter rLimiter = new SlewRateLimiter(2);
  SwerveDrive s_Swerve;
@@ -48,10 +48,12 @@ public class FollowTape extends CommandBase {
     xController.setGoal(0);
     //yController.setGoal(0);
     rController.setSetpoint(180);
-    yController.setSetpoint(23.3);
+    yController.setSetpoint(20.48);
     xController.setTolerance(1);
-    yController.setTolerance(1);
+    yController.setTolerance(0.5);
     s_Swerve.setLimelightPipeline(3);
+    isDone = false;
+    isInPosCnt = 0;
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -82,7 +84,7 @@ public class FollowTape extends CommandBase {
                     "rSpeed",rSpeed);
       
       s_Swerve.drive(translation, rSpeed, false, true);
-      if (s_Swerve.getLimelightY() > 23) {
+      if (Math.abs(s_Swerve.getLimelightY() - 20.48) < 0.5) {
         isInPosCnt++;
       }
       else {

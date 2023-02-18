@@ -43,8 +43,10 @@ public class RobotContainer {
       new JoystickButton(driver, XboxController.Button.kB.value);
   private final JoystickButton autoBalance =
       new JoystickButton(driver, XboxController.Button.kX.value);
-  private final JoystickButton moveArm = 
+  private final JoystickButton moveArmPos1 = 
       new JoystickButton(driver, XboxController.Button.kRightBumper.value);
+  private final JoystickButton moveArmPos2 = 
+      new JoystickButton(driver, XboxController.Button.kLeftBumper.value);
   /* Subsystems */
   private final SwerveDrive s_Swerve = new SwerveDrive();
   private final Intake intake = new Intake();
@@ -69,7 +71,8 @@ public class RobotContainer {
     followObject.whileTrue(new FollowObject(s_Swerve));
     followTape.whileTrue(new FollowTape(s_Swerve, driver));
     autoBalance.whileTrue(new AutoBalance(s_Swerve));
-    moveArm.whileTrue(new MoveArm(s_Arm));
+    moveArmPos1.whileTrue(new ArmMoveTrapezoidal(s_Arm, 1));
+    moveArmPos2.whileTrue(new ArmMoveTrapezoidal(s_Arm, 2));
   }
 
   public static Joystick getOperatorJoystick() {

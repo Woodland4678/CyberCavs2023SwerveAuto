@@ -10,10 +10,14 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.interfaces.Accelerometer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.ArmConstants;
@@ -46,6 +50,21 @@ public class Arm extends SubsystemBase {
   private int smartMovementState = 0;
   private double shoulderTargetAngle = 0;
   private double elbowTargetAngle = 0;
+
+  private final TrapezoidProfile.Constraints shoulderConstraints =
+      new TrapezoidProfile.Constraints(1.75, 0.75);
+ // private TrapezoidProfile.State m_goal = new TrapezoidProfile.State();
+  private TrapezoidProfile.State shoulderSetpoint = new TrapezoidProfile.State();
+  private TrapezoidProfile.State shoulderGoal = new TrapezoidProfile.State();
+  private final SimpleMotorFeedforward shoulderFeedforward = new SimpleMotorFeedforward(1, 1.5);
+
+  private final TrapezoidProfile.Constraints elbowConstraints =
+      new TrapezoidProfile.Constraints(1.75, 0.75);
+ // private TrapezoidProfile.State m_goal = new TrapezoidProfile.State();
+  private TrapezoidProfile.State elbowSetpoint = new TrapezoidProfile.State();
+  private TrapezoidProfile.State elbowGoal = new TrapezoidProfile.State();
+  private final SimpleMotorFeedforward elbowFeedforward = new SimpleMotorFeedforward(1, 1.5);
+  
   /** Creates a new Arm. */
   public Arm() {
     shoulderLeaderMotor = new CANSparkMax(ArmConstants.shoulderLeaderMotorCanId, MotorType.kBrushless);
@@ -103,7 +122,12 @@ public class Arm extends SubsystemBase {
     elbowAbsolute = new DutyCycleEncoder(ArmConstants.elbowEncoderAbsoluteID);
     resetToAbsoluteEncoder();
   }
-
+  public double getCurrentElbowPosition() {
+    return integratedElbowEncoder.getPosition();
+  }
+  public double getCurrentShoulderPosition() {
+    return integratedShoulderEncoder.getPosition();
+  }
   public void ClawOpen(){
     clawPneumatic.set(true);
   }
@@ -111,14 +135,47 @@ public class Arm extends SubsystemBase {
   public void ClawClose(){
     clawPneumatic.set( false);
   }
+  public void moveArmtrapezoidalInit(double currentElbowAngle, double currentShoulderAngle, double x, double y) {
+    
+    shoulderSetpoint.position = currentShoulderAngle;
+    shoulderSetpoint.velocity = 0;
+    elbowSetpoint.position = currentElbowAngle;
+    elbowSetpoint.velocity = 0;
+    double elbowAngle =  calcElbowAngle(x, y);
+    double shoulderAngle = calcShoulderAngle(x, y, elbowAngle);
+   // elbowAngle = shoulderAngle - elbowAngle; //get elbow angle relative to horizontal rather than relative to shoulder angle.
+    elbowGoal.position = elbowAngle;
+    elbowGoal.velocity = 0;
 
-  public void MoveArm(int x, int y) {
-    double elbowAngle =  - Math.acos(((x * x) + (y * y) - (Math.pow(Constants.ArmConstants.shoulderLength, 2)) - (Math.pow(Constants.ArmConstants.elbowLength, 2))) / (2 * Constants.ArmConstants.shoulderLength * Constants.ArmConstants.elbowLength));
-    double shoulderAngle = Math.atan(y / x) + Math.atan((Constants.ArmConstants.elbowLength * Math.sin(elbowAngle)) / (Constants.ArmConstants.elbowLength + Constants.ArmConstants.shoulderLength * Math.cos(elbowAngle)));
-    elbowAngle = shoulderAngle - elbowAngle; //get elbow angle relative to horizontal rather than relative to shoulder angle.
+    shoulderGoal.position = shoulderAngle;
+    shoulderGoal.velocity = 0;
+  }
+  public void moveArmtrapezoidal() {
+    //double elbowAngle =  - Math.acos(((x * x) + (y * y) - (Math.pow(Constants.ArmConstants.shoulderLength, 2)) - (Math.pow(Constants.ArmConstants.elbowLength, 2))) / (2 * Constants.ArmConstants.shoulderLength * Constants.ArmConstants.elbowLength));
+   // double shoulderAngle = Math.atan(y / x) + Math.atan((Constants.ArmConstants.elbowLength * Math.sin(elbowAngle)) / (Constants.ArmConstants.elbowLength + Constants.ArmConstants.shoulderLength * Math.cos(elbowAngle)));
+   // elbowAngle = shoulderAngle - elbowAngle; //get elbow angle relative to horizontal rather than relative to shoulder angle.
+    
+    var shoulderProfile = new TrapezoidProfile(shoulderConstraints, shoulderGoal, shoulderSetpoint);
+    // Retrieve the profiled setpoint for the next timestep. This setpoint moves
+    // toward the goal while obeying the constraints.
+    shoulderSetpoint = shoulderProfile.calculate(0.02);
+
+    var elbowProfile = new TrapezoidProfile(elbowConstraints, elbowGoal, elbowSetpoint);
+    // Retrieve the profiled setpoint for the next timestep. This setpoint moves
+    // toward the goal while obeying the constraints.
+    elbowSetpoint = elbowProfile.calculate(0.02);
+
+    shoulderController.setReference(shoulderSetpoint.position, com.revrobotics.CANSparkMax.ControlType.kPosition, 0, shoulderFeedforward.calculate(shoulderSetpoint.velocity)/12);
+    elbowController.setReference(elbowSetpoint.position, com.revrobotics.CANSparkMax.ControlType.kPosition, 0, elbowFeedforward.calculate(elbowSetpoint.velocity)/12);
+  }
+  public void MoveArm(double x, double y) { //TODO we shouldn't recalculate angles each time, if we use this method change it
+    double elbowAngle =  calcElbowAngle(x, y);
+    double shoulderAngle = calcShoulderAngle(x, y, elbowAngle);
+    //elbowAngle = shoulderAngle - elbowAngle; //get elbow angle relative to horizontal rather than relative to shoulder angle.
     shoulderController.setReference(shoulderAngle, com.revrobotics.CANSparkMax.ControlType.kPosition);
     elbowController.setReference(elbowAngle, com.revrobotics.CANSparkMax.ControlType.kPosition);
   }
+  
   public void resetSmartMotionState() {
     smartMovementState = 0;
   }
@@ -128,7 +185,13 @@ public class Arm extends SubsystemBase {
     wristHorizontalMotor.stopMotor();
     wristVerticalMotor.stopMotor();
   }
-  public void MoveArmSmartMotion(int x, int y, double accelShoulder, double maxVelocityShoulder, double accelElbow, double maxVelocityElbow) {
+  private double calcElbowAngle(double x, double y) {
+    return - Math.acos(((x * x) + (y * y) - (Math.pow(Constants.ArmConstants.shoulderLength, 2)) - (Math.pow(Constants.ArmConstants.elbowLength, 2))) / (2 * Constants.ArmConstants.shoulderLength * Constants.ArmConstants.elbowLength));
+  }
+  private double calcShoulderAngle(double x, double y, double calculatedElbowAngle) {
+    return Math.atan(y / x) + Math.atan((Constants.ArmConstants.elbowLength * Math.sin(calculatedElbowAngle)) / (Constants.ArmConstants.elbowLength + Constants.ArmConstants.shoulderLength * Math.cos(calculatedElbowAngle)));
+  }
+  public void MoveArmSmartMotion(double x, double y, double accelShoulder, double maxVelocityShoulder, double accelElbow, double maxVelocityElbow) {
     switch (smartMovementState) {
       case 0:
         shoulderController.setSmartMotionMaxVelocity(maxVelocityShoulder, 0);
@@ -139,9 +202,11 @@ public class Arm extends SubsystemBase {
         elbowController.setSmartMotionMaxVelocity(maxVelocityElbow, 0);
         elbowController.setSmartMotionMaxAccel(accelElbow, 0);
 
-        elbowTargetAngle =   - Math.acos(((x * x) + (y * y) - (Math.pow(Constants.ArmConstants.shoulderLength, 2)) - (Math.pow(Constants.ArmConstants.elbowLength, 2))) / (2 * Constants.ArmConstants.shoulderLength * Constants.ArmConstants.elbowLength));
-        shoulderTargetAngle = Math.atan(y / x) + Math.atan((Constants.ArmConstants.elbowLength * Math.sin(elbowTargetAngle)) / (Constants.ArmConstants.elbowLength + Constants.ArmConstants.shoulderLength * Math.cos(elbowTargetAngle)));
-        elbowTargetAngle = shoulderTargetAngle - elbowTargetAngle; //get the elbow target relative to horizontal rather than relative to the shoulder angle
+        elbowTargetAngle = calcElbowAngle(x, y);
+        shoulderTargetAngle = calcShoulderAngle(x, y, elbowTargetAngle);
+        //elbowTargetAngle =   - Math.acos(((x * x) + (y * y) - (Math.pow(Constants.ArmConstants.shoulderLength, 2)) - (Math.pow(Constants.ArmConstants.elbowLength, 2))) / (2 * Constants.ArmConstants.shoulderLength * Constants.ArmConstants.elbowLength));
+        //shoulderTargetAngle = Math.atan(y / x) + Math.atan((Constants.ArmConstants.elbowLength * Math.sin(elbowTargetAngle)) / (Constants.ArmConstants.elbowLength + Constants.ArmConstants.shoulderLength * Math.cos(elbowTargetAngle)));
+        //elbowTargetAngle = shoulderTargetAngle - elbowTargetAngle; //get the elbow target relative to horizontal rather than relative to the shoulder angle
         smartMovementState++;
       break;
       case 1:
@@ -166,6 +231,19 @@ public class Arm extends SubsystemBase {
 
   @Override
   public void periodic() {
+    
+    SmartDashboard.putNumber( 
+                  "Elbow Angle", integratedElbowEncoder.getPosition());
+    SmartDashboard.putNumber( 
+                  "Elbow Absolute", elbowAbsolute.getAbsolutePosition());
+    SmartDashboard.putNumber( 
+                  "Shoulder Absolute", shoulderAbsolute.getAbsolutePosition());
+    SmartDashboard.putNumber( 
+                  "Shoulder Angle", integratedShoulderEncoder.getPosition());
+    SmartDashboard.putNumber( 
+                  "Wrist Horizontal Angle", integratedWristHorizontalEncoder.getPosition());
+    SmartDashboard.putNumber( 
+                  "Wrist Vertical Angle", integratedWristVerticalEncoder.getPosition());
     // This method will be called once per scheduler run
   }
 }
