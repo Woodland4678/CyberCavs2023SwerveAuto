@@ -38,7 +38,7 @@ public class ArmMoveSmartMotion extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    s_Arm.MoveArmSmartMotion(targetX, targetY, 1, 1, 1, 1);
+    s_Arm.MoveArmSmartMotion(targetX, targetY, 1000, 1500, 1000, 1500); //velocities in RPM
   }
 
   // Called once the command ends or is interrupted.
