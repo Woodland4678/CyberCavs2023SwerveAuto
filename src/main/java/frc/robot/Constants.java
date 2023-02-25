@@ -111,7 +111,7 @@ public final class Constants {
       public static final int driveMotorID = 1;
       public static final int angleMotorID = 2;
       public static final int canCoderID = 3;
-      public static final Rotation2d angleOffset = Rotation2d.fromDegrees( 304.45);
+      public static final Rotation2d angleOffset = Rotation2d.fromDegrees( 49.1);
       public static final SwerveModuleConstants constants =
           new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
     }
@@ -121,7 +121,7 @@ public final class Constants {
       public static final int driveMotorID = 3;
       public static final int angleMotorID = 4;
       public static final int canCoderID = 0;
-      public static final Rotation2d angleOffset = Rotation2d.fromDegrees(288.5);
+      public static final Rotation2d angleOffset = Rotation2d.fromDegrees(213.21);
       public static final SwerveModuleConstants constants =
           new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
     }
@@ -131,7 +131,7 @@ public final class Constants {
       public static final int driveMotorID = 7;
       public static final int angleMotorID = 8;
       public static final int canCoderID = 1;
-      public static final Rotation2d angleOffset = Rotation2d.fromDegrees(230.5);
+      public static final Rotation2d angleOffset = Rotation2d.fromDegrees(81.7);
       public static final SwerveModuleConstants constants =
           new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
     }
@@ -141,7 +141,7 @@ public final class Constants {
       public static final int driveMotorID = 5;
       public static final int angleMotorID = 6;
       public static final int canCoderID = 2;
-      public static final Rotation2d angleOffset = Rotation2d.fromDegrees(236);
+      public static final Rotation2d angleOffset = Rotation2d.fromDegrees(122.2);
       public static final SwerveModuleConstants constants =
           new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
     }
@@ -179,14 +179,15 @@ public final class Constants {
     public static final int wristHorizontalCanId = 14;
 
     public static final int pneumaticClawChannel = 1;
+    public static final int pneumaticClawChannel2 = 2;
 
     public static final double shoulderGearRatio = (60.0 / 1.0); 
-    public static final double elbowGearRatio = ((((64/12) * 70) / 30) * 5); 
-    public static final double wristHorizontalGearRatio = (10.0 / 1.0); 
+    public static final double elbowGearRatio = ((((64/12) * 70) / 28) * 5); 
+    public static final double wristHorizontalGearRatio = (90/12); 
     public static final double wristVerticalGearRatio = (75.0/ 1.0);
 
     public static final double elbowAngleOffset = 105.35;
-    public static final double shoulderAngleOffset = 140.1;
+    public static final double shoulderAngleOffset = 130.25;
 
     public static final double shoulderAngleConversionFactor = (360 / shoulderGearRatio);
     public static final double elbowAngleConversionFactor = 360 / elbowGearRatio;
@@ -199,31 +200,35 @@ public final class Constants {
     public static final int shoulderEncoderAbsoluteID = 5;
     public static final int elbowEncoderAbsoluteID = 4;
 
-    public static final double shoulderP = 0.1;
+    public static final double shoulderP = 0.015;
     public static final double shoulderI = 0.0;
-    public static final double shoulderD = 0.0;
-    public static final double shoulderFF = 0.1;
+    public static final double shoulderD = 1;
+    public static final double shoulderFF = 0.00;
 
-    public static final double elbowP = 0.1;
+    public static final double elbowP = 0.015;
     public static final double elbowI = 0.0;
-    public static final double elbowD = 0.0;
-    public static final double elbowFF = 0.1;
+    public static final double elbowD = 1;
+    public static final double elbowFF = 0.00;
 
-    public static final double wristVerticalP = 0.1;
+    public static final double wristVerticalP = 0.01;
     public static final double wristVerticalI = 0.0;
     public static final double wristVerticalD = 0.0;
     public static final double wristVerticalFF = 0.0;
 
-    public static final double wristHorizontalP = 0.1;
+    public static final double wristHorizontalP = 0.001;
     public static final double wristHorizontalI = 0.0;
     public static final double wristHorizontalD = 0.0;
     public static final double wristHorizontalFF = 0.0;
 
-    public static final double position1X = 37; //inches
-    public static final double position1Y = 36;
+    public static final double position1X = 52; //inches
+    public static final double position1Y = 40;
+    public static final double position1WristAngle = -30;
+    public static final double position1WristRollAngle = 35;
 
-    public static final double position2X = 30;
-    public static final double position2Y = 20;
+    public static final double position2X = 15;
+    public static final double position2Y = 15;
+    public static final double position2WristAngle = 30;
+    public static final double position2WristRollAngle = -35;
 
     //public static final int shoulderBottomLimitSwitchChannel = 4;
     //public static final int shoulderTopLimitSwitchChannel = 5;

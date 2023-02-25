@@ -71,6 +71,8 @@ public class RobotContainer {
     followObject.whileTrue(new FollowObject(s_Swerve));
     followTape.whileTrue(new FollowTape(s_Swerve, driver));
     autoBalance.whileTrue(new AutoBalance(s_Swerve));
+    //moveArmPos1.whileTrue(new OpenClaw(s_Arm, 1));
+    //moveArmPos2.whileTrue(new OpenClaw(s_Arm, 2));
     moveArmPos1.whileTrue(new ArmMovePIDOnly(s_Arm, 1));
     moveArmPos2.whileTrue(new ArmMovePIDOnly(s_Arm, 2));
   }

@@ -15,6 +15,8 @@ public class ArmMovePIDOnly extends CommandBase {
   int pos = 1;
   double targetX;
   double targetY;
+  double wristPitch;
+  double wristRoll;
   /** Creates a new ArmMovePIDOnly. */
   public ArmMovePIDOnly(Arm s_Arm, int pos) {
     this.s_Arm = s_Arm;
@@ -29,17 +31,21 @@ public class ArmMovePIDOnly extends CommandBase {
     if (pos == 1) {
       targetX = Constants.ArmConstants.position1X;
       targetY = Constants.ArmConstants.position1Y;
+      wristPitch = Constants.ArmConstants.position1WristAngle;
+      wristRoll = Constants.ArmConstants.position1WristRollAngle;
     }
     else {
       targetX = Constants.ArmConstants.position2X;
       targetY = Constants.ArmConstants.position2Y;
+      wristPitch = Constants.ArmConstants.position2WristAngle;
+      wristRoll = Constants.ArmConstants.position2WristRollAngle;
     }
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    s_Arm.MoveArm(targetX, targetY);
+    s_Arm.MoveArm(targetX, targetY, wristPitch, wristRoll);
   }
 
   // Called once the command ends or is interrupted.

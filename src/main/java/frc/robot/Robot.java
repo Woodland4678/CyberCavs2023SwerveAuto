@@ -172,17 +172,17 @@ public class Robot extends TimedRobot {
     double shoulderFF = SmartDashboard.getNumber("Shoulder Feed Forward", 0);
 
     // if PID coefficients on SmartDashboard have changed, write new values to controller
-    if((elbowP != elbowKP)) { m_robotContainer.setElbowPIDF(elbowP, elbowI, elbowD, elbowIZ, elbowFF); elbowKP = elbowP; }
-    if((elbowI != elbowKI)) { m_robotContainer.setElbowPIDF(elbowP, elbowI, elbowD, elbowIZ, elbowFF); elbowKI = elbowI; }
-    if((elbowD != elbowKD)) { m_robotContainer.setElbowPIDF(elbowP, elbowI, elbowD, elbowIZ, elbowFF); elbowKD = elbowD; }
-    if((elbowIZ != elbowIZ)) { m_robotContainer.setElbowPIDF(elbowP, elbowI, elbowD, elbowIZ, elbowFF); elbowKIz = elbowIZ; }
-    if((elbowFF != elbowKFF)) { m_robotContainer.setElbowPIDF(elbowP, elbowI, elbowD, elbowIZ, elbowFF); elbowKFF = elbowFF; }
+    if((elbowP != elbowKP)) { m_robotContainer.setElbowPIDF(elbowP, elbowI, elbowIZ, elbowD, elbowFF); elbowKP = elbowP; }
+    if((elbowI != elbowKI)) { m_robotContainer.setElbowPIDF(elbowP, elbowI, elbowIZ, elbowD, elbowFF); elbowKI = elbowI; }
+    if((elbowD != elbowKD)) { m_robotContainer.setElbowPIDF(elbowP, elbowI, elbowIZ, elbowD, elbowFF); elbowKD = elbowD; }
+    if((elbowIZ != elbowIZ)) { m_robotContainer.setElbowPIDF(elbowP, elbowI, elbowIZ, elbowD, elbowFF); elbowKIz = elbowIZ; }
+    if((elbowFF != elbowKFF)) { m_robotContainer.setElbowPIDF(elbowP, elbowI, elbowIZ, elbowD, elbowFF); elbowKFF = elbowFF; }
   
-    if((shoulderP != shoulderKP)) { m_robotContainer.setShoulderPIDF(shoulderP, shoulderI, shoulderD, shoulderIZ, shoulderFF); shoulderKP = shoulderP; }
-    if((shoulderI != shoulderKI)) { m_robotContainer.setShoulderPIDF(shoulderP, shoulderI, shoulderD, shoulderIZ, shoulderFF); shoulderKI = shoulderI; }
-    if((shoulderD != shoulderKD)) { m_robotContainer.setShoulderPIDF(shoulderP, shoulderI, shoulderD, shoulderIZ, shoulderFF); shoulderKD = shoulderD; }
-    if((shoulderIZ != shoulderKIz)) { m_robotContainer.setShoulderPIDF(shoulderP, shoulderI, shoulderD, shoulderIZ, shoulderFF); shoulderKIz = shoulderIZ; }
-    if((shoulderFF != shoulderKFF)) { m_robotContainer.setShoulderPIDF(shoulderP, shoulderI, shoulderD, shoulderIZ, shoulderFF); shoulderKFF = shoulderFF; }
+    if((shoulderP != shoulderKP)) { m_robotContainer.setShoulderPIDF(shoulderP, shoulderI, shoulderIZ, shoulderD, shoulderFF); shoulderKP = shoulderP; }
+    if((shoulderI != shoulderKI)) { m_robotContainer.setShoulderPIDF(shoulderP, shoulderI, shoulderIZ, shoulderD, shoulderFF); shoulderKI = shoulderI; }
+    if((shoulderD != shoulderKD)) { m_robotContainer.setShoulderPIDF(shoulderP, shoulderI, shoulderIZ, shoulderD, shoulderFF); shoulderKD = shoulderD; }
+    if((shoulderIZ != shoulderKIz)) { m_robotContainer.setShoulderPIDF(shoulderP, shoulderI, shoulderIZ, shoulderD, shoulderFF); shoulderKIz = shoulderIZ; }
+    if((shoulderFF != shoulderKFF)) { m_robotContainer.setShoulderPIDF(shoulderP, shoulderI, shoulderIZ, shoulderD, shoulderFF); shoulderKFF = shoulderFF; } 
   }
 
   @Override

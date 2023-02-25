@@ -9,8 +9,10 @@ import frc.robot.subsystems.Arm;
 
 public class OpenClaw extends CommandBase {
   Arm armSubsystem;
+  int openClose = 1;
   /** Creates a new OpenClaw. */
-  public OpenClaw(Arm armSubsystem) {
+  public OpenClaw(Arm armSubsystem, int openClose) {
+    this.openClose = openClose;
     this.armSubsystem=armSubsystem;
     addRequirements(armSubsystem);
     // Use addRequirements() here to declare subsystem dependencies.
@@ -23,7 +25,12 @@ public class OpenClaw extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    armSubsystem.ClawOpen();
+    if (this.openClose == 1) {
+      armSubsystem.ClawOpen();
+    }
+    else {
+      armSubsystem.ClawClose();
+    }
   }
 
   // Called once the command ends or is interrupted.
