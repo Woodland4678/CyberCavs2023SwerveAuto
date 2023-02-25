@@ -4,9 +4,12 @@
 
 package frc.robot;
 
+import org.ejml.dense.row.decomposition.svd.SafeSvd_DDRM;
+
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.config.CTREConfigs;
@@ -22,6 +25,17 @@ public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
   public static CTREConfigs ctreConfigs;
   private RobotContainer m_robotContainer;
+  double elbowKP;
+  double elbowKI;
+  double elbowKD;
+  double elbowKIz;
+  double elbowKFF;
+
+  double shoulderKP;
+  double shoulderKI;
+  double shoulderKD;
+  double shoulderKIz;
+  double shoulderKFF;
   // PWM port 0
     // Must be a PWM header, not MXP or DIO
     AddressableLED m_led = new AddressableLED(0);
@@ -88,7 +102,9 @@ public class Robot extends TimedRobot {
   public void disabledInit() {}
 
   @Override
-  public void disabledPeriodic() {}
+  public void disabledPeriodic() {
+    m_robotContainer.resetArmAngles();
+  }
 
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
@@ -107,6 +123,17 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
+    elbowKP = Constants.ArmConstants.elbowP; 
+    elbowKI = Constants.ArmConstants.elbowI;
+    elbowKD = Constants.ArmConstants.elbowD; 
+    elbowKIz = 0; 
+    elbowKFF = Constants.ArmConstants.elbowFF; 
+
+    shoulderKP = Constants.ArmConstants.shoulderP; 
+    shoulderKI = Constants.ArmConstants.shoulderI;
+    shoulderKD = Constants.ArmConstants.shoulderD; 
+    shoulderKIz = 0; 
+    shoulderKFF = Constants.ArmConstants.shoulderFF; 
     // This makes sure that the autonomous stops running when
     // teleop starts running. If you want the autonomous to
     // continue until interrupted by another command, remove
@@ -114,11 +141,49 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
+    SmartDashboard.putNumber("Elbow P Gain", elbowKP);
+    SmartDashboard.putNumber("Elbow I Gain", elbowKI);
+    SmartDashboard.putNumber("Elbow D Gain", elbowKD);
+    SmartDashboard.putNumber("Elbow I Zone", elbowKIz);
+    SmartDashboard.putNumber("Elbow Feed Forward", elbowKFF);
+
+    SmartDashboard.putNumber("Shoulder P Gain", shoulderKP);
+    SmartDashboard.putNumber("Shoulder I Gain", shoulderKI);
+    SmartDashboard.putNumber("Shoulder D Gain", shoulderKD);
+    SmartDashboard.putNumber("Shoulder I Zone", shoulderKIz);
+    SmartDashboard.putNumber("Shoulder Feed Forward", shoulderKFF);
   }
 
   /** This function is called periodically during operator control. */
   @Override
-  public void teleopPeriodic() {}
+  public void teleopPeriodic() {
+    //m_robotContainer.moveShoulder(-0.10);
+    //m_robotContainer.moveElbow(0.05);
+    double elbowP = SmartDashboard.getNumber("Elbow P Gain", 0);
+    double elbowI = SmartDashboard.getNumber("Elbow I Gain", 0);
+    double elbowD = SmartDashboard.getNumber("Elbow D Gain", 0);
+    double elbowIZ = SmartDashboard.getNumber("Elbow I Zone", 0);
+    double elbowFF = SmartDashboard.getNumber("Elbow Feed Forward", 0);
+
+    double shoulderP = SmartDashboard.getNumber("Shoulder P Gain", 0);
+    double shoulderI = SmartDashboard.getNumber("Shoulder I Gain", 0);
+    double shoulderD = SmartDashboard.getNumber("Shoulder D Gain", 0);
+    double shoulderIZ = SmartDashboard.getNumber("Shoulder I Zone", 0);
+    double shoulderFF = SmartDashboard.getNumber("Shoulder Feed Forward", 0);
+
+    // if PID coefficients on SmartDashboard have changed, write new values to controller
+    if((elbowP != elbowKP)) { m_robotContainer.setElbowPIDF(elbowP, elbowI, elbowD, elbowIZ, elbowFF); elbowKP = elbowP; }
+    if((elbowI != elbowKI)) { m_robotContainer.setElbowPIDF(elbowP, elbowI, elbowD, elbowIZ, elbowFF); elbowKI = elbowI; }
+    if((elbowD != elbowKD)) { m_robotContainer.setElbowPIDF(elbowP, elbowI, elbowD, elbowIZ, elbowFF); elbowKD = elbowD; }
+    if((elbowIZ != elbowIZ)) { m_robotContainer.setElbowPIDF(elbowP, elbowI, elbowD, elbowIZ, elbowFF); elbowKIz = elbowIZ; }
+    if((elbowFF != elbowKFF)) { m_robotContainer.setElbowPIDF(elbowP, elbowI, elbowD, elbowIZ, elbowFF); elbowKFF = elbowFF; }
+  
+    if((shoulderP != shoulderKP)) { m_robotContainer.setShoulderPIDF(shoulderP, shoulderI, shoulderD, shoulderIZ, shoulderFF); shoulderKP = shoulderP; }
+    if((shoulderI != shoulderKI)) { m_robotContainer.setShoulderPIDF(shoulderP, shoulderI, shoulderD, shoulderIZ, shoulderFF); shoulderKI = shoulderI; }
+    if((shoulderD != shoulderKD)) { m_robotContainer.setShoulderPIDF(shoulderP, shoulderI, shoulderD, shoulderIZ, shoulderFF); shoulderKD = shoulderD; }
+    if((shoulderIZ != shoulderKIz)) { m_robotContainer.setShoulderPIDF(shoulderP, shoulderI, shoulderD, shoulderIZ, shoulderFF); shoulderKIz = shoulderIZ; }
+    if((shoulderFF != shoulderKFF)) { m_robotContainer.setShoulderPIDF(shoulderP, shoulderI, shoulderD, shoulderIZ, shoulderFF); shoulderKFF = shoulderFF; }
+  }
 
   @Override
   public void testInit() {

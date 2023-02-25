@@ -71,8 +71,8 @@ public class RobotContainer {
     followObject.whileTrue(new FollowObject(s_Swerve));
     followTape.whileTrue(new FollowTape(s_Swerve, driver));
     autoBalance.whileTrue(new AutoBalance(s_Swerve));
-    moveArmPos1.whileTrue(new ArmMoveTrapezoidal(s_Arm, 1));
-    moveArmPos2.whileTrue(new ArmMoveTrapezoidal(s_Arm, 2));
+    moveArmPos1.whileTrue(new ArmMovePIDOnly(s_Arm, 1));
+    moveArmPos2.whileTrue(new ArmMovePIDOnly(s_Arm, 2));
   }
 
   public static Joystick getOperatorJoystick() {
@@ -80,6 +80,21 @@ public class RobotContainer {
   }
   public static Joystick getDriverJoystick() {
     return driver;
+  }
+  public void resetArmAngles() {
+    s_Arm.resetToAbsoluteEncoder();
+  }
+  public void moveShoulder(double speed) {
+    s_Arm.runShoulderMotor(speed);
+  }
+  public void moveElbow(double speed) {
+    s_Arm.runElbowMotor(speed);
+  }
+  public void setElbowPIDF(double p, double i, double iZone, double d, double f) {
+    s_Arm.setElbowPIDF(p, i, iZone, d, f);
+  }
+  public void setShoulderPIDF(double p, double i, double iZone, double d, double f) {
+    s_Arm.setShoulderPIDF(p, i, iZone, d, f);
   }
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.

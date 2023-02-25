@@ -13,7 +13,9 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -22,6 +24,8 @@ import frc.robot.Constants;
 import com.kauailabs.navx.frc.AHRS;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.commands.PPSwerveControllerCommand;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -38,7 +42,11 @@ public class SwerveDrive extends SubsystemBase {
   private NetworkTable limelight;
   private NetworkTable rpi;
 
+  private Solenoid limelightPneumatic;
+
   private Field2d field;
+
+  private CANSparkMax driveAssist;
 
   public SwerveDrive() {
     rpi = NetworkTableInstance.getDefault().getTable("rpi");
@@ -60,6 +68,8 @@ public class SwerveDrive extends SubsystemBase {
     swerveOdometry = new SwerveDriveOdometry(Constants.Swerve.swerveKinematics, getYaw(), getModulePositions());
     field = new Field2d();
     SmartDashboard.putData("Field", field);
+    limelightPneumatic = new Solenoid(PneumaticsModuleType.REVPH, Constants.Swerve.limelightPneumaticChannel);
+    driveAssist = new CANSparkMax(Constants.Swerve.driveAssistCANId, MotorType.kBrushless);
   }
 
   public void drive(
@@ -213,8 +223,16 @@ public class SwerveDrive extends SubsystemBase {
              this // Requires this drive subsystem
          )
      );
- }
-
+  }
+  public void limelightDown() {
+    limelightPneumatic.set(true);
+  }
+  public void limelightUp() {
+    limelightPneumatic.set(false);
+  }
+  public void setDriveAssistVelocity(double velocity) {
+    //driveAssist.set
+  }
   @Override
   public void periodic() {
     int targetToGet = 0;

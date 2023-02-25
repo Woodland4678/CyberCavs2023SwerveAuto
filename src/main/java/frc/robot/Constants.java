@@ -26,6 +26,7 @@ public final class Constants {
   }
   public static final class Swerve {
     public static final double stickDeadband = 0.1;
+    public static final int limelightPneumaticChannel = 2;
 
     public static final int gyroId = 6;
     public static final boolean invertGyro = true; // Always ensure Gyro is CCW+ CW-
@@ -36,13 +37,13 @@ public final class Constants {
      *
      * Should be measured from center to center.
      */
-    public static final double trackWidth = 0.6223; //Units.inchesToMeters(21.73);
+    public static final double trackWidth = Units.inchesToMeters(22.5); //0.6223 practice bot //Units.inchesToMeters(21.73);
     /**
      * The front-to-back distance between the drivetrain wheels.
      *
      * Should be measured from center to center.
      */
-    public static final double wheelBase = 0.62865;
+    public static final double wheelBase = Units.inchesToMeters(26.75); //0.62865 practice bot
     public static final double wheelDiameter = Units.inchesToMeters(4.0);
     public static final double wheelCircumference = wheelDiameter * Math.PI;
 
@@ -109,8 +110,8 @@ public final class Constants {
     public static final class Mod0 {
       public static final int driveMotorID = 1;
       public static final int angleMotorID = 2;
-      public static final int canCoderID = 2;
-      public static final Rotation2d angleOffset = Rotation2d.fromDegrees( 211.4);
+      public static final int canCoderID = 3;
+      public static final Rotation2d angleOffset = Rotation2d.fromDegrees( 304.45);
       public static final SwerveModuleConstants constants =
           new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
     }
@@ -119,8 +120,8 @@ public final class Constants {
     public static final class Mod1 {
       public static final int driveMotorID = 3;
       public static final int angleMotorID = 4;
-      public static final int canCoderID = 3;
-      public static final Rotation2d angleOffset = Rotation2d.fromDegrees(350);
+      public static final int canCoderID = 0;
+      public static final Rotation2d angleOffset = Rotation2d.fromDegrees(288.5);
       public static final SwerveModuleConstants constants =
           new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
     }
@@ -129,8 +130,8 @@ public final class Constants {
     public static final class Mod2 {
       public static final int driveMotorID = 7;
       public static final int angleMotorID = 8;
-      public static final int canCoderID = 0;
-      public static final Rotation2d angleOffset = Rotation2d.fromDegrees(319.0);
+      public static final int canCoderID = 1;
+      public static final Rotation2d angleOffset = Rotation2d.fromDegrees(230.5);
       public static final SwerveModuleConstants constants =
           new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
     }
@@ -139,11 +140,13 @@ public final class Constants {
     public static final class Mod3 {
       public static final int driveMotorID = 5;
       public static final int angleMotorID = 6;
-      public static final int canCoderID = 1;
-      public static final Rotation2d angleOffset = Rotation2d.fromDegrees(303);
+      public static final int canCoderID = 2;
+      public static final Rotation2d angleOffset = Rotation2d.fromDegrees(236);
       public static final SwerveModuleConstants constants =
           new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
     }
+
+    public static int driveAssistCANId = 15;
   }
   public static final class AutoConstants {
     public static final double kMaxSpeedMetersPerSecond = 4;
@@ -166,8 +169,8 @@ public final class Constants {
   }
 
   public static final class ArmConstants{
-    public static final int shoulderLeaderMotorCanId = 9;
-    public static final int shoulderFollowerMotorCanId = 10;
+    public static final int shoulderLeaderMotorCanId = 10;
+    public static final int shoulderFollowerMotorCanId = 9;
 
     public static final int elbowLeaderMotorCanId = 11;
     public static final int elbowFollowerMotorCanId = 12;
@@ -182,29 +185,29 @@ public final class Constants {
     public static final double wristHorizontalGearRatio = (10.0 / 1.0); 
     public static final double wristVerticalGearRatio = (75.0/ 1.0);
 
-    public static final double elbowAngleOffset = 0;
-    public static final double shoulderAngleOffset = 0;
+    public static final double elbowAngleOffset = 105.35;
+    public static final double shoulderAngleOffset = 140.1;
 
-    public static final double shoulderAngleConversionFactor = 360 / shoulderGearRatio;
+    public static final double shoulderAngleConversionFactor = (360 / shoulderGearRatio);
     public static final double elbowAngleConversionFactor = 360 / elbowGearRatio;
     public static final double wristHorizontalAngleConversionFactor = 360 / wristHorizontalGearRatio;
     public static final double wristVerticalAngleConversionFactor = 360 / wristVerticalGearRatio;
 
-    public static final double shoulderLength = 37;
-    public static final double elbowLength = 36;
+    public static final double shoulderLength = 37.0;
+    public static final double elbowLength = 36.0;
 
-    public static final int shoulderEncoderAbsoluteID = 4;
-    public static final int elbowEncoderAbsoluteID = 5;
+    public static final int shoulderEncoderAbsoluteID = 5;
+    public static final int elbowEncoderAbsoluteID = 4;
 
     public static final double shoulderP = 0.1;
     public static final double shoulderI = 0.0;
     public static final double shoulderD = 0.0;
-    public static final double shoulderFF = 0.0;
+    public static final double shoulderFF = 0.1;
 
     public static final double elbowP = 0.1;
     public static final double elbowI = 0.0;
     public static final double elbowD = 0.0;
-    public static final double elbowFF = 0.0;
+    public static final double elbowFF = 0.1;
 
     public static final double wristVerticalP = 0.1;
     public static final double wristVerticalI = 0.0;
@@ -216,11 +219,18 @@ public final class Constants {
     public static final double wristHorizontalD = 0.0;
     public static final double wristHorizontalFF = 0.0;
 
-    public static final double position1X = 10; //inches
-    public static final double position1Y = 10;
+    public static final double position1X = 37; //inches
+    public static final double position1Y = 36;
 
     public static final double position2X = 30;
     public static final double position2Y = 20;
+
+    //public static final int shoulderBottomLimitSwitchChannel = 4;
+    //public static final int shoulderTopLimitSwitchChannel = 5;
+   // public static final int elbowBottomLimitSwitchChannel = 6;
+    //public static final int elbowTopLimitSwitchChannel = 7;
+
+    public static final int wristLimitSwitch = 8;
   }
   public class ArmPosition{
     public double elbowTarget = 0;
