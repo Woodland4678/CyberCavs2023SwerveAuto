@@ -153,6 +153,17 @@ public final class Constants {
     public static double autoDriveYP = 0.2;
     public static double autoDriveYI = 0.01;
     public static double autoDriveYD = 0.0;
+    public static double autoDriveXP = 0.2;
+    public static double autoDriveXI = 0.01;
+    public static double autoDriveXD = 0.0;
+    public static double autoDriveRP = 0.2;
+    public static double autoDriveRI = 0.01;
+    public static double autoDriveRD = 0.0;
+
+    public static double coneAutoDriveYTarget = 119.5;
+    public static double cubeAutoDriveYTarget = 119.5;
+
+    
   }
   public static final class AutoConstants {
     public static final double kMaxSpeedMetersPerSecond = 4;
@@ -236,6 +247,9 @@ public final class Constants {
     public static final double position2WristAngle = 30;
     public static final double position2WristRollAngle = -35;
 
+    public static final int cubeMode = 0;
+    public static final int coneMode = 1;
+
 
     //******These define the area we want the arm to avoid (in this case where the shelf is that protects the limelight) */
     public static final double armExclusionXMin = 7.0;
@@ -244,8 +258,13 @@ public final class Constants {
 
     public static final int wristLimitSwitch = 8;
 
+    
     public static final ArmPosition scoreConeHighPosition = new ArmPosition(52, 40, 0, 0);
+    public static ArmPosition pickupPosition = new ArmPosition(35, 0, 0, -35);//wrist roll position needs to change so this shouldn't be "final"
     public static final ArmPosition pos2 = new ArmPosition(20, 20, 0, 0);
+    public static final ArmPosition restPosition = new ArmPosition(10, 10, 0, 0);
+    public static final ArmPosition scoreConeMediumPosition = new ArmPosition(40, 35, 0, 10);
+    public static final ArmPosition scoreLowPosition = new ArmPosition(25, -5, 0, -20);
   }
   public static class ArmPosition{
     public double xTarget = 10; //default "homeish" position

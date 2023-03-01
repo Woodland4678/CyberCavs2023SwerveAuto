@@ -36,6 +36,8 @@ public class Robot extends TimedRobot {
   double shoulderKD;
   double shoulderKIz;
   double shoulderKFF;
+
+  int gamePieceMode = 0;
   // PWM port 0
     // Must be a PWM header, not MXP or DIO
     AddressableLED m_led = new AddressableLED(0);
@@ -184,7 +186,9 @@ public class Robot extends TimedRobot {
     if((shoulderIZ != shoulderKIz)) { m_robotContainer.setShoulderPIDF(shoulderP, shoulderI, shoulderIZ, shoulderD, shoulderFF); shoulderKIz = shoulderIZ; }
     if((shoulderFF != shoulderKFF)) { m_robotContainer.setShoulderPIDF(shoulderP, shoulderI, shoulderIZ, shoulderD, shoulderFF); shoulderKFF = shoulderFF; } 
   }
-
+  public int getGamePieceMode() {
+    return gamePieceMode;
+  }
   @Override
   public void testInit() {
     // Cancels all running commands at the start of test mode.

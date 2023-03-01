@@ -5,13 +5,16 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Constants.ArmPosition;
 import frc.robot.subsystems.Arm;
 
 public class MoveArm extends CommandBase {
   Arm s_Arm;
+  ArmPosition targetPos;
   /** Creates a new MoveArm. */
-  public MoveArm(Arm s_Arm) {
+  public MoveArm(Arm s_Arm, ArmPosition targetPos) {
     this.s_Arm = s_Arm;
+    this.targetPos = targetPos;
     addRequirements(s_Arm);
     // Use addRequirements() here to declare subsystem dependencies.
   }
@@ -19,13 +22,13 @@ public class MoveArm extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    s_Arm.resetSmartMotionState();
+    
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    s_Arm.MoveArmSmartMotion(1, 1, 500, 1000, 500, 1000); //accel and velocity are in RPM
+    s_Arm.MoveArm(this.targetPos);
   }
 
   // Called once the command ends or is interrupted.

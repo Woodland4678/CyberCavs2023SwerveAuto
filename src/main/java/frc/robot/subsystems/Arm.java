@@ -80,6 +80,9 @@ public class Arm extends SubsystemBase {
   //private final SimpleMotorFeedforward elbowFeedforward = new SimpleMotorFeedforward(1, 1.5);
   private final ArmFeedforward elbowFeedForward = new ArmFeedforward(0.12139, 0.17521, 0.023944);
   
+
+  public int gamePieceMode = Constants.ArmConstants.cubeMode;
+  
   /** Creates a new Arm. */
   public Arm() {
     shoulderLeaderMotor = new CANSparkMax(ArmConstants.shoulderLeaderMotorCanId, MotorType.kBrushless);
@@ -145,6 +148,10 @@ public class Arm extends SubsystemBase {
     elbowAbsolute = new DutyCycleEncoder(ArmConstants.elbowEncoderAbsoluteID);
 
 
+    shoulderController.setOutputRange(-0.35, 0.35);
+    elbowController.setOutputRange(-0.35, 0.35);
+
+
     shoulderLeaderMotor.setSmartCurrentLimit(40);
     elbowLeaderMotor.setSmartCurrentLimit(40);
     elbowFollowerMotor.setSmartCurrentLimit(40);
@@ -170,6 +177,12 @@ public class Arm extends SubsystemBase {
   public void ClawClose(){
     clawSolenoid1.set(Value.kReverse);
     clawSolenoid2.set(Value.kReverse);
+  }
+  public int getGamePieceMode() {
+    return gamePieceMode;
+  }
+  public void setGamePieceMode(int mode) {
+    gamePieceMode = mode;
   }
   public void moveArmtrapezoidalInit(double currentElbowAngle, double currentShoulderAngle, double x, double y) {
     
@@ -205,7 +218,7 @@ public class Arm extends SubsystemBase {
     elbowController.setReference(elbowSetpoint.position, com.revrobotics.CANSparkMax.ControlType.kPosition, 0, elbowFeedForward.calculate(90 - integratedShoulderEncoder.getPosition(),elbowSetpoint.velocity)/12);
   }
   
-  public void MoveArm(ArmPosition targetPos) { //TODO we shouldn't recalculate angles each time, if we use this method change it
+  public double MoveArm(ArmPosition targetPos) { //TODO we shouldn't recalculate angles each time, if we use this method change it
     double elbowAngle = calcElbowAngle(targetPos.xTarget, targetPos.yTarget);
     double shoulderAngle = calcShoulderAngle(targetPos.xTarget, targetPos.yTarget, elbowAngle);
     double currentX = getCurrentXPosition();
@@ -225,15 +238,16 @@ public class Arm extends SubsystemBase {
         else { //stop the elbow to let the shoulder get back far enough
           elbowLeaderMotor.stopMotor();
         }
-      }
+      }      
     }
     //if we're not in the danger zone set the motors
     else {
       shoulderController.setReference((90 - shoulderAngle) / 2, com.revrobotics.CANSparkMax.ControlType.kPosition); //90 - inverse calc
       elbowController.setReference(-elbowAngle, com.revrobotics.CANSparkMax.ControlType.kPosition);
-      wristPitchController.setReference(wristPos, com.revrobotics.CANSparkMax.ControlType.kPosition);
-      wristRollController.setReference(wristRollPos, com.revrobotics.CANSparkMax.ControlType.kPosition);
+      wristPitchController.setReference(targetPos.wristPitchTarget, com.revrobotics.CANSparkMax.ControlType.kPosition);
+      wristRollController.setReference(targetPos.wristRollTarget, com.revrobotics.CANSparkMax.ControlType.kPosition);
     }
+    return Math.sqrt((Math.pow(currentX - targetPos.xTarget,2)) + (Math.pow(currentY - targetPos.yTarget, 2))); //returns distance to target
   }
   public void setElbowPIDF(double p, double i, double iZone, double d, double f) {
     elbowController.setP(p);
@@ -312,10 +326,18 @@ public class Arm extends SubsystemBase {
     integratedElbowEncoder.setPosition(((elbowAbsolute.getAbsolutePosition()) * 360) - ArmConstants.elbowAngleOffset);
   }
   public double getCurrentXPosition() {
-    return Constants.ArmConstants.shoulderLength * Math.cos(Math.toRadians(integratedShoulderEncoder.getPosition())) + Constants.ArmConstants.elbowLength * Math.cos(Math.toRadians((integratedShoulderEncoder.getPosition()) - integratedElbowEncoder.getPosition()));
+    double shoulderLength = Constants.ArmConstants.shoulderLength;
+    double elbowLength = Constants.ArmConstants.elbowLength;
+    double shoulderAngle = 90 - integratedShoulderEncoder.getPosition();
+    double elbowAngle = -integratedElbowEncoder.getPosition();
+    return shoulderLength * Math.cos(Math.toRadians(shoulderAngle)) + elbowLength * Math.cos(Math.toRadians((shoulderAngle) - elbowAngle));
   }
   public double getCurrentYPosition() {
-    return Constants.ArmConstants.shoulderLength * Math.sin(Math.toRadians(integratedShoulderEncoder.getPosition())) + Constants.ArmConstants.elbowLength * Math.sin(Math.toRadians((integratedShoulderEncoder.getPosition()) - integratedElbowEncoder.getPosition()));
+    double shoulderLength = Constants.ArmConstants.shoulderLength;
+    double elbowLength = Constants.ArmConstants.elbowLength;
+    double shoulderAngle = 90 - integratedShoulderEncoder.getPosition();
+    double elbowAngle = -integratedElbowEncoder.getPosition();
+    return shoulderLength * Math.sin(Math.toRadians(shoulderAngle)) + elbowLength * Math.sin(Math.toRadians((shoulderAngle) - elbowAngle));
   }
   
   public void runShoulderMotor(double runSpeed) {

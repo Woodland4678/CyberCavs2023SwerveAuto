@@ -31,6 +31,7 @@ public class FollowObject extends CommandBase {
  SwerveDrive s_Swerve;
  boolean isDone = false;
  int isInPosCnt = 0;
+ double limelightYTarget = 0;
   /** Creates a new FollowObject. */
   public FollowObject(SwerveDrive s_Swerve) {
     this.s_Swerve = s_Swerve;

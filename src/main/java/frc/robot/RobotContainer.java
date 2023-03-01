@@ -47,6 +47,19 @@ public class RobotContainer {
       new JoystickButton(driver, XboxController.Button.kRightBumper.value);
   private final JoystickButton moveArmPos2 = 
       new JoystickButton(driver, XboxController.Button.kLeftBumper.value);
+
+  /* Operator Buttons */
+  private final JoystickButton armScoreHigh =
+      new JoystickButton(operator, 4);
+  private final JoystickButton armScoreMedium =
+      new JoystickButton(operator, 1);
+  private final JoystickButton armScoreLow =
+      new JoystickButton(operator, 2);
+  private final JoystickButton armPickup =
+      new JoystickButton(operator, 3);
+  private final JoystickButton armRest =
+      new JoystickButton(operator, 5);
+
   /* Subsystems */
   private final SwerveDrive s_Swerve = new SwerveDrive();
   private final Intake intake = new Intake();
@@ -75,6 +88,13 @@ public class RobotContainer {
     //moveArmPos2.whileTrue(new OpenClaw(s_Arm, 2));
     moveArmPos1.whileTrue(new ArmMovePIDOnly(s_Arm, 1));
     moveArmPos2.whileTrue(new ArmMovePIDOnly(s_Arm, 2));
+
+    /* Operator Buttons */
+    armScoreHigh.onTrue(new MoveArm(s_Arm,Constants.ArmConstants.scoreConeHighPosition));
+    armScoreMedium.onTrue(new MoveArm(s_Arm,Constants.ArmConstants.scoreConeMediumPosition));
+    armScoreLow.onTrue(new MoveArm(s_Arm,Constants.ArmConstants.scoreLowPosition));
+    armPickup.onTrue(new MoveArm(s_Arm,Constants.ArmConstants.pickupPosition));
+    armRest.onTrue(new MoveArm(s_Arm,Constants.ArmConstants.restPosition));
   }
 
   public static Joystick getOperatorJoystick() {

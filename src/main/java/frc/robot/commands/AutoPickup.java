@@ -4,18 +4,16 @@
 
 package frc.robot.commands;
 
-import edu.wpi.first.hal.simulation.ConstBufferCallback;
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
-import frc.robot.Constants.Swerve;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.SwerveDrive;
 
-public class AutoScoreHigh extends CommandBase {
+public class AutoPickup extends CommandBase {
   Arm s_Arm;
   SwerveDrive s_Swerve;
   PIDController xController = new PIDController(Constants.Swerve.autoDriveXP, Constants.Swerve.autoDriveXI, Constants.Swerve.autoDriveXD);
@@ -23,8 +21,9 @@ public class AutoScoreHigh extends CommandBase {
   PIDController rController = new PIDController(Constants.Swerve.autoDriveRP, Constants.Swerve.autoDriveRI, Constants.Swerve.autoDriveRD);
   boolean isDone = false;
   int isInPosCnt = 0;
-  /** Creates a new ScoreHigh. */
-  public AutoScoreHigh(Arm s_Arm, SwerveDrive s_Swerve) {
+  double limelightYTarget = 0;
+  /** Creates a new AutoPickup. */
+  public AutoPickup(Arm s_Arm, SwerveDrive s_Swerve) {
     this.s_Arm = s_Arm;
     this.s_Swerve = s_Swerve;
     addRequirements(s_Arm, s_Swerve);
@@ -34,11 +33,15 @@ public class AutoScoreHigh extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    //xController.setGoal(0);
-    //yController.setGoal(0);
+    if (s_Arm.getGamePieceMode() == Constants.ArmConstants.coneMode) {
+      limelightYTarget = Constants.Swerve.coneAutoDriveYTarget;
+    }
+    else {
+      limelightYTarget = Constants.Swerve.cubeAutoDriveYTarget;
+    }
     xController.setSetpoint(0);
-    rController.setSetpoint(180);
-    yController.setSetpoint(20.48);
+    rController.setSetpoint(s_Swerve.getYaw().getDegrees());
+    yController.setSetpoint(limelightYTarget);
     xController.setTolerance(1);
     yController.setTolerance(0.5);
     s_Swerve.setLimelightPipeline(3);
@@ -49,50 +52,44 @@ public class AutoScoreHigh extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    s_Arm.MoveArm(Constants.ArmConstants.scoreConeHighPosition);
-    var robotPose = new Pose2d();
-    if (s_Swerve.limelightHasTarget() == 1) {
-      var degrees =s_Swerve.getYaw().getDegrees();
-      if (degrees < 0) {
-        degrees += 360;
-      }
-      var rSpeed = rController.calculate(degrees);
-      var xSpeed = xController.calculate(s_Swerve.getLimelightX());
-      var ySpeed = yController.calculate(s_Swerve.getLimelightY());
-      // if (Math.abs(rSpeed) < 0.7) {
-      //   xSpeed = rLimiter.calculate(rController.calculate(s_Swerve.getYaw().getDegrees()));
-      // }
-      // else {
-      //   ySpeed = ySpeed * 0.5;
-      //   xSpeed = 0;
-      // }
-      Translation2d translation = new Translation2d(ySpeed, xSpeed);
-      // SmartDashboard.putNumber(
-      //             "xSpeed",xSpeed);
-      // SmartDashboard.putNumber(
-      //               "ySpeed",ySpeed);
-      // SmartDashboard.putNumber(
-      //               "rSpeed",rSpeed);
-      
-      s_Swerve.drive(translation, rSpeed, false, true);
-      if (Math.abs(s_Swerve.getLimelightY() - 20.48) < 0.5) {
-        isInPosCnt++;
-      }
-      else {
-        isInPosCnt = 0;
-      }
-      if (isInPosCnt > 20) {
-        isDone = true;
-      }
+    var armPosError = s_Arm.MoveArm(Constants.ArmConstants.pickupPosition);    
+    var degrees =s_Swerve.getYaw().getDegrees();
+    //if (degrees < 0) {
+     // degrees += 360;
+   // }
+    var boundingBoxXY = s_Swerve.getBoundingBoxX()[0];
+    var coneAngle = s_Swerve.getConeAngle();
+    var rSpeed = rController.calculate(degrees);
+    var xSpeed = xController.calculate(s_Swerve.getLimelightX());
+    var ySpeed = yController.calculate(boundingBoxXY);
+
+
+    Constants.ArmConstants.pickupPosition.wristRollTarget = coneAngle;
+    Translation2d translation = new Translation2d(ySpeed, xSpeed);
+    SmartDashboard.putNumber(
+                "xSpeed",xSpeed);
+    SmartDashboard.putNumber(
+                  "ySpeed",ySpeed);
+    // SmartDashboard.putNumber(
+    //               "rSpeed",0);
+    //SmartDashboard.putNumber(
+    //              "coneAngle",coneAngle);
+    
+    s_Swerve.drive(translation, rSpeed, false, true);
+
+    if (armPosError < 3 && Math.abs(boundingBoxXY - limelightYTarget) < 2) {
+      isInPosCnt++;
     }
-    else {
-      s_Swerve.stop();
+    if (isInPosCnt > 10) {
+      s_Arm.ClawClose();
     }
   }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    s_Swerve.stop();
+  }
 
   // Returns true when the command should end.
   @Override

@@ -45,7 +45,7 @@ public class ArmMovePIDOnly extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    s_Arm.MoveArm(targetX, targetY, wristPitch, wristRoll);
+    //s_Arm.MoveArm(targetX, targetY, wristPitch, wristRoll);
   }
 
   // Called once the command ends or is interrupted.
