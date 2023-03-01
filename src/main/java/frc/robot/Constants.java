@@ -147,6 +147,12 @@ public final class Constants {
     }
 
     public static int driveAssistCANId = 15;
+    /////////////////////////////////////////////////////////////
+    //**Auto drive values (for scoring and game piece pickup) */
+    /////////////////////////////////////////////////////////////
+    public static double autoDriveYP = 0.2;
+    public static double autoDriveYI = 0.01;
+    public static double autoDriveYD = 0.0;
   }
   public static final class AutoConstants {
     public static final double kMaxSpeedMetersPerSecond = 4;
@@ -175,24 +181,24 @@ public final class Constants {
     public static final int elbowLeaderMotorCanId = 11;
     public static final int elbowFollowerMotorCanId = 12;
 
-    public static final int wristVerticalCanId = 13;
-    public static final int wristHorizontalCanId = 14;
+    public static final int wristPitchCanId = 13;
+    public static final int wristRollCanId = 14;
 
     public static final int pneumaticClawChannel = 1;
     public static final int pneumaticClawChannel2 = 2;
 
     public static final double shoulderGearRatio = (60.0 / 1.0); 
     public static final double elbowGearRatio = ((((64/12) * 70) / 28) * 5); 
-    public static final double wristHorizontalGearRatio = (90/12); 
-    public static final double wristVerticalGearRatio = (75.0/ 1.0);
+    public static final double wristRollGearRatio = (90/12); 
+    public static final double wristPitchGearRatio = (75.0/ 1.0);
 
     public static final double elbowAngleOffset = 105.35;
     public static final double shoulderAngleOffset = 130.25;
 
     public static final double shoulderAngleConversionFactor = (360 / shoulderGearRatio);
     public static final double elbowAngleConversionFactor = 360 / elbowGearRatio;
-    public static final double wristHorizontalAngleConversionFactor = 360 / wristHorizontalGearRatio;
-    public static final double wristVerticalAngleConversionFactor = 360 / wristVerticalGearRatio;
+    public static final double wristRollAngleConversionFactor = 360 / wristRollGearRatio;
+    public static final double wristPitchAngleConversionFactor = 360 / wristPitchGearRatio;
 
     public static final double shoulderLength = 37.0;
     public static final double elbowLength = 36.0;
@@ -210,15 +216,15 @@ public final class Constants {
     public static final double elbowD = 1;
     public static final double elbowFF = 0.00;
 
-    public static final double wristVerticalP = 0.01;
-    public static final double wristVerticalI = 0.0;
-    public static final double wristVerticalD = 0.0;
-    public static final double wristVerticalFF = 0.0;
+    public static final double wristPitchP = 0.01;
+    public static final double wristPitchI = 0.0;
+    public static final double wristPitchD = 0.0;
+    public static final double wristPitchFF = 0.0;
 
-    public static final double wristHorizontalP = 0.001;
-    public static final double wristHorizontalI = 0.0;
-    public static final double wristHorizontalD = 0.0;
-    public static final double wristHorizontalFF = 0.0;
+    public static final double wristRollP = 0.001;
+    public static final double wristRollI = 0.0;
+    public static final double wristRollD = 0.0;
+    public static final double wristRollFF = 0.0;
 
     public static final double position1X = 52; //inches
     public static final double position1Y = 40;
@@ -230,19 +236,27 @@ public final class Constants {
     public static final double position2WristAngle = 30;
     public static final double position2WristRollAngle = -35;
 
-    //public static final int shoulderBottomLimitSwitchChannel = 4;
-    //public static final int shoulderTopLimitSwitchChannel = 5;
-   // public static final int elbowBottomLimitSwitchChannel = 6;
-    //public static final int elbowTopLimitSwitchChannel = 7;
+
+    //******These define the area we want the arm to avoid (in this case where the shelf is that protects the limelight) */
+    public static final double armExclusionXMin = 7.0;
+    public static final double armExclusionXMax = 13.0;
+    public static final double armExclusionY = 4.0;
 
     public static final int wristLimitSwitch = 8;
+
+    public static final ArmPosition scoreConeHighPosition = new ArmPosition(52, 40, 0, 0);
+    public static final ArmPosition pos2 = new ArmPosition(20, 20, 0, 0);
   }
-  public class ArmPosition{
-    public double elbowTarget = 0;
-    public double shoulderTarget = 0;
-    public ArmPosition(double elbowTarget, double shoulderTarget) {
-      this.elbowTarget = elbowTarget;
-      this.shoulderTarget = shoulderTarget;
+  public static class ArmPosition{
+    public double xTarget = 10; //default "homeish" position
+    public double yTarget = 15; //default "homeish" position
+    public double wristPitchTarget = 0;
+    public double wristRollTarget = 0;
+    public ArmPosition(double xTarget, double yTarget, double wristRollTarget, double wristPitchTarget) {
+      this.xTarget = xTarget;
+      this.yTarget = yTarget;
+      this.wristPitchTarget = wristPitchTarget;
+      this.wristRollTarget = wristRollTarget;
     }
   }
 }
