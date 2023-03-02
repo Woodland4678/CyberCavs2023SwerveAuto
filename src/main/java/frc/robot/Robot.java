@@ -37,6 +37,18 @@ public class Robot extends TimedRobot {
   double shoulderKIz;
   double shoulderKFF;
 
+  double wristPitchKP;
+  double wristPitchKI;
+  double wristPitchKD;
+  double wristPitchKIz;
+  double wristPitchKFF;
+
+  double wristRollKP;
+  double wristRollKI;
+  double wristRollKD;
+  double wristRollKIz;
+  double wristRollKFF;
+
   int gamePieceMode = 0;
   // PWM port 0
     // Must be a PWM header, not MXP or DIO
@@ -106,6 +118,7 @@ public class Robot extends TimedRobot {
   @Override
   public void disabledPeriodic() {
     m_robotContainer.resetArmAngles();
+    m_robotContainer.resetSwerveModuleAngles();
   }
 
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
@@ -136,6 +149,18 @@ public class Robot extends TimedRobot {
     shoulderKD = Constants.ArmConstants.shoulderD; 
     shoulderKIz = 0; 
     shoulderKFF = Constants.ArmConstants.shoulderFF; 
+
+    wristPitchKP = Constants.ArmConstants.wristPitchP; 
+    wristPitchKI = Constants.ArmConstants.wristPitchI;
+    wristPitchKD = Constants.ArmConstants.wristPitchD; 
+    wristPitchKIz = 0; 
+    wristPitchKFF = Constants.ArmConstants.wristPitchFF; 
+
+    wristRollKP = Constants.ArmConstants.wristRollP; 
+    wristRollKI = Constants.ArmConstants.wristRollI;
+    wristRollKD = Constants.ArmConstants.wristRollD; 
+    wristRollKIz = 0; 
+    wristRollKFF = Constants.ArmConstants.wristRollFF; 
     // This makes sure that the autonomous stops running when
     // teleop starts running. If you want the autonomous to
     // continue until interrupted by another command, remove
@@ -143,7 +168,8 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
-    SmartDashboard.putNumber("Elbow P Gain", elbowKP);
+    /*Uncomment below lines to tune elbow and shoulder pids */
+    /*SmartDashboard.putNumber("Elbow P Gain", elbowKP);
     SmartDashboard.putNumber("Elbow I Gain", elbowKI);
     SmartDashboard.putNumber("Elbow D Gain", elbowKD);
     SmartDashboard.putNumber("Elbow I Zone", elbowKIz);
@@ -153,7 +179,19 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("Shoulder I Gain", shoulderKI);
     SmartDashboard.putNumber("Shoulder D Gain", shoulderKD);
     SmartDashboard.putNumber("Shoulder I Zone", shoulderKIz);
-    SmartDashboard.putNumber("Shoulder Feed Forward", shoulderKFF);
+    SmartDashboard.putNumber("Shoulder Feed Forward", shoulderKFF);*/
+
+    SmartDashboard.putNumber("Wrist Pitch P Gain", wristPitchKP);
+    SmartDashboard.putNumber("Wrist Pitch I Gain", wristPitchKI);
+    SmartDashboard.putNumber("Wrist Pitch D Gain", wristPitchKD);
+    SmartDashboard.putNumber("Wrist Pitch I Zone", wristPitchKIz);
+    SmartDashboard.putNumber("Wrist Pitch Feed Forward", wristPitchKFF);
+
+    SmartDashboard.putNumber("Wrist Roll P Gain", wristRollKP);
+    SmartDashboard.putNumber("Wrist Roll I Gain", wristRollKI);
+    SmartDashboard.putNumber("Wrist Roll D Gain", wristRollKD);
+    SmartDashboard.putNumber("Wrist Roll I Zone", wristRollKIz);
+    SmartDashboard.putNumber("Wrist Roll Feed Forward", wristRollKFF);
   }
 
   /** This function is called periodically during operator control. */
@@ -161,7 +199,8 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {
     //m_robotContainer.moveShoulder(-0.10);
     //m_robotContainer.moveElbow(0.05);
-    double elbowP = SmartDashboard.getNumber("Elbow P Gain", 0);
+    /*Uncomment the below lines to tune elbow and shoulder PIDS */
+    /*double elbowP = SmartDashboard.getNumber("Elbow P Gain", 0);
     double elbowI = SmartDashboard.getNumber("Elbow I Gain", 0);
     double elbowD = SmartDashboard.getNumber("Elbow D Gain", 0);
     double elbowIZ = SmartDashboard.getNumber("Elbow I Zone", 0);
@@ -171,10 +210,22 @@ public class Robot extends TimedRobot {
     double shoulderI = SmartDashboard.getNumber("Shoulder I Gain", 0);
     double shoulderD = SmartDashboard.getNumber("Shoulder D Gain", 0);
     double shoulderIZ = SmartDashboard.getNumber("Shoulder I Zone", 0);
-    double shoulderFF = SmartDashboard.getNumber("Shoulder Feed Forward", 0);
+    double shoulderFF = SmartDashboard.getNumber("Shoulder Feed Forward", 0); */
+
+    double wristPitchP = SmartDashboard.getNumber("Wrist Pitch P Gain", 0);
+    double wristPitchI = SmartDashboard.getNumber("Wrist Pitch I Gain", 0);
+    double wristPitchD = SmartDashboard.getNumber("Wrist Pitch D Gain", 0);
+    double wristPitchIZ = SmartDashboard.getNumber("Wrist Pitch I Zone", 0);
+    double wristPitchFF = SmartDashboard.getNumber("Wrist Pitch Feed Forward", 0);
+
+    double wristRollP = SmartDashboard.getNumber("Wrist Roll P Gain", 0);
+    double wristRollI = SmartDashboard.getNumber("Wrist Roll I Gain", 0);
+    double wristRollD = SmartDashboard.getNumber("Wrist Roll D Gain", 0);
+    double wristRollIZ = SmartDashboard.getNumber("Wrist Roll I Zone", 0);
+    double wristRollFF = SmartDashboard.getNumber("Wrist Roll Feed Forward", 0);
 
     // if PID coefficients on SmartDashboard have changed, write new values to controller
-    if((elbowP != elbowKP)) { m_robotContainer.setElbowPIDF(elbowP, elbowI, elbowIZ, elbowD, elbowFF); elbowKP = elbowP; }
+    /*if((elbowP != elbowKP)) { m_robotContainer.setElbowPIDF(elbowP, elbowI, elbowIZ, elbowD, elbowFF); elbowKP = elbowP; }
     if((elbowI != elbowKI)) { m_robotContainer.setElbowPIDF(elbowP, elbowI, elbowIZ, elbowD, elbowFF); elbowKI = elbowI; }
     if((elbowD != elbowKD)) { m_robotContainer.setElbowPIDF(elbowP, elbowI, elbowIZ, elbowD, elbowFF); elbowKD = elbowD; }
     if((elbowIZ != elbowIZ)) { m_robotContainer.setElbowPIDF(elbowP, elbowI, elbowIZ, elbowD, elbowFF); elbowKIz = elbowIZ; }
@@ -185,6 +236,18 @@ public class Robot extends TimedRobot {
     if((shoulderD != shoulderKD)) { m_robotContainer.setShoulderPIDF(shoulderP, shoulderI, shoulderIZ, shoulderD, shoulderFF); shoulderKD = shoulderD; }
     if((shoulderIZ != shoulderKIz)) { m_robotContainer.setShoulderPIDF(shoulderP, shoulderI, shoulderIZ, shoulderD, shoulderFF); shoulderKIz = shoulderIZ; }
     if((shoulderFF != shoulderKFF)) { m_robotContainer.setShoulderPIDF(shoulderP, shoulderI, shoulderIZ, shoulderD, shoulderFF); shoulderKFF = shoulderFF; } 
+ */
+    if((wristPitchP != wristPitchKP)) { m_robotContainer.setWristPitchPIDF(wristPitchP, wristPitchI, wristPitchIZ, wristPitchD, wristPitchFF); wristPitchKP = wristPitchP; }
+    if((wristPitchI != wristPitchKI)) { m_robotContainer.setWristPitchPIDF(wristPitchP, wristPitchI, wristPitchIZ, wristPitchD, wristPitchFF); wristPitchKI = wristPitchI; }
+    if((wristPitchD != wristPitchKD)) { m_robotContainer.setWristPitchPIDF(wristPitchP, wristPitchI, wristPitchIZ, wristPitchD, wristPitchFF); wristPitchKD = wristPitchD; }
+    if((wristPitchIZ != wristPitchKIz)) { m_robotContainer.setWristRollPIDF(wristPitchP, wristPitchI, wristPitchIZ, wristPitchD, wristPitchFF); wristPitchKIz = wristPitchIZ; }
+    if((wristPitchFF != wristPitchKFF)) { m_robotContainer.setWristRollPIDF(wristPitchP, wristPitchI, wristPitchIZ, wristPitchD, wristPitchFF); wristPitchKFF = wristPitchFF; } 
+
+    if((wristRollP != wristRollKP)) { m_robotContainer.setWristRollPIDF(wristRollP, wristRollI, wristRollIZ, wristRollD, wristRollFF); wristRollKP = wristRollP; }
+    if((wristRollI != wristRollKI)) { m_robotContainer.setWristRollPIDF(wristRollP, wristRollI, wristRollIZ, wristRollD, wristRollFF); wristRollKI = wristRollI; }
+    if((wristRollD != wristRollKD)) { m_robotContainer.setWristRollPIDF(wristRollP, wristRollI, wristRollIZ, wristRollD, wristRollFF); wristRollKD = wristRollD; }
+    if((wristRollIZ != wristRollKIz)) { m_robotContainer.setWristRollPIDF(wristRollP, wristRollI, wristRollIZ, wristRollD, wristRollFF); wristRollKIz = wristRollIZ; }
+    if((wristRollFF != wristRollKFF)) { m_robotContainer.setWristRollPIDF(wristRollP, wristRollI, wristRollIZ, wristRollD, wristRollFF); wristRollKFF = wristRollFF; } 
   }
   public int getGamePieceMode() {
     return gamePieceMode;

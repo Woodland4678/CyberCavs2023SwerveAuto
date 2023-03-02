@@ -26,7 +26,8 @@ public final class Constants {
   }
   public static final class Swerve {
     public static final double stickDeadband = 0.1;
-    public static final int limelightPneumaticChannel = 2;
+    public static final int limelightSolenoidChannel1 = 6;
+    public static final int limelightSolenoidChannel2 = 7;
 
     public static final int gyroId = 6;
     public static final boolean invertGyro = true; // Always ensure Gyro is CCW+ CW-
@@ -111,7 +112,7 @@ public final class Constants {
       public static final int driveMotorID = 1;
       public static final int angleMotorID = 2;
       public static final int canCoderID = 3;
-      public static final Rotation2d angleOffset = Rotation2d.fromDegrees( 49.1);
+      public static final Rotation2d angleOffset = Rotation2d.fromDegrees( 49.1); 
       public static final SwerveModuleConstants constants =
           new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
     }
@@ -130,8 +131,8 @@ public final class Constants {
     public static final class Mod2 {
       public static final int driveMotorID = 7;
       public static final int angleMotorID = 8;
-      public static final int canCoderID = 1;
-      public static final Rotation2d angleOffset = Rotation2d.fromDegrees(81.7);
+      public static final int canCoderID = 2;
+      public static final Rotation2d angleOffset = Rotation2d.fromDegrees(122.2); //81.7
       public static final SwerveModuleConstants constants =
           new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
     }
@@ -140,28 +141,34 @@ public final class Constants {
     public static final class Mod3 {
       public static final int driveMotorID = 5;
       public static final int angleMotorID = 6;
-      public static final int canCoderID = 2;
-      public static final Rotation2d angleOffset = Rotation2d.fromDegrees(122.2);
+      public static final int canCoderID = 1;
+      public static final Rotation2d angleOffset = Rotation2d.fromDegrees(81.7); //122.2
       public static final SwerveModuleConstants constants =
           new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
     }
+
 
     public static int driveAssistCANId = 15;
     /////////////////////////////////////////////////////////////
     //**Auto drive values (for scoring and game piece pickup) */
     /////////////////////////////////////////////////////////////
-    public static double autoDriveYP = 0.2;
-    public static double autoDriveYI = 0.01;
+    public static double autoDriveYP = 0.022; //0.2
+    public static double autoDriveYI = 0.000;
     public static double autoDriveYD = 0.0;
-    public static double autoDriveXP = 0.2;
-    public static double autoDriveXI = 0.01;
+    public static double autoDriveYTolerance = 1;
+
+    public static double autoDriveXP = 0.1; //0.2
+    public static double autoDriveXI = 0.00;
     public static double autoDriveXD = 0.0;
+    public static double autoDriveXTolerance = 1;
+
     public static double autoDriveRP = 0.2;
     public static double autoDriveRI = 0.01;
     public static double autoDriveRD = 0.0;
+    public static double autoDriveRTolerance = 2;
 
-    public static double coneAutoDriveYTarget = 119.5;
-    public static double cubeAutoDriveYTarget = 119.5;
+    public static double coneAutoDriveYTarget = 131;
+    public static double cubeAutoDriveYTarget = 131;
 
     
   }
@@ -232,7 +239,7 @@ public final class Constants {
     public static final double wristPitchD = 0.0;
     public static final double wristPitchFF = 0.0;
 
-    public static final double wristRollP = 0.001;
+    public static final double wristRollP = 0.01;
     public static final double wristRollI = 0.0;
     public static final double wristRollD = 0.0;
     public static final double wristRollFF = 0.0;
@@ -260,9 +267,9 @@ public final class Constants {
 
     
     public static final ArmPosition scoreConeHighPosition = new ArmPosition(52, 40, 0, 0);
-    public static ArmPosition pickupPosition = new ArmPosition(35, 0, 0, -35);//wrist roll position needs to change so this shouldn't be "final"
+    public static ArmPosition pickupPosition = new ArmPosition(28.84, 11.5, 0, -127.6);//wrist roll position needs to change so this shouldn't be "final"
     public static final ArmPosition pos2 = new ArmPosition(20, 20, 0, 0);
-    public static final ArmPosition restPosition = new ArmPosition(10, 10, 0, 0);
+    public static final ArmPosition restPosition = new ArmPosition(10, 10, -40, 0);
     public static final ArmPosition scoreConeMediumPosition = new ArmPosition(40, 35, 0, 10);
     public static final ArmPosition scoreLowPosition = new ArmPosition(25, -5, 0, -20);
   }

@@ -81,7 +81,7 @@ public class RobotContainer {
   private void configureButtonBindings() {
     /* Driver Buttons */
     zeroGyro.onTrue(new InstantCommand(() -> s_Swerve.zeroGyro()));
-    followObject.whileTrue(new FollowObject(s_Swerve));
+    followObject.whileTrue(new AutoPickup(s_Arm, s_Swerve));
     followTape.whileTrue(new FollowTape(s_Swerve, driver));
     autoBalance.whileTrue(new AutoBalance(s_Swerve));
     //moveArmPos1.whileTrue(new OpenClaw(s_Arm, 1));
@@ -93,8 +93,8 @@ public class RobotContainer {
     armScoreHigh.onTrue(new MoveArm(s_Arm,Constants.ArmConstants.scoreConeHighPosition));
     armScoreMedium.onTrue(new MoveArm(s_Arm,Constants.ArmConstants.scoreConeMediumPosition));
     armScoreLow.onTrue(new MoveArm(s_Arm,Constants.ArmConstants.scoreLowPosition));
-    armPickup.onTrue(new MoveArm(s_Arm,Constants.ArmConstants.pickupPosition));
-    armRest.onTrue(new MoveArm(s_Arm,Constants.ArmConstants.restPosition));
+    armPickup.whileTrue(new MoveArm(s_Arm,Constants.ArmConstants.pickupPosition));
+    armRest.whileTrue(new MoveArm(s_Arm,Constants.ArmConstants.restPosition));
   }
 
   public static Joystick getOperatorJoystick() {
@@ -105,6 +105,9 @@ public class RobotContainer {
   }
   public void resetArmAngles() {
     s_Arm.resetToAbsoluteEncoder();
+  }
+  public void resetSwerveModuleAngles() {
+    s_Swerve.resetSwerveModuleAngles();
   }
   public void moveShoulder(double speed) {
     s_Arm.runShoulderMotor(speed);
@@ -117,6 +120,12 @@ public class RobotContainer {
   }
   public void setShoulderPIDF(double p, double i, double iZone, double d, double f) {
     s_Arm.setShoulderPIDF(p, i, iZone, d, f);
+  }
+  public void setWristPitchPIDF(double p, double i, double iZone, double d, double f) {
+    s_Arm.setWristPitchPIDF(p, i, iZone, d, f);
+  }
+  public void setWristRollPIDF(double p, double i, double iZone, double d, double f) {
+    s_Arm.setWristRollPIDF(p, i, iZone, d, f);
   }
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.

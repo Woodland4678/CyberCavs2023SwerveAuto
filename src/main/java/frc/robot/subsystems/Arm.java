@@ -118,6 +118,7 @@ public class Arm extends SubsystemBase {
 
     wristLimitSwitch = new DigitalInput(Constants.ArmConstants.wristLimitSwitch);
     elbowLeaderMotor.setClosedLoopRampRate(0.5); //TODO may want this for acceleration control
+    wristRollMotor.setClosedLoopRampRate(0.05);
 
     shoulderController = shoulderLeaderMotor.getPIDController();
     elbowController = elbowLeaderMotor.getPIDController();
@@ -150,15 +151,18 @@ public class Arm extends SubsystemBase {
 
     shoulderController.setOutputRange(-0.35, 0.35);
     elbowController.setOutputRange(-0.35, 0.35);
-
+    //wristRollController.setOutputRange(elbowTargetAngle, smartMovementState)
 
     shoulderLeaderMotor.setSmartCurrentLimit(40);
     elbowLeaderMotor.setSmartCurrentLimit(40);
     elbowFollowerMotor.setSmartCurrentLimit(40);
     shoulderFollowerMotor.setSmartCurrentLimit(40);
+
+    wristRollMotor.setSmartCurrentLimit(4);
     //shoulderAbsolute.setDistancePerRotation(360);
     //elbowAbsolute.setDistancePerRotation(360);
     integratedwristPitchEncoder.setPosition(0);
+    integratedwristRollEncoder.setPosition(0);
     elbowLeaderMotor.burnFlash();
     shoulderLeaderMotor.burnFlash();
     resetToAbsoluteEncoder();
@@ -229,24 +233,31 @@ public class Arm extends SubsystemBase {
     SmartDashboard.putNumber( 
                   "Elbow target angle lol", elbowAngle);
     //Check if we might be in the danger zone
-    if (currentY < Constants.ArmConstants.armExclusionY) {
-      if (currentX < Constants.ArmConstants.armExclusionXMax && currentX > Constants.ArmConstants.armExclusionXMin) {
-        //In danger zone
-        if (currentX < targetPos.xTarget) { //moving outward stop the shoulder to allow the elbow to get up high enough
-          shoulderLeaderMotor.stopMotor();
-        }
-        else { //stop the elbow to let the shoulder get back far enough
-          elbowLeaderMotor.stopMotor();
-        }
-      }      
-    }
+    // if (currentY < Constants.ArmConstants.armExclusionY) {
+    //   if (currentX < Constants.ArmConstants.armExclusionXMax && currentX > Constants.ArmConstants.armExclusionXMin) {
+    //     //In danger zone
+    //     if (currentX < targetPos.xTarget) { //moving outward stop the shoulder to allow the elbow to get up high enough
+    //       shoulderLeaderMotor.stopMotor();
+    //     }
+    //     else { //stop the elbow to let the shoulder get back far enough
+    //       elbowLeaderMotor.stopMotor();
+    //     }
+    //   }      
+    // }
     //if we're not in the danger zone set the motors
-    else {
-      shoulderController.setReference((90 - shoulderAngle) / 2, com.revrobotics.CANSparkMax.ControlType.kPosition); //90 - inverse calc
+    //else {
+      shoulderController.setReference((90 - shoulderAngle) , com.revrobotics.CANSparkMax.ControlType.kPosition); //90 - inverse calc
       elbowController.setReference(-elbowAngle, com.revrobotics.CANSparkMax.ControlType.kPosition);
-      wristPitchController.setReference(targetPos.wristPitchTarget, com.revrobotics.CANSparkMax.ControlType.kPosition);
-      wristRollController.setReference(targetPos.wristRollTarget, com.revrobotics.CANSparkMax.ControlType.kPosition);
-    }
+      if (currentX > 17) {
+        wristPitchController.setReference(targetPos.wristPitchTarget, com.revrobotics.CANSparkMax.ControlType.kPosition);
+        wristRollController.setReference(targetPos.wristRollTarget, com.revrobotics.CANSparkMax.ControlType.kPosition);
+      }
+      else {
+        wristRollMotor.stopMotor();
+        wristPitchMotor.stopMotor();
+      }
+      
+    //}
     return Math.sqrt((Math.pow(currentX - targetPos.xTarget,2)) + (Math.pow(currentY - targetPos.yTarget, 2))); //returns distance to target
   }
   public void setElbowPIDF(double p, double i, double iZone, double d, double f) {
@@ -262,6 +273,20 @@ public class Arm extends SubsystemBase {
     shoulderController.setIZone(iZone);
     shoulderController.setD(d);
     shoulderController.setFF(f);
+  }
+  public void setWristPitchPIDF(double p, double i, double iZone, double d, double f) {
+    wristPitchController.setP(p);
+    wristPitchController.setI(i);
+    wristPitchController.setIZone(iZone);
+    wristPitchController.setD(d);
+    wristPitchController.setFF(f);
+  }
+  public void setWristRollPIDF(double p, double i, double iZone, double d, double f) {
+    wristRollController.setP(p);
+    wristRollController.setI(i);
+    wristRollController.setIZone(iZone);
+    wristRollController.setD(d);
+    wristRollController.setFF(f);
   }
   public void resetSmartMotionState() {
     smartMovementState = 0;
@@ -329,15 +354,15 @@ public class Arm extends SubsystemBase {
     double shoulderLength = Constants.ArmConstants.shoulderLength;
     double elbowLength = Constants.ArmConstants.elbowLength;
     double shoulderAngle = 90 - integratedShoulderEncoder.getPosition();
-    double elbowAngle = -integratedElbowEncoder.getPosition();
+    double elbowAngle = integratedElbowEncoder.getPosition();
     return shoulderLength * Math.cos(Math.toRadians(shoulderAngle)) + elbowLength * Math.cos(Math.toRadians((shoulderAngle) - elbowAngle));
   }
   public double getCurrentYPosition() {
     double shoulderLength = Constants.ArmConstants.shoulderLength;
     double elbowLength = Constants.ArmConstants.elbowLength;
     double shoulderAngle = 90 - integratedShoulderEncoder.getPosition();
-    double elbowAngle = -integratedElbowEncoder.getPosition();
-    return shoulderLength * Math.sin(Math.toRadians(shoulderAngle)) + elbowLength * Math.sin(Math.toRadians((shoulderAngle) - elbowAngle));
+    double elbowAngle = integratedElbowEncoder.getPosition();
+    return (shoulderLength * Math.sin(Math.toRadians(shoulderAngle)) + elbowLength * Math.sin(Math.toRadians((shoulderAngle) - elbowAngle)));
   }
   
   public void runShoulderMotor(double runSpeed) {

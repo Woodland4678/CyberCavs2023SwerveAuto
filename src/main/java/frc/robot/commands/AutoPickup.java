@@ -4,6 +4,10 @@
 
 package frc.robot.commands;
 
+import java.util.Arrays;
+
+import javax.print.attribute.standard.OrientationRequested;
+
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.AddressableLED;
@@ -21,11 +25,14 @@ public class AutoPickup extends CommandBase {
   PIDController rController = new PIDController(Constants.Swerve.autoDriveRP, Constants.Swerve.autoDriveRI, Constants.Swerve.autoDriveRD);
   boolean isDone = false;
   int isInPosCnt = 0;
-  double limelightYTarget = 0;
+  double limelightYTarget = 94;
+  double[] orientationReadings = new double[100];
+  int orientationReadingsIndex = 0;
   /** Creates a new AutoPickup. */
   public AutoPickup(Arm s_Arm, SwerveDrive s_Swerve) {
     this.s_Arm = s_Arm;
     this.s_Swerve = s_Swerve;
+    
     addRequirements(s_Arm, s_Swerve);
     // Use addRequirements() here to declare subsystem dependencies.
   }
@@ -44,14 +51,17 @@ public class AutoPickup extends CommandBase {
     yController.setSetpoint(limelightYTarget);
     xController.setTolerance(1);
     yController.setTolerance(0.5);
-    s_Swerve.setLimelightPipeline(3);
+    s_Swerve.setLimelightPipeline(1);
     isDone = false;
     isInPosCnt = 0;
+    s_Swerve.limelightDown();
+    orientationReadingsIndex = 0;
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+  
     var armPosError = s_Arm.MoveArm(Constants.ArmConstants.pickupPosition);    
     var degrees =s_Swerve.getYaw().getDegrees();
     //if (degrees < 0) {
@@ -63,8 +73,19 @@ public class AutoPickup extends CommandBase {
     var xSpeed = xController.calculate(s_Swerve.getLimelightX());
     var ySpeed = yController.calculate(boundingBoxXY);
 
-
-    Constants.ArmConstants.pickupPosition.wristRollTarget = coneAngle;
+    if ((boundingBoxXY < 80 && boundingBoxXY > 50) && s_Swerve.isConeFound() == 1) {
+      if (orientationReadingsIndex < 100) {
+        orientationReadings[orientationReadingsIndex] = -coneAngle;
+        orientationReadingsIndex++;
+      }
+    }
+    if (boundingBoxXY > 85) {
+      Arrays.sort(orientationReadings, 0, orientationReadingsIndex);
+      Constants.ArmConstants.pickupPosition.wristRollTarget = orientationReadings[orientationReadingsIndex / 2];
+    }
+    // if (s_Swerve.isConeFound() == 1) {
+    //   Constants.ArmConstants.pickupPosition.wristRollTarget = -coneAngle;
+    // }
     Translation2d translation = new Translation2d(ySpeed, xSpeed);
     SmartDashboard.putNumber(
                 "xSpeed",xSpeed);

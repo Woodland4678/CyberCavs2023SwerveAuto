@@ -13,9 +13,11 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -42,7 +44,7 @@ public class SwerveDrive extends SubsystemBase {
   private NetworkTable limelight;
   private NetworkTable rpi;
 
-  private Solenoid limelightPneumatic;
+  private DoubleSolenoid limelightSolenoid;
 
   private Field2d field;
 
@@ -68,7 +70,7 @@ public class SwerveDrive extends SubsystemBase {
     swerveOdometry = new SwerveDriveOdometry(Constants.Swerve.swerveKinematics, getYaw(), getModulePositions());
     field = new Field2d();
     SmartDashboard.putData("Field", field);
-    limelightPneumatic = new Solenoid(PneumaticsModuleType.REVPH, Constants.Swerve.limelightPneumaticChannel);
+    limelightSolenoid = new DoubleSolenoid(PneumaticsModuleType.REVPH, Constants.Swerve.limelightSolenoidChannel1, Constants.Swerve.limelightSolenoidChannel2);
     driveAssist = new CANSparkMax(Constants.Swerve.driveAssistCANId, MotorType.kBrushless);
   }
 
@@ -88,6 +90,11 @@ public class SwerveDrive extends SubsystemBase {
   }
   public void alternateDrive(double xSpeed, double ySpeed, double omegaSpeed, Pose2d robotPose2d) {
     ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, omegaSpeed, robotPose2d.getRotation());
+  }
+  public void resetSwerveModuleAngles() {
+    for (SwerveModule mod : mSwerveMods) {
+      mod.resetToAbsolute();
+    }
   }
 
   /* Used by SwerveControllerCommand in Auto */
@@ -118,7 +125,10 @@ public class SwerveDrive extends SubsystemBase {
     return limelight.getEntry("ta").getDouble(0);
   }
   public double getConeAngle() {
-    return rpi.getEntry("tv_angle").getDouble(0);
+    return rpi.getEntry("cone_angle").getDouble(0);
+  }
+  public double isConeFound() {
+    return rpi.getEntry("cone_found").getDouble(0);
   }
   public double getLimelightY() {
     return limelight.getEntry("ty").getDouble(0);
@@ -225,10 +235,10 @@ public class SwerveDrive extends SubsystemBase {
      );
   }
   public void limelightDown() {
-    limelightPneumatic.set(true);
+    limelightSolenoid.set(Value.kReverse);
   }
   public void limelightUp() {
-    limelightPneumatic.set(false);
+    limelightSolenoid.set(Value.kForward);
   }
   public void setDriveAssistVelocity(double velocity) {
     //driveAssist.set
