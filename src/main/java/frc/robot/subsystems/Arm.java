@@ -62,7 +62,11 @@ public class Arm extends SubsystemBase {
   private DigitalInput shoulderTopLimitSwitch;
   private DigitalInput shoulderBottomLimitSwitch;
 
-  private DigitalInput wristLimitSwitch;
+  private DigitalInput wristPitchLimitSwitch;
+
+  private boolean armMayMove = false;
+
+  private int calibrateWristState = 0;
 
   private final TrapezoidProfile.Constraints shoulderConstraints =
       new TrapezoidProfile.Constraints(1.75, 0.75);
@@ -81,7 +85,7 @@ public class Arm extends SubsystemBase {
   private final ArmFeedforward elbowFeedForward = new ArmFeedforward(0.12139, 0.17521, 0.023944);
   
 
-  public int gamePieceMode = Constants.ArmConstants.cubeMode;
+  public int gamePieceMode = Constants.ArmConstants.coneMode;
   
   /** Creates a new Arm. */
   public Arm() {
@@ -116,7 +120,7 @@ public class Arm extends SubsystemBase {
    // shoulderTopLimitSwitch = new DigitalInput(Constants.ArmConstants.shoulderTopLimitSwitchChannel);
     //shoulderBottomLimitSwitch = new DigitalInput(Constants.ArmConstants.shoulderBottomLimitSwitchChannel);
 
-    wristLimitSwitch = new DigitalInput(Constants.ArmConstants.wristLimitSwitch);
+    wristPitchLimitSwitch = new DigitalInput(Constants.ArmConstants.wristPitchLimitSwitchChannel);
     elbowLeaderMotor.setClosedLoopRampRate(0.5); //TODO may want this for acceleration control
     wristRollMotor.setClosedLoopRampRate(0.05);
 
@@ -149,8 +153,8 @@ public class Arm extends SubsystemBase {
     elbowAbsolute = new DutyCycleEncoder(ArmConstants.elbowEncoderAbsoluteID);
 
 
-    shoulderController.setOutputRange(-0.35, 0.35);
-    elbowController.setOutputRange(-0.35, 0.35);
+    shoulderController.setOutputRange(-1, 1);
+    elbowController.setOutputRange(-1, 1);
     //wristRollController.setOutputRange(elbowTargetAngle, smartMovementState)
 
     shoulderLeaderMotor.setSmartCurrentLimit(40);
@@ -173,17 +177,20 @@ public class Arm extends SubsystemBase {
   public double getCurrentShoulderPosition() {
     return integratedShoulderEncoder.getPosition();
   }
-  public void ClawOpen(){
-    clawSolenoid1.set(Value.kForward);
-    clawSolenoid2.set(Value.kForward);
-  }
-
-  public void ClawClose(){
+  public void openClaw(){
     clawSolenoid1.set(Value.kReverse);
     clawSolenoid2.set(Value.kReverse);
   }
+
+  public void closeClaw(){
+    clawSolenoid1.set(Value.kForward);
+    clawSolenoid2.set(Value.kForward);
+  }
   public int getGamePieceMode() {
     return gamePieceMode;
+  }
+  public void setArmCanMove(boolean canMove) {
+    armMayMove = canMove;
   }
   public void setGamePieceMode(int mode) {
     gamePieceMode = mode;
@@ -221,8 +228,16 @@ public class Arm extends SubsystemBase {
     shoulderController.setReference(shoulderSetpoint.position, com.revrobotics.CANSparkMax.ControlType.kPosition, 0, shoulderFeedforward.calculate(integratedShoulderEncoder.getPosition(),shoulderSetpoint.velocity)/12);
     elbowController.setReference(elbowSetpoint.position, com.revrobotics.CANSparkMax.ControlType.kPosition, 0, elbowFeedForward.calculate(90 - integratedShoulderEncoder.getPosition(),elbowSetpoint.velocity)/12);
   }
-  
+  public boolean isArmStartOkay() {
+    if ((90 - integratedShoulderEncoder.getPosition()) > 105 && (90 - integratedShoulderEncoder.getPosition() < 132)) {
+      if (-integratedElbowEncoder.getPosition() > -175 && -integratedElbowEncoder.getPosition() < -165) {
+        return true;
+      }
+    }
+    return false;
+  }
   public double MoveArm(ArmPosition targetPos) { //TODO we shouldn't recalculate angles each time, if we use this method change it
+    
     double elbowAngle = calcElbowAngle(targetPos.xTarget, targetPos.yTarget);
     double shoulderAngle = calcShoulderAngle(targetPos.xTarget, targetPos.yTarget, elbowAngle);
     double currentX = getCurrentXPosition();
@@ -246,8 +261,9 @@ public class Arm extends SubsystemBase {
     // }
     //if we're not in the danger zone set the motors
     //else {
-      shoulderController.setReference((90 - shoulderAngle) , com.revrobotics.CANSparkMax.ControlType.kPosition); //90 - inverse calc
-      elbowController.setReference(-elbowAngle, com.revrobotics.CANSparkMax.ControlType.kPosition);
+      if (shoulderAngle >= 45 && shoulderAngle <= 135 && elbowAngle <= 0 && elbowAngle >= -175 ) {
+        moveToAngle(shoulderAngle, elbowAngle);
+      }
       if (currentX > 17) {
         wristPitchController.setReference(targetPos.wristPitchTarget, com.revrobotics.CANSparkMax.ControlType.kPosition);
         wristRollController.setReference(targetPos.wristRollTarget, com.revrobotics.CANSparkMax.ControlType.kPosition);
@@ -256,9 +272,14 @@ public class Arm extends SubsystemBase {
         wristRollMotor.stopMotor();
         wristPitchMotor.stopMotor();
       }
+    
       
     //}
     return Math.sqrt((Math.pow(currentX - targetPos.xTarget,2)) + (Math.pow(currentY - targetPos.yTarget, 2))); //returns distance to target
+  }
+  public void moveToAngle(double shoulderAngle, double elbowAngle) {
+    shoulderController.setReference((90 - shoulderAngle) , com.revrobotics.CANSparkMax.ControlType.kPosition); //90 - inverse calc
+    elbowController.setReference(-elbowAngle, com.revrobotics.CANSparkMax.ControlType.kPosition);
   }
   public void setElbowPIDF(double p, double i, double iZone, double d, double f) {
     elbowController.setP(p);
@@ -345,7 +366,52 @@ public class Arm extends SubsystemBase {
   public void MovewristPitch(double position) {
     wristPitchController.setReference(position, com.revrobotics.CANSparkMax.ControlType.kPosition);
   }
-  
+  public void resetCalibrateWristState() {
+    calibrateWristState = 0;
+  }
+  public boolean calibrateWrist() {
+    switch(calibrateWristState) {
+      case 0:
+        wristPitchMotor.set(0.1);
+        if (!wristPitchLimitSwitch.get()) {
+          calibrateWristState++;
+        }
+      break;
+      case 1:
+        wristPitchMotor.set(-0.1);
+        if (wristPitchLimitSwitch.get()) {
+          calibrateWristState++;
+        }
+      break;
+      case 2:
+        wristPitchMotor.stopMotor();
+        integratedwristPitchEncoder.setPosition(0);
+        return true;
+    }
+    return false;
+  }
+  public void wristRollManual(double speed) {
+    if (integratedwristRollEncoder.getPosition() > 720 && speed > 0) {
+      wristRollMotor.stopMotor();
+    }
+    else if (integratedwristRollEncoder.getPosition() < -720 && speed < 0) {
+      wristRollMotor.stopMotor();
+    } 
+    else {
+      wristRollMotor.set(speed);
+    }
+  }
+  public void wristPitchManual(double speed) {
+    if (integratedwristRollEncoder.getPosition() <= 0 && speed > 0) {
+      wristPitchMotor.stopMotor();
+    }
+    else if (integratedwristRollEncoder.getPosition() < -150 && speed < 0) {
+      wristPitchMotor.stopMotor();
+    } 
+    else {
+      wristPitchMotor.set(speed);
+    }
+  }
   public void resetToAbsoluteEncoder() {
     integratedShoulderEncoder.setPosition(((shoulderAbsolute.getAbsolutePosition()) * 360) - ArmConstants.shoulderAngleOffset);
     integratedElbowEncoder.setPosition(((elbowAbsolute.getAbsolutePosition()) * 360) - ArmConstants.elbowAngleOffset);
@@ -364,7 +430,9 @@ public class Arm extends SubsystemBase {
     double elbowAngle = integratedElbowEncoder.getPosition();
     return (shoulderLength * Math.sin(Math.toRadians(shoulderAngle)) + elbowLength * Math.sin(Math.toRadians((shoulderAngle) - elbowAngle)));
   }
-  
+  public double getCurrentWristRollPosition() {
+    return integratedwristRollEncoder.getPosition();
+  }
   public void runShoulderMotor(double runSpeed) {
     shoulderLeaderMotor.set(runSpeed);
   }
@@ -376,13 +444,13 @@ public class Arm extends SubsystemBase {
   public void periodic() {
     //resetToAbsoluteEncoder();
     SmartDashboard.putNumber( 
-                  "Elbow Angle", integratedElbowEncoder.getPosition());
+                  "Elbow Angle", -integratedElbowEncoder.getPosition());
     SmartDashboard.putNumber( 
                   "Elbow Absolute", elbowAbsolute.getAbsolutePosition() * 360);
     SmartDashboard.putNumber( 
                   "Shoulder Absolute", (shoulderAbsolute.getAbsolutePosition()) * 360);
     SmartDashboard.putNumber( 
-                  "Shoulder Angle", integratedShoulderEncoder.getPosition());
+                  "Shoulder Angle", 90 - integratedShoulderEncoder.getPosition());
     SmartDashboard.putNumber( 
                   "Wrist Horizontal Angle", integratedwristRollEncoder.getPosition());
     SmartDashboard.putNumber( 
@@ -391,6 +459,8 @@ public class Arm extends SubsystemBase {
                   "Arm X Position", getCurrentXPosition());
     SmartDashboard.putNumber( 
                   "Arm Y Position", getCurrentYPosition());
+    SmartDashboard.putBoolean( 
+                  "Wrist Pitch Limit Switch", wristPitchLimitSwitch.get());
     // This method will be called once per scheduler run
     // if (elbowTopLimitSwitch.get() || elbowBottomLimitSwitch.get()) {
     //   elbowLeaderMotor.stopMotor();

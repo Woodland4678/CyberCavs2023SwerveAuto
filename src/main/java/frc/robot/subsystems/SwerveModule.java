@@ -38,6 +38,8 @@ public class SwerveModule {
   private final SparkMaxPIDController driveController;
   private final SparkMaxPIDController angleController;
 
+  private double driveSetSpeed = 0;
+
   private final SimpleMotorFeedforward feedforward =
       new SimpleMotorFeedforward(
           Constants.Swerve.driveKS, Constants.Swerve.driveKV, Constants.Swerve.driveKA);
@@ -121,6 +123,7 @@ public class SwerveModule {
   }
 
   private void setSpeed(SwerveModuleState desiredState, boolean isOpenLoop) {
+    driveSetSpeed = desiredState.speedMetersPerSecond;
     if (isOpenLoop) {
       double percentOutput = desiredState.speedMetersPerSecond / Constants.Swerve.maxSpeed;
       driveMotor.set(percentOutput);
@@ -147,7 +150,9 @@ public class SwerveModule {
   private Rotation2d getAngle() {
     return Rotation2d.fromDegrees(integratedAngleEncoder.getPosition());
   }
-
+  public double getSetVelocity() {
+    return driveSetSpeed;
+  }
   public Rotation2d getCanCoder() {
 
     return Rotation2d.fromDegrees(angleEncoderTemp.getAbsolutePosition() * 360); //TODO may need the if statements with the offsets here like we had in the other code

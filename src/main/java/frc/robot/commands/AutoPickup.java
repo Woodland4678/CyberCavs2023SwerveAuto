@@ -28,6 +28,8 @@ public class AutoPickup extends CommandBase {
   double limelightYTarget = 94;
   double[] orientationReadings = new double[100];
   int orientationReadingsIndex = 0;
+  double currentArmError = 0;
+  int isDoneCnt = 0;
   /** Creates a new AutoPickup. */
   public AutoPickup(Arm s_Arm, SwerveDrive s_Swerve) {
     this.s_Arm = s_Arm;
@@ -40,6 +42,7 @@ public class AutoPickup extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    isDoneCnt = 0;
     if (s_Arm.getGamePieceMode() == Constants.ArmConstants.coneMode) {
       limelightYTarget = Constants.Swerve.coneAutoDriveYTarget;
     }
@@ -51,7 +54,12 @@ public class AutoPickup extends CommandBase {
     yController.setSetpoint(limelightYTarget);
     xController.setTolerance(1);
     yController.setTolerance(0.5);
-    s_Swerve.setLimelightPipeline(1);
+    if (s_Arm.gamePieceMode == Constants.ArmConstants.coneMode) {
+      s_Swerve.setLimelightPipeline(1);
+    }
+    else {
+      s_Swerve.setLimelightPipeline(2);
+    }
     isDone = false;
     isInPosCnt = 0;
     s_Swerve.limelightDown();
@@ -62,7 +70,7 @@ public class AutoPickup extends CommandBase {
   @Override
   public void execute() {
   
-    var armPosError = s_Arm.MoveArm(Constants.ArmConstants.pickupPosition);    
+     
     var degrees =s_Swerve.getYaw().getDegrees();
     //if (degrees < 0) {
      // degrees += 360;
@@ -72,16 +80,18 @@ public class AutoPickup extends CommandBase {
     var rSpeed = rController.calculate(degrees);
     var xSpeed = xController.calculate(s_Swerve.getLimelightX());
     var ySpeed = yController.calculate(boundingBoxXY);
-
-    if ((boundingBoxXY < 80 && boundingBoxXY > 50) && s_Swerve.isConeFound() == 1) {
-      if (orientationReadingsIndex < 100) {
-        orientationReadings[orientationReadingsIndex] = -coneAngle;
-        orientationReadingsIndex++;
+    if (s_Arm.getGamePieceMode() == Constants.ArmConstants.coneMode) {
+      if ((boundingBoxXY < 80 && boundingBoxXY > 50) && s_Swerve.isConeFound() == 1) {
+        if (orientationReadingsIndex < 100) {
+          orientationReadings[orientationReadingsIndex] = -coneAngle;
+          orientationReadingsIndex++;
+        }
       }
-    }
-    if (boundingBoxXY > 85) {
-      Arrays.sort(orientationReadings, 0, orientationReadingsIndex);
-      Constants.ArmConstants.pickupPosition.wristRollTarget = orientationReadings[orientationReadingsIndex / 2];
+      if (boundingBoxXY > 85) {
+        Arrays.sort(orientationReadings, 0, orientationReadingsIndex);
+        Constants.ArmConstants.pickupPosition.wristRollTarget = orientationReadings[orientationReadingsIndex / 2];
+        Constants.ArmConstants.grabConePosition.wristRollTarget = orientationReadings[orientationReadingsIndex / 2];
+      }
     }
     // if (s_Swerve.isConeFound() == 1) {
     //   Constants.ArmConstants.pickupPosition.wristRollTarget = -coneAngle;
@@ -96,25 +106,45 @@ public class AutoPickup extends CommandBase {
     //SmartDashboard.putNumber(
     //              "coneAngle",coneAngle);
     
-    s_Swerve.drive(translation, rSpeed, false, true);
+    
 
-    if (armPosError < 3 && Math.abs(boundingBoxXY - limelightYTarget) < 2) {
+    if (currentArmError < 3 && Math.abs(boundingBoxXY - limelightYTarget) < 2) {
       isInPosCnt++;
     }
+    else {
+      currentArmError = s_Arm.MoveArm(Constants.ArmConstants.pickupPosition);   
+    }
     if (isInPosCnt > 10) {
-      s_Arm.ClawClose();
+      s_Swerve.stop();
+      if (s_Arm.gamePieceMode == Constants.ArmConstants.coneMode) {
+        currentArmError = s_Arm.MoveArm(Constants.ArmConstants.grabConePosition);
+      }
+      else {
+        currentArmError = s_Arm.MoveArm(Constants.ArmConstants.grabCubePosition);
+      }
+      if (Math.abs(currentArmError) < 3) {
+        s_Arm.closeClaw();
+        isDoneCnt++;
+        if (isDoneCnt > 8) {
+          isDone = true;
+        }
+      }
+    }
+    else {
+      s_Swerve.drive(translation, rSpeed, false, true);
     }
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
+    s_Arm.MoveArm(Constants.ArmConstants.pickupToRestIntermediatePosition);
     s_Swerve.stop();
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return isDone;
   }
 }

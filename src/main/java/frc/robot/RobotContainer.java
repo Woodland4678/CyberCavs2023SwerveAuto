@@ -33,32 +33,42 @@ public class RobotContainer {
   private final int rotationAxis = XboxController.Axis.kRightX.value;
 
   /* Driver Buttons */
-  private final JoystickButton zeroGyro =
+  private final JoystickButton driverBtnY =
       new JoystickButton(driver, XboxController.Button.kY.value);
-  private final JoystickButton robotCentric =
+  private final JoystickButton driverBtnLB =
       new JoystickButton(driver, XboxController.Button.kLeftBumper.value);
-  private final JoystickButton followObject =
-      new JoystickButton(driver, XboxController.Button.kA.value);
-  private final JoystickButton followTape =
-      new JoystickButton(driver, XboxController.Button.kB.value);
-  private final JoystickButton autoBalance =
-      new JoystickButton(driver, XboxController.Button.kX.value);
-  private final JoystickButton moveArmPos1 = 
+  private final JoystickButton driverBtnRB =
       new JoystickButton(driver, XboxController.Button.kRightBumper.value);
-  private final JoystickButton moveArmPos2 = 
-      new JoystickButton(driver, XboxController.Button.kLeftBumper.value);
+  private final JoystickButton driverBtnA =
+      new JoystickButton(driver, XboxController.Button.kA.value);
+  private final JoystickButton driverBtnB =
+      new JoystickButton(driver, XboxController.Button.kB.value);
+  private final JoystickButton driverBtnX =
+      new JoystickButton(driver, XboxController.Button.kX.value);
+  private final JoystickButton driverBtnRT = 
+      new JoystickButton(driver, XboxController.Axis.kRightTrigger.value);
+  
+  
 
   /* Operator Buttons */
-  private final JoystickButton armScoreHigh =
+  private final JoystickButton operatorBtnY =
       new JoystickButton(operator, 4);
-  private final JoystickButton armScoreMedium =
+  private final JoystickButton operatorBtnX =
       new JoystickButton(operator, 1);
-  private final JoystickButton armScoreLow =
+  private final JoystickButton operatorBtnA =
       new JoystickButton(operator, 2);
-  private final JoystickButton armPickup =
+  private final JoystickButton operatorBtnB =
       new JoystickButton(operator, 3);
-  private final JoystickButton armRest =
+  private final JoystickButton operatorBtnLB =
       new JoystickButton(operator, 5);
+  private final JoystickButton operatorBtnRB =
+      new JoystickButton(operator, 6);
+  private final JoystickButton operatorBtnBack =
+      new JoystickButton(operator, 9);
+  private final JoystickButton operatorBtnStart =
+      new JoystickButton(operator, 10);
+  private final JoystickButton operatorBtnRT =
+      new JoystickButton(operator, 8);
 
   /* Subsystems */
   private final SwerveDrive s_Swerve = new SwerveDrive();
@@ -67,34 +77,42 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+    
     s_Swerve.setDefaultCommand(
         new TeleopSwerve(
             s_Swerve,
             () -> -driver.getRawAxis(translationAxis),
             () -> -driver.getRawAxis(strafeAxis),
             () -> -driver.getRawAxis(rotationAxis),
-            () -> robotCentric.getAsBoolean()));
+            () -> driverBtnLB.getAsBoolean()));
+
 
     // Configure the button bindings
     configureButtonBindings();
   }
   private void configureButtonBindings() {
     /* Driver Buttons */
-    zeroGyro.onTrue(new InstantCommand(() -> s_Swerve.zeroGyro()));
-    followObject.whileTrue(new AutoPickup(s_Arm, s_Swerve));
-    followTape.whileTrue(new FollowTape(s_Swerve, driver));
-    autoBalance.whileTrue(new AutoBalance(s_Swerve));
+    driverBtnY.onTrue(new InstantCommand(() -> s_Swerve.zeroGyro()));
+    driverBtnA.whileTrue(new AutoPickup(s_Arm, s_Swerve));
+    driverBtnX.onTrue(new InstantCommand(() -> s_Arm.openClaw()));
+    driverBtnB.onTrue(new InstantCommand(() -> s_Arm.closeClaw()));
+    driverBtnRB.whileTrue(new YeetCube(s_Arm));
+    //followTape.whileTrue(new FollowTape(s_Swerve, driver));
+    //autoBalance.whileTrue(new AutoBalance(s_Swerve));
     //moveArmPos1.whileTrue(new OpenClaw(s_Arm, 1));
     //moveArmPos2.whileTrue(new OpenClaw(s_Arm, 2));
-    moveArmPos1.whileTrue(new ArmMovePIDOnly(s_Arm, 1));
-    moveArmPos2.whileTrue(new ArmMovePIDOnly(s_Arm, 2));
+    //moveArmPos1.whileTrue(new ArmMovePIDOnly(s_Arm, 1));
+    //moveArmPos2.whileTrue(new ArmMovePIDOnly(s_Arm, 2));
 
     /* Operator Buttons */
-    armScoreHigh.onTrue(new MoveArm(s_Arm,Constants.ArmConstants.scoreConeHighPosition));
-    armScoreMedium.onTrue(new MoveArm(s_Arm,Constants.ArmConstants.scoreConeMediumPosition));
-    armScoreLow.onTrue(new MoveArm(s_Arm,Constants.ArmConstants.scoreLowPosition));
-    armPickup.whileTrue(new MoveArm(s_Arm,Constants.ArmConstants.pickupPosition));
-    armRest.whileTrue(new MoveArm(s_Arm,Constants.ArmConstants.restPosition));
+    operatorBtnY.onTrue(new MoveArm(s_Arm,Constants.ArmConstants.scoreConeHighPosition, operator));
+    operatorBtnB.onTrue(new MoveArm(s_Arm,Constants.ArmConstants.scoreConeMediumPosition, operator));
+    operatorBtnA.onTrue(new MoveArm(s_Arm,Constants.ArmConstants.scoreLowPosition, operator));
+    operatorBtnX.onTrue(new MoveArm(s_Arm,Constants.ArmConstants.pickupPosition, operator));
+    operatorBtnLB.onTrue(new MoveArm(s_Arm,Constants.ArmConstants.restPosition, operator));
+    operatorBtnRB.onTrue(new GrabGamePiece(s_Arm));
+    operatorBtnBack.onTrue(new CalibrateArm(s_Arm));
+    operatorBtnRT.onTrue(new MoveArm(s_Arm,Constants.ArmConstants.grabUprightConePosition, operator));
   }
 
   public static Joystick getOperatorJoystick() {
@@ -126,6 +144,12 @@ public class RobotContainer {
   }
   public void setWristRollPIDF(double p, double i, double iZone, double d, double f) {
     s_Arm.setWristRollPIDF(p, i, iZone, d, f);
+  }
+  public boolean isArmStartOkay() {
+    return s_Arm.isArmStartOkay();
+  }
+  public void setArmMayMove(boolean mayMove) {
+    s_Arm.setArmCanMove(mayMove);
   }
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.

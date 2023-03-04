@@ -139,7 +139,7 @@ public final class Constants {
 
     /* Back Right Module - Module 3 */
     public static final class Mod3 {
-      public static final int driveMotorID = 5;
+      public static final int driveMotorID = 16;
       public static final int angleMotorID = 6;
       public static final int canCoderID = 1;
       public static final Rotation2d angleOffset = Rotation2d.fromDegrees(81.7); //122.2
@@ -263,26 +263,38 @@ public final class Constants {
     public static final double armExclusionXMax = 13.0;
     public static final double armExclusionY = 4.0;
 
-    public static final int wristLimitSwitch = 8;
+    public static final int wristPitchLimitSwitchChannel = 9;
 
     
-    public static final ArmPosition scoreConeHighPosition = new ArmPosition(52, 40, 0, 0);
-    public static ArmPosition pickupPosition = new ArmPosition(28.84, 11.5, 0, -127.6);//wrist roll position needs to change so this shouldn't be "final"
-    public static final ArmPosition pos2 = new ArmPosition(20, 20, 0, 0);
-    public static final ArmPosition restPosition = new ArmPosition(10, 10, -40, 0);
-    public static final ArmPosition scoreConeMediumPosition = new ArmPosition(40, 35, 0, 10);
-    public static final ArmPosition scoreLowPosition = new ArmPosition(25, -5, 0, -20);
+    public static final ArmPosition scoreConeHighPosition = new ArmPosition(52, 45.5, 0, -35, false);
+    public static ArmPosition pickupPosition = new ArmPosition(28.84, 11.5, 0, -127.6, false);//wrist roll position needs to change so this shouldn't be "final"
+    public static final ArmPosition pos2 = new ArmPosition(20, 20, 0, 0, false);
+    public static final ArmPosition restPosition = new ArmPosition(110.3, -170.46, 90, 0, true);
+    public static final ArmPosition scoreConeMediumPosition = new ArmPosition(40, 35, 0, 10, false);
+    public static final ArmPosition scoreLowPosition = new ArmPosition(25, -5, 0, -20, false);
+    public static ArmPosition grabConePosition = new ArmPosition(31.27, 2.3, 0, -140.68, false);
+    public static ArmPosition grabCubePosition = new ArmPosition(28.84, 2, 0, -127.6, false);
+    public static final ArmPosition pickupToRestIntermediatePosition = new ArmPosition(17.44, 10.2, 90, 0, false);
+    public static final ArmPosition yeetCubePosition = new ArmPosition(22.8, 47.8, 0, 0, false);
+    public static final ArmPosition grabUprightConePosition = new ArmPosition(27.07, -3.75, 0, 0, false);
+    public static final ArmPosition restToScoreIntermediatePosition = new ArmPosition(18.205, 36, 0, 0, false);
+
+    public static final ArmPosition scoreCubeHighPosition = new ArmPosition(52, 40, 0, 0, false);
+    public static final ArmPosition scoreCubeMediumPosition = new ArmPosition(40, 35, 0, 10, false);
+
   }
   public static class ArmPosition{
     public double xTarget = 10; //default "homeish" position
     public double yTarget = 15; //default "homeish" position
     public double wristPitchTarget = 0;
     public double wristRollTarget = 0;
-    public ArmPosition(double xTarget, double yTarget, double wristRollTarget, double wristPitchTarget) {
+    public boolean isAngleTarget = false;
+    public ArmPosition(double xTarget, double yTarget, double wristRollTarget, double wristPitchTarget, boolean isAngleTarget) {
       this.xTarget = xTarget;
       this.yTarget = yTarget;
       this.wristPitchTarget = wristPitchTarget;
       this.wristRollTarget = wristRollTarget;
+      this.isAngleTarget = isAngleTarget;
     }
   }
 }

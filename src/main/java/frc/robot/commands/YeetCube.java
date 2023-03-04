@@ -5,16 +5,15 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Constants;
 import frc.robot.subsystems.Arm;
 
-public class OpenClaw extends CommandBase {
-  Arm armSubsystem;
-  int openClose = 1;
-  /** Creates a new OpenClaw. */
-  public OpenClaw(Arm armSubsystem, int openClose) {
-    this.openClose = openClose;
-    this.armSubsystem=armSubsystem;
-    addRequirements(armSubsystem);
+public class YeetCube extends CommandBase {
+  Arm s_Arm;
+  /** Creates a new YeetCube. */
+  public YeetCube(Arm s_Arm) {
+    this.s_Arm = s_Arm;
+    addRequirements(s_Arm);
     // Use addRequirements() here to declare subsystem dependencies.
   }
 
@@ -25,21 +24,21 @@ public class OpenClaw extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if (this.openClose == 1) {
-      armSubsystem.openClaw();
-    }
-    else {
-      armSubsystem.closeClaw();
+    var currentArmError = s_Arm.MoveArm(Constants.ArmConstants.yeetCubePosition);
+    if (currentArmError < 40) {
+      s_Arm.openClaw();
     }
   }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    s_Arm.stopArm();
+  }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return true;
+    return false;
   }
 }

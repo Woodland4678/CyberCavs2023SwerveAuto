@@ -87,6 +87,7 @@ public class SwerveDrive extends SubsystemBase {
     for (SwerveModule mod : mSwerveMods) {
       mod.setDesiredState(swerveModuleStates[mod.moduleNumber], isOpenLoop);
     }
+    limelightUp();
   }
   public void alternateDrive(double xSpeed, double ySpeed, double omegaSpeed, Pose2d robotPose2d) {
     ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, omegaSpeed, robotPose2d.getRotation());
@@ -282,6 +283,8 @@ public class SwerveDrive extends SubsystemBase {
                   "Swerve Yaw", getYaw().getDegrees());
     SmartDashboard.putNumber(
                   "gyro pitch", gyro.getPitch());
+    SmartDashboard.putNumber(
+                    "Wonky swerve motor", mSwerveMods[3].getSetVelocity());
     SmartDashboard.putNumber(
                   "gyro Roll", gyro.getRoll());
                   SmartDashboard.putNumber(
