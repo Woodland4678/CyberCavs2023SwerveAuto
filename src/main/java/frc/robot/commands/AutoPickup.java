@@ -42,6 +42,7 @@ public class AutoPickup extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    s_Swerve.limelightDown();
     isDoneCnt = 0;
     if (s_Arm.getGamePieceMode() == Constants.ArmConstants.coneMode) {
       limelightYTarget = Constants.Swerve.coneAutoDriveYTarget;
@@ -62,7 +63,6 @@ public class AutoPickup extends CommandBase {
     }
     isDone = false;
     isInPosCnt = 0;
-    s_Swerve.limelightDown();
     orientationReadingsIndex = 0;
   }
 
@@ -108,7 +108,7 @@ public class AutoPickup extends CommandBase {
     
     
 
-    if (currentArmError < 3 && Math.abs(boundingBoxXY - limelightYTarget) < 2) {
+    if (currentArmError < 3 && Math.abs(boundingBoxXY - limelightYTarget) < 2 && Math.abs(s_Swerve.getLimelightX()) < 3.5) {
       isInPosCnt++;
     }
     else {

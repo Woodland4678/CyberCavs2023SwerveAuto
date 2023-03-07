@@ -66,7 +66,7 @@ public final class Constants {
 
     /* Swerve Current Limiting */
     public static final int angleContinuousCurrentLimit = 20;
-    public static final int driveContinuousCurrentLimit = 80;
+    public static final int driveContinuousCurrentLimit = 40;
 
     /* Angle Motor PID Values */
     public static final double angleKP = 0.01;
@@ -112,7 +112,7 @@ public final class Constants {
       public static final int driveMotorID = 1;
       public static final int angleMotorID = 2;
       public static final int canCoderID = 3;
-      public static final Rotation2d angleOffset = Rotation2d.fromDegrees( 49.1); 
+      public static final Rotation2d angleOffset = Rotation2d.fromDegrees( 49.5); 
       public static final SwerveModuleConstants constants =
           new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
     }
@@ -122,7 +122,7 @@ public final class Constants {
       public static final int driveMotorID = 3;
       public static final int angleMotorID = 4;
       public static final int canCoderID = 0;
-      public static final Rotation2d angleOffset = Rotation2d.fromDegrees(213.21);
+      public static final Rotation2d angleOffset = Rotation2d.fromDegrees(212.5);
       public static final SwerveModuleConstants constants =
           new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
     }
@@ -132,7 +132,7 @@ public final class Constants {
       public static final int driveMotorID = 7;
       public static final int angleMotorID = 8;
       public static final int canCoderID = 2;
-      public static final Rotation2d angleOffset = Rotation2d.fromDegrees(122.2); //81.7
+      public static final Rotation2d angleOffset = Rotation2d.fromDegrees(122.23); //81.7
       public static final SwerveModuleConstants constants =
           new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
     }
@@ -142,7 +142,7 @@ public final class Constants {
       public static final int driveMotorID = 16;
       public static final int angleMotorID = 6;
       public static final int canCoderID = 1;
-      public static final Rotation2d angleOffset = Rotation2d.fromDegrees(81.7); //122.2
+      public static final Rotation2d angleOffset = Rotation2d.fromDegrees(81.01); //122.2
       public static final SwerveModuleConstants constants =
           new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
     }
@@ -152,23 +152,36 @@ public final class Constants {
     /////////////////////////////////////////////////////////////
     //**Auto drive values (for scoring and game piece pickup) */
     /////////////////////////////////////////////////////////////
-    public static double autoDriveYP = 0.022; //0.2
+    public static double autoDriveYP = 0.3; //0.2
     public static double autoDriveYI = 0.000;
     public static double autoDriveYD = 0.0;
     public static double autoDriveYTolerance = 1;
+
+    public static double autoDriveScoreYP = 0.05; //0.2
+    public static double autoDriveScoreYI = 0.000;
+    public static double autoDriveScoreYD = 0.0;
+    public static double autoDriveYScoreTolerance = 1;
 
     public static double autoDriveXP = 0.1; //0.2
     public static double autoDriveXI = 0.00;
     public static double autoDriveXD = 0.0;
     public static double autoDriveXTolerance = 1;
 
-    public static double autoDriveRP = 0.2;
-    public static double autoDriveRI = 0.01;
+    public static double autoDriveRP = 0.15;
+    public static double autoDriveRI = 0.0;
     public static double autoDriveRD = 0.0;
     public static double autoDriveRTolerance = 2;
 
     public static double coneAutoDriveYTarget = 131;
     public static double cubeAutoDriveYTarget = 131;
+
+    public static int limelightHighScorePipeline = 3;
+    public static int limelightMediumScorePipeline = 5;
+
+    public static double autoScoreHighYTarget = 0.1;
+    public static double autoScoreMediumYTarget = -5;
+
+    public static final double uprightConeAutoDriveYTarget = 33.6;
 
     
   }
@@ -276,11 +289,12 @@ public final class Constants {
     public static ArmPosition grabCubePosition = new ArmPosition(28.84, 2, 0, -127.6, false);
     public static final ArmPosition pickupToRestIntermediatePosition = new ArmPosition(17.44, 10.2, 90, 0, false);
     public static final ArmPosition yeetCubePosition = new ArmPosition(22.8, 47.8, 0, 0, false);
-    public static final ArmPosition grabUprightConePosition = new ArmPosition(27.07, -3.75, 0, 0, false);
+    public static final ArmPosition grabUprightConePosition = new ArmPosition(32.7, -5, 0, 0, false);
     public static final ArmPosition restToScoreIntermediatePosition = new ArmPosition(18.205, 36, 0, 0, false);
 
     public static final ArmPosition scoreCubeHighPosition = new ArmPosition(52, 40, 0, 0, false);
     public static final ArmPosition scoreCubeMediumPosition = new ArmPosition(40, 35, 0, 10, false);
+    public static final ArmPosition pickupUprightIntermediatePosition = new ArmPosition(15.44, 10.2, 0, 0, false);
 
   }
   public static class ArmPosition{

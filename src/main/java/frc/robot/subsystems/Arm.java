@@ -451,7 +451,7 @@ public class Arm extends SubsystemBase {
                   "Shoulder Absolute", (shoulderAbsolute.getAbsolutePosition()) * 360);
     SmartDashboard.putNumber( 
                   "Shoulder Angle", 90 - integratedShoulderEncoder.getPosition());
-    SmartDashboard.putNumber( 
+    SmartDashboard.putNumber(
                   "Wrist Horizontal Angle", integratedwristRollEncoder.getPosition());
     SmartDashboard.putNumber( 
                   "Wrist Vertical Angle", integratedwristPitchEncoder.getPosition());

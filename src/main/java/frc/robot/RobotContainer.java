@@ -47,6 +47,8 @@ public class RobotContainer {
       new JoystickButton(driver, XboxController.Button.kX.value);
   private final JoystickButton driverBtnRT = 
       new JoystickButton(driver, XboxController.Axis.kRightTrigger.value);
+  private final JoystickButton driverBtnBack =
+      new JoystickButton(driver, XboxController.Button.kBack.value);
   
   
 
@@ -84,7 +86,10 @@ public class RobotContainer {
             () -> -driver.getRawAxis(translationAxis),
             () -> -driver.getRawAxis(strafeAxis),
             () -> -driver.getRawAxis(rotationAxis),
-            () -> driverBtnLB.getAsBoolean()));
+            () -> driverBtnRT.getAsBoolean(),
+            () -> driverBtnLB.getAsBoolean(),
+            () -> driverBtnRB.getAsBoolean()));
+
 
 
     // Configure the button bindings
@@ -92,11 +97,12 @@ public class RobotContainer {
   }
   private void configureButtonBindings() {
     /* Driver Buttons */
-    driverBtnY.onTrue(new InstantCommand(() -> s_Swerve.zeroGyro()));
-    driverBtnA.whileTrue(new AutoPickup(s_Arm, s_Swerve));
+    driverBtnBack.onTrue(new InstantCommand(() -> s_Swerve.zeroGyro()));
+    driverBtnA.whileTrue(new UprightGrabSequence(s_Swerve, s_Arm));
     driverBtnX.onTrue(new InstantCommand(() -> s_Arm.openClaw()));
     driverBtnB.onTrue(new InstantCommand(() -> s_Arm.closeClaw()));
     driverBtnRB.whileTrue(new YeetCube(s_Arm));
+    driverBtnY.whileTrue(new AutoScoreHigh(s_Arm, s_Swerve));
     //followTape.whileTrue(new FollowTape(s_Swerve, driver));
     //autoBalance.whileTrue(new AutoBalance(s_Swerve));
     //moveArmPos1.whileTrue(new OpenClaw(s_Arm, 1));

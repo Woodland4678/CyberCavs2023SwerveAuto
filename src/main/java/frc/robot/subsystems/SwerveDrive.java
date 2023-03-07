@@ -15,9 +15,11 @@ import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
+import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
+import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -34,6 +36,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import frc.robot.LimelightHelpers;
 import frc.robot.RobotContainer;
 import frc.robot.LimelightHelpers.LimelightResults;
+import frc.robot.LimelightHelpers.LimelightTarget_Retro;
 
 public class SwerveDrive extends SubsystemBase {
   private final AHRS gyro;
@@ -49,6 +52,8 @@ public class SwerveDrive extends SubsystemBase {
   private Field2d field;
 
   private CANSparkMax driveAssist;
+
+  private PowerDistribution pdp;
 
   public SwerveDrive() {
     rpi = NetworkTableInstance.getDefault().getTable("rpi");
@@ -72,6 +77,7 @@ public class SwerveDrive extends SubsystemBase {
     SmartDashboard.putData("Field", field);
     limelightSolenoid = new DoubleSolenoid(PneumaticsModuleType.REVPH, Constants.Swerve.limelightSolenoidChannel1, Constants.Swerve.limelightSolenoidChannel2);
     driveAssist = new CANSparkMax(Constants.Swerve.driveAssistCANId, MotorType.kBrushless);
+    pdp =  new PowerDistribution(1, ModuleType.kRev);
   }
 
   public void drive(
@@ -87,7 +93,7 @@ public class SwerveDrive extends SubsystemBase {
     for (SwerveModule mod : mSwerveMods) {
       mod.setDesiredState(swerveModuleStates[mod.moduleNumber], isOpenLoop);
     }
-    limelightUp();
+    
   }
   public void alternateDrive(double xSpeed, double ySpeed, double omegaSpeed, Pose2d robotPose2d) {
     ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, omegaSpeed, robotPose2d.getRotation());
@@ -107,7 +113,9 @@ public class SwerveDrive extends SubsystemBase {
     }
   }
   public void stop() {
-    ChassisSpeeds.fromFieldRelativeSpeeds(0, 0, 0, new Pose2d().getRotation());
+    Translation2d translation = new Translation2d(0, 0);
+    drive(translation, 0, false, false);
+   // ChassisSpeeds.fromFieldRelativeSpeeds(0, 0, 0, new Pose2d().getRotation());
   }
   public Pose2d getPose() {
     return swerveOdometry.getPoseMeters();
@@ -214,6 +222,28 @@ public class SwerveDrive extends SubsystemBase {
   public float getGyroRoll() {
     return gyro.getRoll();
   }
+  public LimelightTarget_Retro getBestLimelightTarget(int pipeline) {
+    int bestResult = 0;
+    double bestScore = 0;
+    double targetScore = 0;
+    LimelightTarget_Retro[] currentResult = getLimelightResults().targetingResults.targets_Retro;
+    for (int i = 0; i< currentResult.length; i++) {
+      if (pipeline == Constants.Swerve.limelightHighScorePipeline) {
+        targetScore = 2 * currentResult[i].ty - Math.abs(3 * currentResult[i].tx);
+      }
+      else {
+        targetScore = -2 * currentResult[i].ty - Math.abs(3 * currentResult[i].tx);
+      }
+      if (targetScore > bestScore) {
+        bestResult = i;
+        bestScore = targetScore;
+      }
+    }
+    if (currentResult.length == 0) {
+      return null;
+    }
+    return currentResult[bestResult];
+  }
   
   public Command followTrajectoryCommand(PathPlannerTrajectory traj, boolean isFirstPath) {
     return new SequentialCommandGroup(
@@ -231,7 +261,8 @@ public class SwerveDrive extends SubsystemBase {
              new PIDController(0.1, 0, 0), // Y controller (usually the same values as X controller)
              new PIDController(0.1, 0, 0), // Rotation controller. Tune these values for your robot. Leaving them 0 will only use feedforwards.
              this::setModuleStates, // Module states consumer
-             this // Requires this drive subsystem
+              false, 
+            this // Requires this drive subsystem
          )
      );
   }
@@ -240,6 +271,9 @@ public class SwerveDrive extends SubsystemBase {
   }
   public void limelightUp() {
     limelightSolenoid.set(Value.kForward);
+  }
+  public double getCurrentVelocity() {
+    return mSwerveMods[0].getState().speedMetersPerSecond;
   }
   public void setDriveAssistVelocity(double velocity) {
     //driveAssist.set
@@ -297,5 +331,9 @@ public class SwerveDrive extends SubsystemBase {
                     "Cone angle", getConeAngle());
                   SmartDashboard.putNumber( 
                   "limelight result x", getLimelightResults().targetingResults.targets_Retro.length);
+    for (int i = 0; i < 20; i++) {
+      SmartDashboard.putNumber(
+          "PDP Channel " + i,pdp.getCurrent(i));
+    }
   }
 }
