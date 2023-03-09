@@ -14,6 +14,8 @@ import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
+import edu.wpi.first.wpilibj.AddressableLED;
+import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
@@ -67,6 +69,14 @@ public class Arm extends SubsystemBase {
   private boolean armMayMove = false;
 
   private int calibrateWristState = 0;
+
+  AddressableLED m_led = new AddressableLED(0);
+
+    // Reuse buffer
+    // Default to a length of 60, start empty output
+    // Length is expensive to set, so only set it once, then just update data
+  AddressableLEDBuffer m_ledBuffer = new AddressableLEDBuffer(60);
+  int m_rainbowFirstPixelHue = 0;
 
   private final TrapezoidProfile.Constraints shoulderConstraints =
       new TrapezoidProfile.Constraints(1.75, 0.75);
@@ -170,6 +180,11 @@ public class Arm extends SubsystemBase {
     elbowLeaderMotor.burnFlash();
     shoulderLeaderMotor.burnFlash();
     resetToAbsoluteEncoder();
+
+    m_led.setLength(m_ledBuffer.getLength());
+    // Set the data
+    m_led.setData(m_ledBuffer);
+    m_led.start();
   }
   public double getCurrentElbowPosition() {
     return integratedElbowEncoder.getPosition();
@@ -439,9 +454,39 @@ public class Arm extends SubsystemBase {
   public void runElbowMotor(double runSpeed) {
     elbowLeaderMotor.set(runSpeed);
   }
-
+  private void rainbow() {
+    
+    // For every pixel
+    for (var i = 0; i < m_ledBuffer.getLength(); i++) {
+      // Calculate the hue - hue is easier for rainbows because the color
+      // shape is a circle so only one value needs to precess
+      final var hue = (m_rainbowFirstPixelHue + (i * 180 / m_ledBuffer.getLength())) % 180;
+      // Set the value
+      m_ledBuffer.setHSV(i, hue, 255, 128);
+    }
+    // Increase by to make the rainbow "move"
+    m_rainbowFirstPixelHue += 3;
+    // Check bounds
+    m_rainbowFirstPixelHue %= 180;
+  }
+  public void setLEDs(int r, int g, int b) {
+    for (var i = 0; i < m_ledBuffer.getLength(); i++) {
+      // Set the value
+      m_ledBuffer.setRGB(i, r, g, b);
+    }
+  }
+  public void coneMode() {
+    setLEDs(255, 255, 0);
+    setGamePieceMode(1);
+    gamePieceMode = 1;
+  }
+  public void cubeMode() {
+    setLEDs(75, 0, 130);
+    setGamePieceMode(Constants.ArmConstants.coneMode); //TODO change this back to cubes
+  }
   @Override
   public void periodic() {
+    m_led.setData(m_ledBuffer);
     //resetToAbsoluteEncoder();
     SmartDashboard.putNumber( 
                   "Elbow Angle", -integratedElbowEncoder.getPosition());

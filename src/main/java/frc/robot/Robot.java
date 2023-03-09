@@ -39,15 +39,7 @@ public class Robot extends TimedRobot {
 
   boolean isArmStartOkay = false;
 
-  // PWM port 0
-    // Must be a PWM header, not MXP or DIO
-    AddressableLED m_led = new AddressableLED(0);
-
-    // Reuse buffer
-    // Default to a length of 60, start empty output
-    // Length is expensive to set, so only set it once, then just update data
-    AddressableLEDBuffer m_ledBuffer = new AddressableLEDBuffer(60);
-    int m_rainbowFirstPixelHue = 0;
+  
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -57,10 +49,7 @@ public class Robot extends TimedRobot {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
-    m_led.setLength(m_ledBuffer.getLength());
-    // Set the data
-    m_led.setData(m_ledBuffer);
-    m_led.start();
+    
     isArmStartOkay = false;
   }
 
@@ -89,37 +78,11 @@ public class Robot extends TimedRobot {
     CommandScheduler.getInstance().run();
     
     // Fill the buffer with a rainbow
-    rainbow();
+    //rainbow();
     // Set the LEDs
-    m_led.setData(m_ledBuffer);
-  }
-  private void rainbow() {
     
-    // For every pixel
-    for (var i = 0; i < m_ledBuffer.getLength(); i++) {
-      // Calculate the hue - hue is easier for rainbows because the color
-      // shape is a circle so only one value needs to precess
-      final var hue = (m_rainbowFirstPixelHue + (i * 180 / m_ledBuffer.getLength())) % 180;
-      // Set the value
-      m_ledBuffer.setHSV(i, hue, 255, 128);
-    }
-    // Increase by to make the rainbow "move"
-    m_rainbowFirstPixelHue += 3;
-    // Check bounds
-    m_rainbowFirstPixelHue %= 180;
-  }
-  private void ledCubeMode() {
-    for (var i = 0; i < m_ledBuffer.getLength(); i++) {
-      
-      m_ledBuffer.setRGB(i, 139, 0, 139);;
-    }
-  }
-  private void ledConeMode() {
-    for (var i = 0; i < m_ledBuffer.getLength(); i++) {
-      
-      m_ledBuffer.setRGB(i, 255, 255, 0);;
-    }
-  }
+  }  
+  
   /** This function is called once each time the robot enters Disabled mode. */
   @Override
   public void disabledInit() {}
@@ -164,17 +127,17 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
-    SmartDashboard.putNumber("Elbow P Gain", elbowKP);
-    SmartDashboard.putNumber("Elbow I Gain", elbowKI);
-    SmartDashboard.putNumber("Elbow D Gain", elbowKD);
-    SmartDashboard.putNumber("Elbow I Zone", elbowKIz);
-    SmartDashboard.putNumber("Elbow Feed Forward", elbowKFF);
+    // SmartDashboard.putNumber("Elbow P Gain", elbowKP);
+    // SmartDashboard.putNumber("Elbow I Gain", elbowKI);
+    // SmartDashboard.putNumber("Elbow D Gain", elbowKD);
+    // SmartDashboard.putNumber("Elbow I Zone", elbowKIz);
+    // SmartDashboard.putNumber("Elbow Feed Forward", elbowKFF);
 
-    SmartDashboard.putNumber("Shoulder P Gain", shoulderKP);
-    SmartDashboard.putNumber("Shoulder I Gain", shoulderKI);
-    SmartDashboard.putNumber("Shoulder D Gain", shoulderKD);
-    SmartDashboard.putNumber("Shoulder I Zone", shoulderKIz);
-    SmartDashboard.putNumber("Shoulder Feed Forward", shoulderKFF);
+    // SmartDashboard.putNumber("Shoulder P Gain", shoulderKP);
+    // SmartDashboard.putNumber("Shoulder I Gain", shoulderKI);
+    // SmartDashboard.putNumber("Shoulder D Gain", shoulderKD);
+    // SmartDashboard.putNumber("Shoulder I Zone", shoulderKIz);
+    // SmartDashboard.putNumber("Shoulder Feed Forward", shoulderKFF);
   }
 
   /** This function is called periodically during operator control. */
@@ -182,30 +145,30 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {
     //m_robotContainer.moveShoulder(-0.10);
     //m_robotContainer.moveElbow(0.05);
-    double elbowP = SmartDashboard.getNumber("Elbow P Gain", 0);
-    double elbowI = SmartDashboard.getNumber("Elbow I Gain", 0);
-    double elbowD = SmartDashboard.getNumber("Elbow D Gain", 0);
-    double elbowIZ = SmartDashboard.getNumber("Elbow I Zone", 0);
-    double elbowFF = SmartDashboard.getNumber("Elbow Feed Forward", 0);
+    // double elbowP = SmartDashboard.getNumber("Elbow P Gain", 0);
+    // double elbowI = SmartDashboard.getNumber("Elbow I Gain", 0);
+    // double elbowD = SmartDashboard.getNumber("Elbow D Gain", 0);
+    // double elbowIZ = SmartDashboard.getNumber("Elbow I Zone", 0);
+    // double elbowFF = SmartDashboard.getNumber("Elbow Feed Forward", 0);
 
-    double shoulderP = SmartDashboard.getNumber("Shoulder P Gain", 0);
-    double shoulderI = SmartDashboard.getNumber("Shoulder I Gain", 0);
-    double shoulderD = SmartDashboard.getNumber("Shoulder D Gain", 0);
-    double shoulderIZ = SmartDashboard.getNumber("Shoulder I Zone", 0);
-    double shoulderFF = SmartDashboard.getNumber("Shoulder Feed Forward", 0);
+    // double shoulderP = SmartDashboard.getNumber("Shoulder P Gain", 0);
+    // double shoulderI = SmartDashboard.getNumber("Shoulder I Gain", 0);
+    // double shoulderD = SmartDashboard.getNumber("Shoulder D Gain", 0);
+    // double shoulderIZ = SmartDashboard.getNumber("Shoulder I Zone", 0);
+    // double shoulderFF = SmartDashboard.getNumber("Shoulder Feed Forward", 0);
 
-    // if PID coefficients on SmartDashboard have changed, write new values to controller
-    if((elbowP != elbowKP)) { m_robotContainer.setElbowPIDF(elbowP, elbowI, elbowIZ, elbowD, elbowFF); elbowKP = elbowP; }
-    if((elbowI != elbowKI)) { m_robotContainer.setElbowPIDF(elbowP, elbowI, elbowIZ, elbowD, elbowFF); elbowKI = elbowI; }
-    if((elbowD != elbowKD)) { m_robotContainer.setElbowPIDF(elbowP, elbowI, elbowIZ, elbowD, elbowFF); elbowKD = elbowD; }
-    if((elbowIZ != elbowIZ)) { m_robotContainer.setElbowPIDF(elbowP, elbowI, elbowIZ, elbowD, elbowFF); elbowKIz = elbowIZ; }
-    if((elbowFF != elbowKFF)) { m_robotContainer.setElbowPIDF(elbowP, elbowI, elbowIZ, elbowD, elbowFF); elbowKFF = elbowFF; }
+    // // if PID coefficients on SmartDashboard have changed, write new values to controller
+    // if((elbowP != elbowKP)) { m_robotContainer.setElbowPIDF(elbowP, elbowI, elbowIZ, elbowD, elbowFF); elbowKP = elbowP; }
+    // if((elbowI != elbowKI)) { m_robotContainer.setElbowPIDF(elbowP, elbowI, elbowIZ, elbowD, elbowFF); elbowKI = elbowI; }
+    // if((elbowD != elbowKD)) { m_robotContainer.setElbowPIDF(elbowP, elbowI, elbowIZ, elbowD, elbowFF); elbowKD = elbowD; }
+    // if((elbowIZ != elbowIZ)) { m_robotContainer.setElbowPIDF(elbowP, elbowI, elbowIZ, elbowD, elbowFF); elbowKIz = elbowIZ; }
+    // if((elbowFF != elbowKFF)) { m_robotContainer.setElbowPIDF(elbowP, elbowI, elbowIZ, elbowD, elbowFF); elbowKFF = elbowFF; }
   
-    if((shoulderP != shoulderKP)) { m_robotContainer.setShoulderPIDF(shoulderP, shoulderI, shoulderIZ, shoulderD, shoulderFF); shoulderKP = shoulderP; }
-    if((shoulderI != shoulderKI)) { m_robotContainer.setShoulderPIDF(shoulderP, shoulderI, shoulderIZ, shoulderD, shoulderFF); shoulderKI = shoulderI; }
-    if((shoulderD != shoulderKD)) { m_robotContainer.setShoulderPIDF(shoulderP, shoulderI, shoulderIZ, shoulderD, shoulderFF); shoulderKD = shoulderD; }
-    if((shoulderIZ != shoulderKIz)) { m_robotContainer.setShoulderPIDF(shoulderP, shoulderI, shoulderIZ, shoulderD, shoulderFF); shoulderKIz = shoulderIZ; }
-    if((shoulderFF != shoulderKFF)) { m_robotContainer.setShoulderPIDF(shoulderP, shoulderI, shoulderIZ, shoulderD, shoulderFF); shoulderKFF = shoulderFF; } 
+    // if((shoulderP != shoulderKP)) { m_robotContainer.setShoulderPIDF(shoulderP, shoulderI, shoulderIZ, shoulderD, shoulderFF); shoulderKP = shoulderP; }
+    // if((shoulderI != shoulderKI)) { m_robotContainer.setShoulderPIDF(shoulderP, shoulderI, shoulderIZ, shoulderD, shoulderFF); shoulderKI = shoulderI; }
+    // if((shoulderD != shoulderKD)) { m_robotContainer.setShoulderPIDF(shoulderP, shoulderI, shoulderIZ, shoulderD, shoulderFF); shoulderKD = shoulderD; }
+    // if((shoulderIZ != shoulderKIz)) { m_robotContainer.setShoulderPIDF(shoulderP, shoulderI, shoulderIZ, shoulderD, shoulderFF); shoulderKIz = shoulderIZ; }
+    // if((shoulderFF != shoulderKFF)) { m_robotContainer.setShoulderPIDF(shoulderP, shoulderI, shoulderIZ, shoulderD, shoulderFF); shoulderKFF = shoulderFF; } 
   }
 
   @Override

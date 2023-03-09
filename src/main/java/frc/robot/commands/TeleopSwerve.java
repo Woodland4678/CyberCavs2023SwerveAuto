@@ -21,7 +21,7 @@ public class TeleopSwerve extends CommandBase {
   private SlewRateLimiter strafeLimiter = new SlewRateLimiter(3.0);
   private SlewRateLimiter rotationLimiter = new SlewRateLimiter(3.0);
 
-  PIDController rController = new PIDController(Constants.Swerve.autoDriveRP, Constants.Swerve.autoDriveRI, Constants.Swerve.autoDriveRD);
+  PIDController rController = new PIDController(Constants.Swerve.autoDriveScoreRP, Constants.Swerve.autoDriveScoreRI, Constants.Swerve.autoDriveScoreRD);
 
   BooleanSupplier turnToDrivers;
   BooleanSupplier turnToLoading;

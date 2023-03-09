@@ -13,7 +13,10 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DigitalSource;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.DutyCycle;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.SPI;
@@ -55,6 +58,10 @@ public class SwerveDrive extends SubsystemBase {
 
   private PowerDistribution pdp;
 
+  private DutyCycle distanceLaserLeft;
+  private DutyCycle distanceLaserCenter;
+  private DutyCycle distanceLaserRight;
+
   public SwerveDrive() {
     rpi = NetworkTableInstance.getDefault().getTable("rpi");
     limelight = NetworkTableInstance.getDefault().getTable("limelight");
@@ -78,8 +85,17 @@ public class SwerveDrive extends SubsystemBase {
     limelightSolenoid = new DoubleSolenoid(PneumaticsModuleType.REVPH, Constants.Swerve.limelightSolenoidChannel1, Constants.Swerve.limelightSolenoidChannel2);
     driveAssist = new CANSparkMax(Constants.Swerve.driveAssistCANId, MotorType.kBrushless);
     pdp =  new PowerDistribution(1, ModuleType.kRev);
-  }
 
+    //distanceLaserLeft = new DutyCycle(new DigitalInput(Constants.Swerve.distanceLaserLeftChannel));
+    //distanceLaserCenter = new DutyCycle(new DigitalInput(Constants.Swerve.distanceLaserLeftChannel));
+    //distanceLaserRight = new DutyCycle(new DigitalInput(Constants.Swerve.distanceLaserLeftChannel));
+  }
+  public void setLimeLED(boolean on) {
+    if(!on)
+      limelight.getEntry("ledMode").setNumber(1); //turn off
+    else
+      limelight.getEntry("ledMode").setNumber(3); //turn on
+  }
   public void drive(
       Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {
     SwerveModuleState[] swerveModuleStates =
@@ -222,21 +238,14 @@ public class SwerveDrive extends SubsystemBase {
   public float getGyroRoll() {
     return gyro.getRoll();
   }
-  public LimelightTarget_Retro getBestLimelightTarget(int pipeline) {
+  public LimelightTarget_Retro getBestLimelightTarget() {
     int bestResult = 0;
-    double bestScore = 0;
-    double targetScore = 0;
+    double lowestX = 100;    
     LimelightTarget_Retro[] currentResult = getLimelightResults().targetingResults.targets_Retro;
     for (int i = 0; i< currentResult.length; i++) {
-      if (pipeline == Constants.Swerve.limelightHighScorePipeline) {
-        targetScore = 2 * currentResult[i].ty - Math.abs(3 * currentResult[i].tx);
-      }
-      else {
-        targetScore = -2 * currentResult[i].ty - Math.abs(3 * currentResult[i].tx);
-      }
-      if (targetScore > bestScore) {
+      if (currentResult[i].tx < lowestX) {
+        lowestX = currentResult[i].tx;
         bestResult = i;
-        bestScore = targetScore;
       }
     }
     if (currentResult.length == 0) {

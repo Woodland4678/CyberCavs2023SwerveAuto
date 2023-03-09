@@ -12,6 +12,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import frc.robot.Constants;
 import frc.robot.Constants.ArmPosition;
 import frc.robot.subsystems.Arm;
@@ -20,9 +21,9 @@ import frc.robot.subsystems.SwerveDrive;
 public class AutoGrabUprightCone extends CommandBase {
   Arm s_Arm;
   SwerveDrive s_Swerve;
-  PIDController xController = new PIDController(Constants.Swerve.autoDriveXP, Constants.Swerve.autoDriveXI, Constants.Swerve.autoDriveXD);
-  PIDController yController = new PIDController(Constants.Swerve.autoDriveYP, Constants.Swerve.autoDriveYI, Constants.Swerve.autoDriveYD);
-  PIDController rController = new PIDController(Constants.Swerve.autoDriveRP, Constants.Swerve.autoDriveRI, Constants.Swerve.autoDriveRD);
+  PIDController xController = new PIDController(Constants.Swerve.autoDriveConePickupXP, Constants.Swerve.autoDriveConePickupXI, Constants.Swerve.autoDriveConePickupXD);
+  PIDController yController = new PIDController(Constants.Swerve.autoDriveConePickupYP, Constants.Swerve.autoDriveConePickupYI, Constants.Swerve.autoDriveConePickupYD);
+  PIDController rController = new PIDController(Constants.Swerve.autoDriveConePickupRP, Constants.Swerve.autoDriveConePickupRI, Constants.Swerve.autoDriveConePickupRD);
   boolean isDone = false;
   int isInPosCnt = 0;
   int isDoneCnt = 0;
@@ -80,15 +81,15 @@ public class AutoGrabUprightCone extends CommandBase {
         //currentArmError = s_Arm.MoveArm(currentTarget);
         if (boundingBox[0] > 40) {          
           grabState++;
-          // currentTarget = Constants.ArmConstants.grabUprightConePosition;
-          // double distanceFromFrameToCone = 121.698104 - 2.55144332 * boundingBox[0] + 0.0154124386 * boundingBox[0] * boundingBox[0];
-          // SmartDashboard.putNumber(
-          //                 "Distance From Cone",distanceFromFrameToCone);
-          // moveToCone = PathPlanner.generatePath(
-          //     new PathConstraints(2, 2), 
-          //     new PathPoint(new Translation2d(0, 0.0), Rotation2d.fromDegrees(0), Rotation2d.fromDegrees(0), s_Swerve.getCurrentVelocity()), // position, heading(direction of travel), holonomic rotation, velocity override
-          //     new PathPoint(new Translation2d(0.1, 0), Rotation2d.fromDegrees(0), Rotation2d.fromDegrees(0)) // position, heading(direction of travel), holonomic rotation
-          // );
+          currentTarget = Constants.ArmConstants.grabUprightConePosition;
+          double distanceFromFrameToCone = 121.698104 - 2.55144332 * boundingBox[0] + 0.0154124386 * boundingBox[0] * boundingBox[0];
+          SmartDashboard.putNumber(
+                          "Distance From Cone",distanceFromFrameToCone);
+          moveToCone = PathPlanner.generatePath(
+              new PathConstraints(2, 2), 
+              new PathPoint(new Translation2d(0, 0.0), Rotation2d.fromDegrees(0), Rotation2d.fromDegrees(0), s_Swerve.getCurrentVelocity()), // position, heading(direction of travel), holonomic rotation, velocity override
+              new PathPoint(new Translation2d(0.1, 0), Rotation2d.fromDegrees(0), Rotation2d.fromDegrees(0)) // position, heading(direction of travel), holonomic rotation
+          );
         }
         else  {
           if (s_Swerve.limelightHasTarget() == 1) {
@@ -123,7 +124,8 @@ public class AutoGrabUprightCone extends CommandBase {
         //s_Swerve.stop();
         isDone = true;
         // grabState++;
-        // s_Swerve.followTrajectoryCommand(moveToCone, true);
+        new RunCommand(() -> s_Swerve.followTrajectoryCommand(moveToCone, true),
+          s_Swerve);
           
       break;
       case 2:

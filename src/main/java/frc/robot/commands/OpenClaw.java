@@ -14,7 +14,7 @@ public class OpenClaw extends CommandBase {
   public OpenClaw(Arm armSubsystem, int openClose) {
     this.openClose = openClose;
     this.armSubsystem=armSubsystem;
-    addRequirements(armSubsystem);
+    //addRequirements(armSubsystem);
     // Use addRequirements() here to declare subsystem dependencies.
   }
 

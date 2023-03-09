@@ -20,38 +20,52 @@ import frc.robot.Constants.ArmPosition;
 public class AutoScoreHigh extends CommandBase {
   Arm s_Arm;
   SwerveDrive s_Swerve;
-  PIDController xController = new PIDController(Constants.Swerve.autoDriveXP, Constants.Swerve.autoDriveXI, Constants.Swerve.autoDriveXD);
+  PIDController xController = new PIDController(Constants.Swerve.autoDriveScoreXP, Constants.Swerve.autoDriveScoreXI, Constants.Swerve.autoDriveScoreXD);
   PIDController yController = new PIDController(Constants.Swerve.autoDriveScoreYP, Constants.Swerve.autoDriveScoreYI, Constants.Swerve.autoDriveScoreYD);
-  PIDController rController = new PIDController(Constants.Swerve.autoDriveRP, Constants.Swerve.autoDriveRI, Constants.Swerve.autoDriveRD);
+  PIDController rController = new PIDController(Constants.Swerve.autoDriveScoreRP, Constants.Swerve.autoDriveScoreRI, Constants.Swerve.autoDriveScoreRD);
   boolean isDone = false;
   int isInPosCnt = 0;
   int currentPipeline = Constants.Swerve.limelightHighScorePipeline;
   ArmPosition currentTarget;
-  double yTarget = Constants.Swerve.autoScoreHighYTarget;
+  double yTarget = 0;
+  boolean isHigh = true;
   /** Creates a new ScoreHigh. */
-  public AutoScoreHigh(Arm s_Arm, SwerveDrive s_Swerve) {
+  public AutoScoreHigh(Arm s_Arm, SwerveDrive s_Swerve, boolean isHigh) {
     this.s_Arm = s_Arm;
     this.s_Swerve = s_Swerve;
     addRequirements(s_Arm, s_Swerve);
+    this.isHigh = isHigh;
     // Use addRequirements() here to declare subsystem dependencies.
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    xController.reset();
+    yController.reset();
+    rController.reset();
+    s_Swerve.setLimeLED(true);
+    if (isHigh) {
+      yTarget = Constants.Swerve.autoScoreHighYTarget;
+    }
+    else {
+      yTarget = Constants.Swerve.autoScoreMediumYTarget;
+    }
     currentTarget = Constants.ArmConstants.restToScoreIntermediatePosition;
     s_Swerve.limelightUp();
     //xController.setGoal(0);
     //yController.setGoal(0);
     xController.setSetpoint(0);
     rController.setSetpoint(180);
-    yController.setSetpoint(yTarget);
-    xController.setTolerance(1);
-    yController.setTolerance(0.5);
+    yController.setSetpoint(4.4);
+    xController.setTolerance(Constants.Swerve.autoDriveScoreXTolerance);
+    yController.setTolerance(Constants.Swerve.autoDriveScoreYTolerance);
+    rController.setTolerance(Constants.Swerve.autoDriveScoreRTolerance);
     currentPipeline = Constants.Swerve.limelightHighScorePipeline;
     s_Swerve.setLimelightPipeline(currentPipeline);
     isDone = false;
     isInPosCnt = 0;
+    
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -60,19 +74,24 @@ public class AutoScoreHigh extends CommandBase {
     
     var currentArmError = s_Arm.MoveArm(currentTarget);
     if (currentArmError < 8) {
-      currentTarget = Constants.ArmConstants.scoreConeHighPosition;
+      if (isHigh) {
+        currentTarget = Constants.ArmConstants.scoreConeHighPosition;
+      }
+      else {
+        currentTarget = Constants.ArmConstants.scoreConeMediumPosition;
+      }
     }
     
     if (s_Swerve.limelightHasTarget() == 1) {
-      LimelightTarget_Retro currentLimelightTarget = s_Swerve.getBestLimelightTarget(currentPipeline);
+      LimelightTarget_Retro currentLimelightTarget = s_Swerve.getBestLimelightTarget();
       if (currentLimelightTarget != null) {
         var degrees =s_Swerve.getYaw().getDegrees();
         if (degrees < 0) {
           degrees += 360;
         }
         var rSpeed = rController.calculate(degrees);
-        var xSpeed = xController.calculate(currentLimelightTarget.tx);
-        var ySpeed = yController.calculate(currentLimelightTarget.ty);
+        var xSpeed = xController.calculate(s_Swerve.getLimelightX());
+        var ySpeed = yController.calculate(s_Swerve.getLimelightY());
         // if (Math.abs(rSpeed) < 0.7) {
         //   xSpeed = rLimiter.calculate(rController.calculate(s_Swerve.getYaw().getDegrees()));
         // }
@@ -89,7 +108,7 @@ public class AutoScoreHigh extends CommandBase {
         //               "rSpeed",rSpeed);
         
         
-        if (Math.abs(s_Swerve.getLimelightY() - yTarget) < 0.5) {
+        if (xController.atSetpoint() && yController.atSetpoint() && rController.atSetpoint()) {
           isInPosCnt++;
         }
         else {
@@ -97,6 +116,7 @@ public class AutoScoreHigh extends CommandBase {
         }
         if (isInPosCnt > 10) {
           isDone = true;
+          s_Arm.setLEDs(0, 255, 0);
           s_Swerve.stop();
         }
         else {
@@ -113,6 +133,14 @@ public class AutoScoreHigh extends CommandBase {
   @Override
   public void end(boolean interrupted) {
     //s_Swerve.limelightDown();
+    s_Swerve.stop();
+    s_Swerve.setLimeLED(false);
+    if (s_Arm.getGamePieceMode() == Constants.ArmConstants.coneMode) {
+      s_Arm.coneMode();
+    }
+    else {
+      s_Arm.cubeMode();
+    }
   }
 
   // Returns true when the command should end.

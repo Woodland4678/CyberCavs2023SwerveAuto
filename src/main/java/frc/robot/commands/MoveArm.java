@@ -5,6 +5,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
 import frc.robot.Constants.ArmPosition;
@@ -18,6 +19,8 @@ public class MoveArm extends CommandBase {
   ArmPosition currentTarget;
   Joystick operatorJoystick;
   boolean armOkayToMove = true;
+  boolean isDone = false;
+  int isDoneCnt = 0;
   /** Creates a new MoveArm. */
   public MoveArm(Arm s_Arm, ArmPosition targetPos, Joystick operatorJoystick) {
     this.s_Arm = s_Arm;
@@ -30,10 +33,23 @@ public class MoveArm extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    isDone = false;
+    isDoneCnt = 0;
     armOkayToMove = true;
     //if we're going to pickup position set the target as the intermediate position first
     if (this.targetPos == Constants.ArmConstants.pickupPosition) {
      currentTarget = Constants.ArmConstants.pickupToRestIntermediatePosition; 
+    }
+    else if (this.targetPos == Constants.ArmConstants.grabUprightConePosition) {
+      currentTarget = Constants.ArmConstants.pickupToRestIntermediatePosition;
+      SmartDashboard.putNumber("IS IT A CUBE WHAT??", s_Arm.getGamePieceMode()) ;
+      if (s_Arm.getGamePieceMode() == Constants.ArmConstants.coneMode) {
+        this.targetPos = Constants.ArmConstants.grabUprightConePosition;
+      }
+      else if (s_Arm.getGamePieceMode() == Constants.ArmConstants.cubeMode) {
+        this.targetPos = Constants.ArmConstants.grabCubePosition;
+      }
+     
     }
     else if (this.targetPos == Constants.ArmConstants.restPosition) {
       currentTarget = Constants.ArmConstants.pickupToRestIntermediatePosition;
@@ -55,9 +71,15 @@ public class MoveArm extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    if (currentTarget == targetPos && currentArmError < 5) {
+      isDoneCnt++;
+      if (isDoneCnt > 10) {
+        isDone = true;
+      }      
+    }
     if (currentTarget == Constants.ArmConstants.grabConePosition || currentTarget == Constants.ArmConstants.grabCubePosition || currentTarget == Constants.ArmConstants.grabUprightConePosition) {
       if (s_Arm.getCurrentXPosition() < 15) {
-        armOkayToMove = false;
+        armOkayToMove = true;
       }
     }
     if (armOkayToMove) {
@@ -69,14 +91,15 @@ public class MoveArm extends CommandBase {
       }
       if (Math.abs(currentArmError) < 5) { //handles intermediate positions
         currentTarget = targetPos;
-        double wristRollSpeed = operatorJoystick.getRawAxis(0);
+        //Manual wrist Roll control (doesn't work too well)
+        /*double wristRollSpeed = operatorJoystick.getRawAxis(0);
         if (Math.abs(wristRollSpeed) > 0.1) {
           s_Arm.wristRollManual(-wristRollSpeed / 13);
           currentTarget.wristRollTarget = s_Arm.getCurrentWristRollPosition();
         }
         else {
           s_Arm.wristRollManual(0);
-        }
+        }*/
       }
     }
     
@@ -93,6 +116,6 @@ public class MoveArm extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return isDone;
   }
 }

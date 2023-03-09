@@ -49,6 +49,9 @@ public class RobotContainer {
       new JoystickButton(driver, XboxController.Axis.kRightTrigger.value);
   private final JoystickButton driverBtnBack =
       new JoystickButton(driver, XboxController.Button.kBack.value);
+  private final JoystickButton driverBtnStart =
+      new JoystickButton(driver, XboxController.Button.kStart.value);
+    
   
   
 
@@ -71,6 +74,8 @@ public class RobotContainer {
       new JoystickButton(operator, 10);
   private final JoystickButton operatorBtnRT =
       new JoystickButton(operator, 8);
+  private final JoystickButton operatorBtnLT =
+      new JoystickButton(operator, 7);
 
   /* Subsystems */
   private final SwerveDrive s_Swerve = new SwerveDrive();
@@ -98,11 +103,13 @@ public class RobotContainer {
   private void configureButtonBindings() {
     /* Driver Buttons */
     driverBtnBack.onTrue(new InstantCommand(() -> s_Swerve.zeroGyro()));
-    driverBtnA.whileTrue(new UprightGrabSequence(s_Swerve, s_Arm));
+   // driverBtnA.whileTrue(new UprightGrabSequence(s_Swerve, s_Arm));
     driverBtnX.onTrue(new InstantCommand(() -> s_Arm.openClaw()));
     driverBtnB.onTrue(new InstantCommand(() -> s_Arm.closeClaw()));
-    driverBtnRB.whileTrue(new YeetCube(s_Arm));
-    driverBtnY.whileTrue(new AutoScoreHigh(s_Arm, s_Swerve));
+    //driverBtnRB.whileTrue(new YeetCube(s_Arm));
+    driverBtnY.whileTrue(new AutoScoreHigh(s_Arm, s_Swerve, true)); //score high
+    driverBtnA.whileTrue(new AutoScoreHigh(s_Arm, s_Swerve, false)); //score medium
+    driverBtnStart.onTrue(new InstantCommand(() -> s_Swerve.resetSwerveModuleAngles()));
     //followTape.whileTrue(new FollowTape(s_Swerve, driver));
     //autoBalance.whileTrue(new AutoBalance(s_Swerve));
     //moveArmPos1.whileTrue(new OpenClaw(s_Arm, 1));
@@ -114,11 +121,13 @@ public class RobotContainer {
     operatorBtnY.onTrue(new MoveArm(s_Arm,Constants.ArmConstants.scoreConeHighPosition, operator));
     operatorBtnB.onTrue(new MoveArm(s_Arm,Constants.ArmConstants.scoreConeMediumPosition, operator));
     operatorBtnA.onTrue(new MoveArm(s_Arm,Constants.ArmConstants.scoreLowPosition, operator));
-    operatorBtnX.onTrue(new MoveArm(s_Arm,Constants.ArmConstants.pickupPosition, operator));
-    operatorBtnLB.onTrue(new MoveArm(s_Arm,Constants.ArmConstants.restPosition, operator));
-    operatorBtnRB.onTrue(new GrabGamePiece(s_Arm));
+    operatorBtnX.onTrue(new MoveArm(s_Arm,Constants.ArmConstants.restPosition, operator));
+    operatorBtnLB.onTrue(new InstantCommand(() -> s_Arm.coneMode()));
+    operatorBtnRB.onTrue(new InstantCommand(() -> s_Arm.cubeMode()));
+    //operatorBtnRB.onTrue(new GrabGamePiece(s_Arm));
     operatorBtnBack.onTrue(new CalibrateArm(s_Arm));
     operatorBtnRT.onTrue(new MoveArm(s_Arm,Constants.ArmConstants.grabUprightConePosition, operator));
+    operatorBtnLT.onTrue(new MoveArm(s_Arm,Constants.ArmConstants.pickupPosition, operator));
   }
 
   public static Joystick getOperatorJoystick() {
