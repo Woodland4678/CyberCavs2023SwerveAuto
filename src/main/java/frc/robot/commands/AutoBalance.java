@@ -15,9 +15,12 @@ public class AutoBalance extends CommandBase {
   SwerveDrive s_Swerve;
   int count =0;
   int timer = 0;
+  int counter = 0;
   boolean isBalanced = false;
   boolean isDone = false;
   double[] rollArray = new double[20];
+  double[] rocArray = new double[19];
+
   /** Creates a new AutoBalance. */
   public AutoBalance(SwerveDrive s_Swerve) {
     // Use addRequirements() here to declare subsystem dependencies.
@@ -35,13 +38,25 @@ public class AutoBalance extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    // if we add a gyro val every 2/50 seconds
+    // 20 would be 2/50 * 20 = 0.8 seconds to fill the whole array
+
     if (timer == 2){
       timer =0;
-     
-      for (int i = 0; i<19; i++){
-        rollArray[i] = rollArray[i + 1];
-      }
+      
+      // i=0 is the oldest 
+      // i=19 is the latest data
       rollArray[19] = s_Swerve.getGyroRoll();
+      for (int i = 19; i>0; i--){
+        rollArray[i-1] = rollArray[i];
+      }
+    
+
+      /* 
+      for (int i = 0; i<17; i++){
+        rollArray[i] = (rollArray[i+1] - rollArray[i]) / 0.1;
+      }
+      */
 
         SmartDashboard.putNumber(
                     "Roll difference",Math.abs(rollArray[19] - rollArray[0]));
@@ -49,12 +64,16 @@ public class AutoBalance extends CommandBase {
     timer++;
 
     System.out.println(rollArray[19]);
-    if (rollArray[19] != 0) {
-      
-      if (Math.abs(rollArray[19] - rollArray[0]) > 14){
-        
-        isDone = true;
-        
+    if (rollArray[0] != 0) {
+      // positive slope, ignore negative slope
+      if ( ( ((rollArray[19] - rollArray[0]) / 0.8 ) > 14 )){
+        counter ++;
+        if (counter > 20){
+          isDone = true;
+          counter = 0;
+        }else{
+          counter = 0;
+        }
       }
     }
     
