@@ -58,24 +58,24 @@ public class TeleopSwerve extends CommandBase {
         strafeLimiter.calculate(
             MathUtil.applyDeadband(strafeSup.getAsDouble(), Constants.Swerve.stickDeadband));
 
-    if (turnToDrivers.getAsBoolean()) {
-      rController.setSetpoint(180);
-      var degrees = s_Swerve.getYaw().getDegrees();      
-      rotationVal = rController.calculate(degrees);
-    }
-    else if (turnToLoading.getAsBoolean()) {
-      rController.setSetpoint(0);
-      var degrees = s_Swerve.getYaw().getDegrees();      
-      if (degrees < 0) {
-        degrees += 360;
-      }
-      rotationVal = rController.calculate(degrees);
-    }
-    else {
+    // if (turnToDrivers.getAsBoolean()) {
+    //   rController.setSetpoint(180);
+    //   var degrees = s_Swerve.getYaw().getDegrees();      
+    //   rotationVal = rController.calculate(degrees);
+    // }
+    // else if (turnToLoading.getAsBoolean()) {
+    //   rController.setSetpoint(0);
+    //   var degrees = s_Swerve.getYaw().getDegrees();      
+    //   if (degrees < 0) {
+    //     degrees += 360;
+    //   }
+    //   rotationVal = rController.calculate(degrees);
+    // }
+    //else {
       rotationVal =
         rotationLimiter.calculate(
             MathUtil.applyDeadband(rotationSup.getAsDouble(), Constants.Swerve.stickDeadband));
-    }
+   // }
 
     /* Drive */
     s_Swerve.drive(

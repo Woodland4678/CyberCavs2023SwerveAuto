@@ -61,7 +61,7 @@ public class MoveArm extends CommandBase {
       currentTarget = Constants.ArmConstants.scoreCubeMediumPosition;
     }
     else if (this.targetPos == Constants.ArmConstants.scoreConeHighPosition) {
-      currentTarget = Constants.ArmConstants.restToScoreIntermediatePosition;
+      currentTarget = Constants.ArmConstants.restToScoreHighIntermediatePosition;
     }
     else {
       currentTarget = targetPos;

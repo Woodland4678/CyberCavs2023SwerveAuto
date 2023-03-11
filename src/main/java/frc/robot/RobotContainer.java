@@ -51,6 +51,10 @@ public class RobotContainer {
       new JoystickButton(driver, XboxController.Button.kBack.value);
   private final JoystickButton driverBtnStart =
       new JoystickButton(driver, XboxController.Button.kStart.value);
+  private final JoystickButton driverBtnLeftStickClick =
+      new JoystickButton(driver, XboxController.Button.kLeftStick.value);
+  private final JoystickButton driverBtnRightStickClick =
+      new JoystickButton(driver, XboxController.Button.kRightStick.value);
     
   
   
@@ -91,9 +95,9 @@ public class RobotContainer {
             () -> -driver.getRawAxis(translationAxis),
             () -> -driver.getRawAxis(strafeAxis),
             () -> -driver.getRawAxis(rotationAxis),
-            () -> driverBtnRT.getAsBoolean(),
-            () -> driverBtnLB.getAsBoolean(),
-            () -> driverBtnRB.getAsBoolean()));
+            () -> driverBtnRT.getAsBoolean(), //TODO this doesn't work cause the trigger is an axis not a button
+            () -> false,
+            () -> false)); //driverBtnRB.getAsBoolean()
 
 
 
@@ -110,6 +114,10 @@ public class RobotContainer {
     driverBtnY.whileTrue(new AutoScoreHigh(s_Arm, s_Swerve, true)); //score high
     driverBtnA.whileTrue(new AutoScoreHigh(s_Arm, s_Swerve, false)); //score medium
     driverBtnStart.onTrue(new InstantCommand(() -> s_Swerve.resetSwerveModuleAngles()));
+    driverBtnRB.whileTrue(new AutoGrabUprightCone(s_Arm, s_Swerve));
+    driverBtnLB.whileTrue(new AutoGrabCube(s_Swerve, s_Arm));
+    driverBtnLeftStickClick.whileTrue(new AutoBalance(s_Swerve));
+    driverBtnRightStickClick.onTrue(new AutoPickup(s_Arm, s_Swerve));
     //followTape.whileTrue(new FollowTape(s_Swerve, driver));
     //autoBalance.whileTrue(new AutoBalance(s_Swerve));
     //moveArmPos1.whileTrue(new OpenClaw(s_Arm, 1));

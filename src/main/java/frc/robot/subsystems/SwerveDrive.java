@@ -19,10 +19,15 @@ import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.DutyCycle;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.PowerDistribution;
+import edu.wpi.first.wpilibj.Relay;
 import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.SerialPort;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
+import edu.wpi.first.wpilibj.SerialPort.FlowControl;
+import edu.wpi.first.wpilibj.SerialPort.Port;
+import edu.wpi.first.wpilibj.SerialPort.WriteBufferMode;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -60,7 +65,15 @@ public class SwerveDrive extends SubsystemBase {
 
   private DutyCycle distanceLaserLeft;
   private DutyCycle distanceLaserCenter;
-  private DutyCycle distanceLaserRight;
+  //private DutyCycle distanceLaserRight;
+  private double rightLaserDistance;
+  int loopcount = 0;
+  int cstate = 0;
+
+  private Relay headlights;
+
+
+  private SerialPort serPort = new SerialPort(19200, Port.kMXP);
 
   public SwerveDrive() {
     rpi = NetworkTableInstance.getDefault().getTable("rpi");
@@ -86,15 +99,29 @@ public class SwerveDrive extends SubsystemBase {
     driveAssist = new CANSparkMax(Constants.Swerve.driveAssistCANId, MotorType.kBrushless);
     pdp =  new PowerDistribution(1, ModuleType.kRev);
 
-    //distanceLaserLeft = new DutyCycle(new DigitalInput(Constants.Swerve.distanceLaserLeftChannel));
-    //distanceLaserCenter = new DutyCycle(new DigitalInput(Constants.Swerve.distanceLaserLeftChannel));
+    headlights = new Relay(Constants.Swerve.headlightsRelayChannel);
+
+    distanceLaserLeft = new DutyCycle(new DigitalInput(Constants.Swerve.distanceLaserLeftChannel));
+    distanceLaserCenter = new DutyCycle(new DigitalInput(Constants.Swerve.distanceLaserCenterChannel));
     //distanceLaserRight = new DutyCycle(new DigitalInput(Constants.Swerve.distanceLaserLeftChannel));
+    serPort.setFlowControl(FlowControl.kNone);
+    serPort.setReadBufferSize(128);
+    serPort.flush();
+    rightLaserDistance = 0;
   }
   public void setLimeLED(boolean on) {
     if(!on)
       limelight.getEntry("ledMode").setNumber(1); //turn off
     else
       limelight.getEntry("ledMode").setNumber(3); //turn on
+  }
+  public void setHeadlights(boolean on) {
+    if (!on) {
+      headlights.set(Relay.Value.kOff);
+    }
+    else {
+      headlights.set(Relay.Value.kForward);
+    }
   }
   public void drive(
       Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {
@@ -118,6 +145,15 @@ public class SwerveDrive extends SubsystemBase {
     for (SwerveModule mod : mSwerveMods) {
       mod.resetToAbsolute();
     }
+  }
+  public double getLeftLaserValue() {
+    return distanceLaserLeft.getOutput() * 180 + 20;
+  }
+  public double getCenterLaserValue() {
+    return distanceLaserCenter.getOutput() * 180 + 20;
+  }
+  public double getRightLaserValue() {
+    return rightLaserDistance;
   }
 
   /* Used by SwerveControllerCommand in Auto */
@@ -289,10 +325,94 @@ public class SwerveDrive extends SubsystemBase {
   }
   @Override
   public void periodic() {
-    int targetToGet = 0;
-    if (RobotContainer.getDriverJoystick().getRawButton(6)) {
-      targetToGet = 1;
+    loopcount = 0;
+    int bytes_available = serPort.getBytesReceived();
+    var bytes_to_read = 0;
+    int chktmp = 0;
+    int chksum = 0;
+    long dist = 0;
+    int signal = 0;
+    int temperature = 0;
+    while((loopcount < 2)&&(bytes_available > 0)) {
+		  loopcount++;
+		  if (bytes_available > 128) {
+        bytes_to_read = 128;
+      }
+      else {
+        bytes_to_read = bytes_available;
+      }
+      if (bytes_to_read > 0) {
+        var rxbuf = serPort.read(bytes_available);
+        
+        
+			  for(int x = 0;x<rxbuf.length;x++) { // process each character in the serial port buffer.
+          int ch = rxbuf[x]; // get the character
+          chktmp += ch;
+          // printf("ch=%02x, cstate=%d, dcnt=%d\n",ch,cstate,dcnt);
+          //if (cstate < 4)
+          //if (chcnt < 16)
+          //	{
+          //	printf("%02X ",ch);
+          //	chcnt++;
+          //	}
+          switch(cstate) {
+            case 0: // expecting a packet start character
+              if (ch == 0x59) {
+                chktmp = 0x59;
+                cstate++; // go to next state if we get a valid packet start character
+              }
+              break;
+            case 1:
+              if (ch == 0x59) {
+                cstate++;
+              }
+              else {
+                cstate = 0;
+              }
+            break;
+            case 2:
+              dist = ch & 0xFF;
+              cstate++;
+            break;
+            case 3:
+              dist += ((ch & 0xFF) << 8);
+              cstate++;
+            break;
+            case 4:
+              signal = ch;
+              cstate++;
+            break;
+            case 5:
+              signal += (ch << 8);
+              cstate++;
+            break;
+            case 6:
+              temperature = ch;
+              cstate++;
+            break;
+            case 7:
+              temperature += (ch << 8);
+              cstate++;
+              chksum = chktmp & 0xFF;
+            break;
+            case 8:
+              if (chksum == ch) {
+                if (dist >= 200) {
+                  dist = 200;
+                }
+                rightLaserDistance = dist;
+              }
+              cstate = 0;
+            break;
+          }
+        }
+      }
+      bytes_available = serPort.getBytesReceived();
     }
+    int targetToGet = 0;
+    // if (RobotContainer.getDriverJoystick().getRawButton(6)) {
+    //   targetToGet = 1;
+    // }
     swerveOdometry.update(getYaw(), getModulePositions());
     field.setRobotPose(getPose());
     double [] boundingBox = getBoundingBoxX();
@@ -329,6 +449,12 @@ public class SwerveDrive extends SubsystemBase {
     SmartDashboard.putNumber(
                     "Wonky swerve motor", mSwerveMods[3].getSetVelocity());
     SmartDashboard.putNumber(
+                    "Left Laser Distance", getLeftLaserValue());
+    SmartDashboard.putNumber(
+                    "Center Laser Distance", getCenterLaserValue());
+    SmartDashboard.putNumber(
+                    "Right Laser Distance", getRightLaserValue());
+    SmartDashboard.putNumber(
                   "gyro Roll", gyro.getRoll());
                   SmartDashboard.putNumber(
                   "gyro Accel X", gyro.getRawAccelX());
@@ -340,9 +466,9 @@ public class SwerveDrive extends SubsystemBase {
                     "Cone angle", getConeAngle());
                   SmartDashboard.putNumber( 
                   "limelight result x", getLimelightResults().targetingResults.targets_Retro.length);
-    for (int i = 0; i < 20; i++) {
-      SmartDashboard.putNumber(
-          "PDP Channel " + i,pdp.getCurrent(i));
-    }
+    // for (int i = 0; i < 20; i++) {
+    //   SmartDashboard.putNumber(
+    //       "PDP Channel " + i,pdp.getCurrent(i));
+    // }
   }
 }

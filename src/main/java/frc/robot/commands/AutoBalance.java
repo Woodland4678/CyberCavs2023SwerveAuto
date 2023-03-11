@@ -15,9 +15,12 @@ public class AutoBalance extends CommandBase {
   SwerveDrive s_Swerve;
   int count =0;
   int timer = 0;
+  int counter = 0;
+  double slope = 0;
   boolean isBalanced = false;
   boolean isDone = false;
   double[] rollArray = new double[20];
+
   /** Creates a new AutoBalance. */
   public AutoBalance(SwerveDrive s_Swerve) {
     // Use addRequirements() here to declare subsystem dependencies.
@@ -35,32 +38,53 @@ public class AutoBalance extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    // if we add a gyro val every 2/50 seconds
+    // 20 would be 2/50 * 20 = 0.8 seconds to fill the whole array
+
+    Translation2d translation = new Translation2d(-0.5, 0);
+    s_Swerve.drive(translation, 0, false, true);
+
     if (timer == 2){
       timer =0;
-     
-      for (int i = 0; i<19; i++){
-        rollArray[i] = rollArray[i + 1];
+      
+      // i=0 is the oldest 
+      // i=19 is the latest data
+      for (int i = 0; i<18; i++){
+        rollArray[i] = rollArray[i+1];
       }
+
       rollArray[19] = s_Swerve.getGyroRoll();
+    
+
 
         SmartDashboard.putNumber(
-                    "Roll difference",Math.abs(rollArray[19] - rollArray[0]));
+                    "Roll slope", slope);
+        SmartDashboard.putNumber(
+                      "rollArray[0]", rollArray[0]);
     }
     timer++;
 
-    System.out.println(rollArray[19]);
-    if (rollArray[19] != 0) {
-      
-      if (Math.abs(rollArray[19] - rollArray[0]) > 14){
-        
-        isDone = true;
-        
+    System.out.println(rollArray[0]);
+
+    if (rollArray[0] != 0) {
+      // positive slope, ignore negative slope
+      slope = (rollArray[19] - rollArray[0]) / 0.8 ;
+
+      if (slope > 8 ){
+        counter ++;
+
+        if (counter > 10){
+          counter =0;
+          isDone = true;
+
+        }else{
+          counter = 0;
+        }
       }
     }
     
 
-
-
+    /* 
     var ySpeed = yController.calculate(s_Swerve.getGyroRoll());
 
     if (count > 50){
@@ -85,11 +109,13 @@ public class AutoBalance extends CommandBase {
       s_Swerve.drive(translation, 0, false, true);
       count = 0;
     }
-    // else {
-    //   Translation2d translation = new Translation2d(0, 0);
-    //   s_Swerve.drive(translation, 0, false, true);
-    //   count++;
-    // }
+    
+    else {
+      Translation2d translation = new Translation2d(0, 0);
+      s_Swerve.drive(translation, 0, false, true);
+      count++;
+    }
+    */
   }
 
   // Called once the command ends or is interrupted.

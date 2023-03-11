@@ -51,12 +51,17 @@ public class AutoScoreHigh extends CommandBase {
     else {
       yTarget = Constants.Swerve.autoScoreMediumYTarget;
     }
-    currentTarget = Constants.ArmConstants.restToScoreIntermediatePosition;
+    if (!isHigh) {
+      currentTarget = Constants.ArmConstants.restToScoreMediumIntermediatePosition;
+    }
+    else {
+      currentTarget = Constants.ArmConstants.restToScoreHighIntermediatePosition;
+    }
     s_Swerve.limelightUp();
     //xController.setGoal(0);
     //yController.setGoal(0);
     xController.setSetpoint(0);
-    rController.setSetpoint(180);
+    rController.setSetpoint(s_Swerve.getYaw().getDegrees());
     yController.setSetpoint(4.4);
     xController.setTolerance(Constants.Swerve.autoDriveScoreXTolerance);
     yController.setTolerance(Constants.Swerve.autoDriveScoreYTolerance);
@@ -87,7 +92,7 @@ public class AutoScoreHigh extends CommandBase {
       if (currentLimelightTarget != null) {
         var degrees =s_Swerve.getYaw().getDegrees();
         if (degrees < 0) {
-          degrees += 360;
+          degrees = 360 + degrees;
         }
         var rSpeed = rController.calculate(degrees);
         var xSpeed = xController.calculate(s_Swerve.getLimelightX());
@@ -120,7 +125,7 @@ public class AutoScoreHigh extends CommandBase {
           s_Swerve.stop();
         }
         else {
-          s_Swerve.drive(translation, rSpeed, false, true);
+          s_Swerve.drive(translation, 0, false, true);
         }
       }
     }

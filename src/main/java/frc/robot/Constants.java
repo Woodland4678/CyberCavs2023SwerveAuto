@@ -93,7 +93,7 @@ public final class Constants {
 
     /* Swerve Profiling Values */
     public static final double maxSpeed = 4.5; // meters per second
-    public static final double maxAngularVelocity = 11.5;
+    public static final double maxAngularVelocity = 6; //1.5
 
     /* Neutral Modes */
     public static final IdleMode angleNeutralMode = IdleMode.kBrake;
@@ -168,18 +168,35 @@ public final class Constants {
     public static double autoScoreHighYTarget = 1;
     public static double autoScoreMediumYTarget = -5;
 
-    public static double autoDriveConePickupXP = 0.3;
+    public static double autoDriveConePickupXP = 0.01;
     public static double autoDriveConePickupXI = 0.0;
     public static double autoDriveConePickupXD = 0.0;
     public static double autoDriveConePickupXTolerance = 1;
-    public static double autoDriveConePickupYP = 0.3;
+    public static double autoDriveConePickupYP = 0.5;
     public static double autoDriveConePickupYI = 0.0;
     public static double autoDriveConePickupYD = 0.0;
     public static double autoDriveConePickupYTolerance = 1;
-    public static double autoDriveConePickupRP = 0.1;
+    public static double autoDriveConePickupRP = 0.15;
     public static double autoDriveConePickupRI = 0.0;
     public static double autoDriveConePickupRD = 0.0;
     public static double autoDriveConePickupRTolerance = 1;
+
+    public static double autoDriveCubePickupXP = 0.12;
+    public static double autoDriveCubePickupXI = 0.0;
+    public static double autoDriveCubePickupXD = 0.0;
+    public static double autoDriveCubePickupXTolerance = 1;
+    public static double autoDriveCubePickupYP = 0.022;
+    public static double autoDriveCubePickupYI = 0.0;
+    public static double autoDriveCubePickupYD = 0.0;
+    public static double autoDriveCubePickupYTolerance = 1;
+    public static double autoDriveCubePickupRP = 0.15;
+    public static double autoDriveCubePickupRI = 0.0;
+    public static double autoDriveCubePickupRD = 0.0;
+    public static double autoDriveCubePickupRTolerance = 1;
+    
+    public static double autoGrabCubeLidarTarget = 40;
+    public static double autoGrabCubeYTolerance = 3;
+    public static double autoGrabCubeEnableY = 3.0;
     
 
     public static double coneAutoDriveYTarget = 131;
@@ -190,12 +207,24 @@ public final class Constants {
     
     public static int distanceLaserLeftChannel = 6;
     public static int distanceLaserCenterChannel = 7;
-    public static int distanceLaserRightChannel = 8;
+   // public static int distanceLaserRightChannel = 8;
     
 
     public static final double uprightConeAutoDriveYTarget = 33.6;
 
-    
+    public static final int headlightsRelayChannel = 0;
+
+    /*Constants for auto grab upright cone with the lidar */
+    public static final double autoGrabUprightConeYSwitchToLidar = 42;
+    public static final double autoGrabUprightConeRTolerance = 1;
+    public static final double autoGrabUprightConeYLimelightTolerance = 1;
+    public static final double autoGrabUprightConeYLimelightTarget = 40.0;
+    public static final double autoGrabUprightConeXLimelightTolerance = 7;
+    public static final double autoGrabUprightConeLidarYP = 0.022;
+    public static final double autoGrabUprightConeLidarYI = 0.0;
+    public static final double autoGrabUprightConeLidarYD = 0.0;
+    public static final double autoGrabUprightConeLidarYTarget = 49; //cm distance we want to be to the cone
+    public static final double autoGrabUprightConeLidarYTolerance = 3;
   }
   public static final class AutoConstants {
     public static final double kMaxSpeedMetersPerSecond = 4;
@@ -264,7 +293,7 @@ public final class Constants {
     public static final double wristPitchD = 0.0;
     public static final double wristPitchFF = 0.0;
 
-    public static final double wristRollP = 0.01;
+    public static final double wristRollP = 0.013;
     public static final double wristRollI = 0.0;
     public static final double wristRollD = 0.0;
     public static final double wristRollFF = 0.0;
@@ -291,18 +320,19 @@ public final class Constants {
     public static final int wristPitchLimitSwitchChannel = 9;
 
     
-    public static final ArmPosition scoreConeHighPosition = new ArmPosition(45, 44.5, 0, -35, false);
+    public static final ArmPosition scoreConeHighPosition = new ArmPosition(47.5, 44.5, 0, -35, false);
     public static ArmPosition pickupPosition = new ArmPosition(28.84, 11.5, 0, -127.6, false);//wrist roll position needs to change so this shouldn't be "final"
     public static final ArmPosition pos2 = new ArmPosition(20, 20, 0, 0, false);
-    public static final ArmPosition restPosition = new ArmPosition(110.3, -170.46, 90, 0, true);
-    public static final ArmPosition scoreConeMediumPosition = new ArmPosition(40, 35, 0, 10, false);
+    public static final ArmPosition restPosition = new ArmPosition(110.3, -170.46, 0, 0, true);
+    public static final ArmPosition scoreConeMediumPosition = new ArmPosition(35.8, 28, 0, 5, false);
     public static final ArmPosition scoreLowPosition = new ArmPosition(25, -5, 0, -20, false);
     public static ArmPosition grabConePosition = new ArmPosition(31.27, 2.3, 0, -140.68, false);
     public static ArmPosition grabCubePosition = new ArmPosition(22.1, 6, 0, -127.6, false);
-    public static final ArmPosition pickupToRestIntermediatePosition = new ArmPosition(17.44, 10.2, 90, 0, false);
+    public static final ArmPosition pickupToRestIntermediatePosition = new ArmPosition(17.44, 10.2, 0, 0, false);
     public static final ArmPosition yeetCubePosition = new ArmPosition(22.8, 47.8, 0, 0, false);
-    public static final ArmPosition grabUprightConePosition = new ArmPosition(32.7, -3.5, 0, 0, false);
-    public static final ArmPosition restToScoreIntermediatePosition = new ArmPosition(18.205, 36, 0, 0, false);
+    public static final ArmPosition grabUprightConePosition = new ArmPosition(32.7, -3.5, 0, 2, false);
+    public static final ArmPosition restToScoreHighIntermediatePosition = new ArmPosition(18.205, 36, 0, 0, false);
+    public static final ArmPosition restToScoreMediumIntermediatePosition = new ArmPosition(21.4, 24.2, 0, -38.51, false);
 
     public static final ArmPosition scoreCubeHighPosition = new ArmPosition(52, 40, 0, 0, false);
     public static final ArmPosition scoreCubeMediumPosition = new ArmPosition(40, 35, 0, 10, false);

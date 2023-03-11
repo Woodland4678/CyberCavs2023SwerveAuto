@@ -42,6 +42,7 @@ public class AutoPickup extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    //s_Swerve.setHeadlights(true);
     s_Swerve.limelightDown();
     isDoneCnt = 0;
     if (s_Arm.getGamePieceMode() == Constants.ArmConstants.coneMode) {
@@ -131,7 +132,7 @@ public class AutoPickup extends CommandBase {
       }
     }
     else {
-      s_Swerve.drive(translation, rSpeed, false, true);
+      //s_Swerve.drive(translation, rSpeed, false, true);
     }
   }
 
@@ -140,6 +141,7 @@ public class AutoPickup extends CommandBase {
   public void end(boolean interrupted) {
     s_Arm.MoveArm(Constants.ArmConstants.pickupToRestIntermediatePosition);
     s_Swerve.stop();
+    //s_Swerve.setHeadlights(false);
   }
 
   // Returns true when the command should end.

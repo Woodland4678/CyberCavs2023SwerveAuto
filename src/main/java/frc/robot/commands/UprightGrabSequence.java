@@ -42,7 +42,7 @@ public class UprightGrabSequence extends SequentialCommandGroup {
     );
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
-    addCommands(new AutoGrabUprightCone(s_Arm, s_Swerve));
+    addCommands(new OldAutoGrabUprightCone(s_Arm, s_Swerve));
     var boundingBox = s_Swerve.getBoundingBoxX();
     PathPlannerTrajectory moveToCone;
     double distanceFromFrameToCone = 100.698104 - 2.55144332 * boundingBox[0] + 0.0154124386 * boundingBox[0] * boundingBox[0];

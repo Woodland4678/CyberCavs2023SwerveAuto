@@ -172,7 +172,7 @@ public class Arm extends SubsystemBase {
     elbowFollowerMotor.setSmartCurrentLimit(40);
     shoulderFollowerMotor.setSmartCurrentLimit(40);
 
-    wristRollMotor.setSmartCurrentLimit(4);
+    wristRollMotor.setSmartCurrentLimit(8);
     //shoulderAbsolute.setDistancePerRotation(360);
     //elbowAbsolute.setDistancePerRotation(360);
     integratedwristPitchEncoder.setPosition(0);

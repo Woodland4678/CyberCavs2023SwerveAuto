@@ -4,184 +4,158 @@
 
 package frc.robot.commands;
 
-import com.pathplanner.lib.*;
-
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import edu.wpi.first.wpilibj2.command.RunCommand;
 import frc.robot.Constants;
 import frc.robot.Constants.ArmPosition;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.SwerveDrive;
 
 public class AutoGrabUprightCone extends CommandBase {
+  int grabState = 0;
   Arm s_Arm;
   SwerveDrive s_Swerve;
   PIDController xController = new PIDController(Constants.Swerve.autoDriveConePickupXP, Constants.Swerve.autoDriveConePickupXI, Constants.Swerve.autoDriveConePickupXD);
   PIDController yController = new PIDController(Constants.Swerve.autoDriveConePickupYP, Constants.Swerve.autoDriveConePickupYI, Constants.Swerve.autoDriveConePickupYD);
   PIDController rController = new PIDController(Constants.Swerve.autoDriveConePickupRP, Constants.Swerve.autoDriveConePickupRI, Constants.Swerve.autoDriveConePickupRD);
-  boolean isDone = false;
-  int isInPosCnt = 0;
-  int isDoneCnt = 0;
-  double limelightYTarget = 0;
   ArmPosition currentTarget;
-  double currentArmError = 0;
-  int grabState = 0;
-  PathPlannerTrajectory moveToCone;
+  double rSpeed = 0;
+  double xSpeed = 0;
+  double ySpeed = 0;
+  Translation2d translation;
+  double degrees = 0;
+  int waitCnt = 0;
+  boolean isDone = false;
   /** Creates a new AutoGrabUprightCone. */
   public AutoGrabUprightCone(Arm s_Arm, SwerveDrive s_Swerve) {
     this.s_Arm = s_Arm;
     this.s_Swerve = s_Swerve;
-    addRequirements(s_Arm, s_Swerve);
+    addRequirements(s_Swerve, s_Arm);
     // Use addRequirements() here to declare subsystem dependencies.
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    grabState = 0;
+    s_Arm.openClaw();
+    yController.setPID(Constants.Swerve.autoDriveConePickupYP, Constants.Swerve.autoDriveConePickupYI, Constants.Swerve.autoDriveConePickupYD);
+    rController.reset();
     xController.reset();
     yController.reset();
-    rController.reset();
-    currentArmError = 50.0;
-    isInPosCnt = 0;
-    currentTarget = Constants.ArmConstants.pickupUprightIntermediatePosition;
-    s_Swerve.limelightDown();
-    isDoneCnt = 0;
-    if (s_Arm.getGamePieceMode() == Constants.ArmConstants.coneMode) {
-      limelightYTarget = Constants.Swerve.uprightConeAutoDriveYTarget;
-    }
-    else {
-      limelightYTarget = Constants.Swerve.cubeAutoDriveYTarget;
-    }
-    xController.setSetpoint(0);
-    rController.setSetpoint(s_Swerve.getYaw().getDegrees());
-    yController.setSetpoint(limelightYTarget);
-    xController.setTolerance(1);
-    yController.setTolerance(1);
-    if (s_Arm.gamePieceMode == Constants.ArmConstants.coneMode) {
-      s_Swerve.setLimelightPipeline(1);
-    }
-    else {
-      s_Swerve.setLimelightPipeline(2);
-    }
+    s_Swerve.setHeadlights(true);
     isDone = false;
+    waitCnt = 0;
+    rSpeed = 0;
+    xSpeed = 0;
+    ySpeed = 0;
+    s_Swerve.limelightDown();
+    s_Swerve.setLimelightPipeline(1);
+    s_Swerve.setLimelightLED(false);
+    xController.setSetpoint(150);
+    xController.setTolerance(Constants.Swerve.autoGrabUprightConeXLimelightTolerance);
+    yController.setSetpoint(Constants.Swerve.autoGrabUprightConeYLimelightTarget);
+    yController.setTolerance(Constants.Swerve.autoGrabUprightConeYLimelightTolerance);
+    rController.setSetpoint(s_Swerve.getYaw().getDegrees());
+    rController.setTolerance(Constants.Swerve.autoGrabUprightConeRTolerance);
+    currentTarget = Constants.ArmConstants.pickupToRestIntermediatePosition;
+    grabState = 0;
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    var boundingBox = s_Swerve.getBoundingBoxX();
+    double currentArmError = s_Arm.MoveArm(currentTarget);
     switch(grabState) {
       case 0:
-        //currentArmError = s_Arm.MoveArm(currentTarget);
-        if (boundingBox[0] > 40) {          
-          grabState++;
-          currentTarget = Constants.ArmConstants.grabUprightConePosition;
-          double distanceFromFrameToCone = 121.698104 - 2.55144332 * boundingBox[0] + 0.0154124386 * boundingBox[0] * boundingBox[0];
-          SmartDashboard.putNumber(
-                          "Distance From Cone",distanceFromFrameToCone);
-          moveToCone = PathPlanner.generatePath(
-              new PathConstraints(2, 2), 
-              new PathPoint(new Translation2d(0, 0.0), Rotation2d.fromDegrees(0), Rotation2d.fromDegrees(0), s_Swerve.getCurrentVelocity()), // position, heading(direction of travel), holonomic rotation, velocity override
-              new PathPoint(new Translation2d(0.1, 0), Rotation2d.fromDegrees(0), Rotation2d.fromDegrees(0)) // position, heading(direction of travel), holonomic rotation
-          );
-        }
-        else  {
-          if (s_Swerve.limelightHasTarget() == 1) {
-            var degrees =s_Swerve.getYaw().getDegrees();
-            if (degrees < 0) {
-              degrees += 360;
+        degrees =s_Swerve.getYaw().getDegrees();
+        // if (degrees < 0) {
+        //   degrees += 360;
+        // }
+        var boundingBoxXY = s_Swerve.getBoundingBoxX();
+        rSpeed = rController.calculate(degrees);
+        xSpeed = xController.calculate(boundingBoxXY[1]); 
+        ySpeed = yController.calculate(s_Swerve.getLimelightY()); 
+        
+        translation = new Translation2d(-ySpeed, xSpeed);
+        
+        
+        s_Swerve.drive(translation, rSpeed, false, true);
+        if (s_Swerve.getLimelightY() < Constants.Swerve.autoGrabUprightConeYSwitchToLidar && xController.atSetpoint()) {
+            if (currentArmError < 5) {
+              grabState++;
             }
-            //var boundingBoxXY = s_Swerve.getBoundingBoxX();
-            var rSpeed = rController.calculate(degrees);
-            var xSpeed = xController.calculate(s_Swerve.getLimelightX()); //bounding box [1]
-            var ySpeed = yController.calculate(s_Swerve.getLimelightY()); // bounding box [2]
-            // if (Math.abs(rSpeed) < 0.7) {
-            //   xSpeed = rLimiter.calculate(rController.calculate(s_Swerve.getYaw().getDegrees()));
-            // }
-            // else {
-            //   ySpeed = ySpeed * 0.5;
-            //   xSpeed = 0;
-            // }
-            Translation2d translation = new Translation2d(-ySpeed, xSpeed);
-            SmartDashboard.putNumber(
-                        "xSpeed",xSpeed);
-            SmartDashboard.putNumber(
-                          "ySpeed",ySpeed);
-            SmartDashboard.putNumber(
-                          "rSpeed",rSpeed);
-            
-            s_Swerve.drive(translation, rSpeed, false, true);
-          }
         }
       break;
       case 1:
-        //s_Swerve.stop();
-        isDone = true;
-        // grabState++;
-        new RunCommand(() -> s_Swerve.followTrajectoryCommand(moveToCone, true),
-          s_Swerve);
-          
+        currentTarget = Constants.ArmConstants.grabUprightConePosition;
+        //xController.setPID(Constants.Swerve.autoGrabUprightConeLidarXP, Constants.Swerve.autoGrabUprightConeLidarXI, Constants.Swerve.autoGrabUprightConeLidarXD);
+        yController.setPID(Constants.Swerve.autoGrabUprightConeLidarYP, Constants.Swerve.autoGrabUprightConeLidarYI, Constants.Swerve.autoGrabUprightConeLidarYD);
+        yController.setSetpoint(Constants.Swerve.autoGrabUprightConeLidarYTarget);
+        yController.setTolerance(Constants.Swerve.autoGrabUprightConeLidarYTolerance);
+        grabState++;
       break;
       case 2:
-        //s_Swerve.stop();
-      break;
-    }
-    /*
-    if (xController.atSetpoint() && yController.atSetpoint() && currentArmError < 3){
-      s_Swerve.stop();
-      currentTarget = Constants.ArmConstants.grabUprightConePosition;
-    }
-    else if (!(currentTarget == Constants.ArmConstants.grabUprightConePosition)) {
-      if (s_Swerve.limelightHasTarget() == 1) {
-        var degrees =s_Swerve.getYaw().getDegrees();
-        if (degrees < 0) {
-          degrees += 360;
-        }
+        degrees =s_Swerve.getYaw().getDegrees();
+        // if (degrees < 0) {
+        //   degrees += 360;
+        // }
         //var boundingBoxXY = s_Swerve.getBoundingBoxX();
-        var rSpeed = rController.calculate(degrees);
-        var xSpeed = xController.calculate(s_Swerve.getLimelightX()); //bounding box [1]
-        var ySpeed = yController.calculate(s_Swerve.getLimelightY()); // bounding box [2]
-        // if (Math.abs(rSpeed) < 0.7) {
-        //   xSpeed = rLimiter.calculate(rController.calculate(s_Swerve.getYaw().getDegrees()));
-        // }
-        // else {
-        //   ySpeed = ySpeed * 0.5;
-        //   xSpeed = 0;
-        // }
-        Translation2d translation = new Translation2d(-ySpeed, xSpeed);
-        SmartDashboard.putNumber(
-                    "xSpeed",xSpeed);
-        SmartDashboard.putNumber(
-                      "ySpeed",ySpeed);
-        SmartDashboard.putNumber(
-                      "rSpeed",rSpeed);
+        rSpeed = rController.calculate(degrees);       
+        ySpeed = yController.calculate(s_Swerve.getCenterLaserValue()); 
+        if (s_Swerve.getLeftLaserValue() - s_Swerve.getCenterLaserValue() < -10) {
+          xSpeed = 0.5;
+        }
+        else if (s_Swerve.getRightLaserValue() - s_Swerve.getCenterLaserValue() < -10) {
+          xSpeed = -0.5;
+        }
+        else if (Math.abs(s_Swerve.getLeftLaserValue() - s_Swerve.getCenterLaserValue()) < 8) {
+          xSpeed = 0.25;
+        }
+        else if (Math.abs(s_Swerve.getRightLaserValue() - s_Swerve.getCenterLaserValue()) < 8) {
+          xSpeed = -0.25;
+        }
+        else {
+          xSpeed = 0;
+        }
+        translation = new Translation2d(-ySpeed, xSpeed); 
+        
         
         s_Swerve.drive(translation, rSpeed, false, true);
-      }
-    }
-    if (currentTarget == Constants.ArmConstants.grabUprightConePosition) {
-      if (currentArmError < 2) {
-        isInPosCnt++;
-       
-      }
-      if (isInPosCnt > 20) {
+        if (yController.atSetpoint() && currentArmError < 2) {
+          grabState++;
+        }
+      break;
+      case 3:
+        s_Swerve.stop();
         s_Arm.closeClaw();
-      }
-    }*/
-  
+        grabState++;
+      break;
+      case 4:
+        waitCnt++;
+        if (waitCnt > 10) {
+          grabState++;
+        }
+      break;
+      case 5:
+        currentTarget = Constants.ArmConstants.pickupToRestIntermediatePosition;
+        if (currentArmError < 4) {
+          grabState++;
+        }
+      break;
+      case 6:
+        currentTarget = Constants.ArmConstants.restPosition;
+        s_Arm.setLEDs(0, 255, 0);
+        isDone = true;
+      break;
+    }
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    //s_Swerve.stop();
-    //s_Arm.stopArm();
+    s_Swerve.setHeadlights(false);
+    s_Swerve.stop();
   }
 
   // Returns true when the command should end.
