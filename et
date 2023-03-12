@@ -1,0 +1,32 @@
+[33m912f0b1[m[33m ([m[1;36mHEAD -> [m[1;32mmaster[m[33m, [m[1;31morigin/master[m[33m)[m HEAD@{0}: reset: moving to origin/master
+[33mb146c8a[m HEAD@{1}: reset: moving to HEAD
+[33mb146c8a[m HEAD@{2}: reset: moving to HEAD
+[33mb146c8a[m HEAD@{3}: reset: moving to HEAD
+[33mb146c8a[m HEAD@{4}: reset: moving to HEAD
+[33mb146c8a[m HEAD@{5}: reset: moving to HEAD
+[33mb146c8a[m HEAD@{6}: commit: auto grab cone, other optimzations
+[33m4cc95bc[m HEAD@{7}: commit: Auto score and teleop changes
+[33m26ae04a[m HEAD@{8}: commit: testing auto drive to upright cone
+[33m97f75ff[m HEAD@{9}: commit: auto grab, arm stuff yay
+[33m24d46cd[m HEAD@{10}: commit: swerve fix, auto drive, auto rotate
+[33m3f86a6d[m HEAD@{11}: commit: Added code for auto pickup and scoring
+[33mde46bf9[m HEAD@{12}: commit: y tho
+[33ma970f17[m HEAD@{13}: commit: Need to add auto drive constants, wrist pids
+[33m8ba4b7c[m HEAD@{14}: commit: PID tuning of arm
+[33mb02f030[m HEAD@{15}: commit: nothing works wtf
+[33m00e58ee[m HEAD@{16}: commit: wpilib update
+[33m46ad834[m HEAD@{17}: commit: Updated wpilib
+[33m1cd6407[m HEAD@{18}: commit: again
+[33m5e2f0eb[m HEAD@{19}: commit: Added code to test arm movement
+[33mab01fdb[m HEAD@{20}: commit: Tuned the cone and cube auto drive. Added lime lib
+[33m329145f[m HEAD@{21}: commit: auto balance testing
+[33m7a4ad95[m HEAD@{22}: pull --tags origin master: Fast-forward
+[33m369d287[m HEAD@{23}: pull --tags origin master: Merge made by the 'recursive' strategy.
+[33mdcc0c1b[m HEAD@{24}: commit: tuned some game piece following
+[33mef60b46[m HEAD@{25}: commit: Arm updates again first commit didn't work
+[33m2464116[m HEAD@{26}: commit: Added arm code, ready to test
+[33m4b2ec7e[m HEAD@{27}: commit: some auto balance
+[33m3fad3af[m HEAD@{28}: commit: Paths, auto driving, object detect, tape detect
+[33mb4a69a0[m HEAD@{29}: commit: it works! had to change angle gear ratio and invert motors
+[33m2af5f94[m HEAD@{30}: commit: what
+[33m25e7c08[m HEAD@{31}: commit (initial): first commit
