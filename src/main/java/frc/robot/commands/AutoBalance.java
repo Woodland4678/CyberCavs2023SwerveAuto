@@ -16,10 +16,10 @@ public class AutoBalance extends CommandBase {
   int count =0;
   int timer = 0;
   int counter = 0;
-  double slope = 0;
   boolean isBalanced = false;
   boolean isDone = false;
   double[] rollArray = new double[20];
+  double[] rocArray = new double[19];
 
   /** Creates a new AutoBalance. */
   public AutoBalance(SwerveDrive s_Swerve) {
@@ -41,21 +41,22 @@ public class AutoBalance extends CommandBase {
     // if we add a gyro val every 2/50 seconds
     // 20 would be 2/50 * 20 = 0.8 seconds to fill the whole array
 
-    Translation2d translation = new Translation2d(-0.5, 0);
-    s_Swerve.drive(translation, 0, false, true);
-
     if (timer == 2){
       timer =0;
       
       // i=0 is the oldest 
       // i=19 is the latest data
-      for (int i = 0; i<18; i++){
-        rollArray[i] = rollArray[i+1];
-      }
-
       rollArray[19] = s_Swerve.getGyroRoll();
+      for (int i = 19; i>0; i--){
+        rollArray[i-1] = rollArray[i];
+      }
     
 
+      /* 
+      for (int i = 0; i<17; i++){
+        rollArray[i] = (rollArray[i+1] - rollArray[i]) / 0.1;
+      }
+      */
 
         SmartDashboard.putNumber(
                     "Roll slope", slope);
@@ -64,19 +65,14 @@ public class AutoBalance extends CommandBase {
     }
     timer++;
 
-    System.out.println(rollArray[0]);
-
+    System.out.println(rollArray[19]);
     if (rollArray[0] != 0) {
       // positive slope, ignore negative slope
-      slope = (rollArray[19] - rollArray[0]) / 0.8 ;
-
-      if (slope > 8 ){
+      if ( ( ((rollArray[19] - rollArray[0]) / 0.8 ) > 14 )){
         counter ++;
-
-        if (counter > 10){
-          counter =0;
+        if (counter > 20){
           isDone = true;
-
+          counter = 0;
         }else{
           counter = 0;
         }
