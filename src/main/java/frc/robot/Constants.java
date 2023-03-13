@@ -89,7 +89,7 @@ public final class Constants {
     public static final double driveConversionPositionFactor = (wheelDiameter * Math.PI) / driveGearRatio;
         //(wheelDiameter * Math.PI) / (driveGearRatio * 42); //42 is the number of "clicks" per full rotation of a neo motor
     public static final double driveConversionVelocityFactor = driveConversionPositionFactor / 60.0;
-    public static final double angleConversionFactor = 360.0 / angleGearRatio;
+    public static final double angleConversionFactor = (360.0 / angleGearRatio);
 
     /* Swerve Profiling Values */
     public static final double maxSpeed = 4.5; // meters per second
@@ -152,12 +152,12 @@ public final class Constants {
     /////////////////////////////////////////////////////////////
     //**Auto drive values (for scoring and game piece pickup) */
     /////////////////////////////////////////////////////////////
-    public static double autoDriveScoreXP = 0.1;
+    public static double autoDriveScoreXP = 0.08;
     public static double autoDriveScoreXI = 0.0;
     public static double autoDriveScoreXD = 0.0;
     public static double autoDriveScoreXTolerance = 0.75;
-    public static double autoDriveScoreYP = 0.1;
-    public static double autoDriveScoreYI = 0.0;
+    public static double autoDriveScoreYP = 0.15;
+    public static double autoDriveScoreYI = 0.000001;
     public static double autoDriveScoreYD = 0.0;
     public static double autoDriveScoreYTolerance = 0.75;
     public static double autoDriveScoreRP = 0.1;
@@ -168,11 +168,11 @@ public final class Constants {
     public static double autoScoreHighYTarget = 1;
     public static double autoScoreMediumYTarget = -5;
 
-    public static double autoDriveConePickupXP = 0.01;
+    public static double autoDriveConePickupXP = 0.025;
     public static double autoDriveConePickupXI = 0.0;
     public static double autoDriveConePickupXD = 0.0;
     public static double autoDriveConePickupXTolerance = 1;
-    public static double autoDriveConePickupYP = 0.5;
+    public static double autoDriveConePickupYP = 0.02;
     public static double autoDriveConePickupYI = 0.0;
     public static double autoDriveConePickupYD = 0.0;
     public static double autoDriveConePickupYTolerance = 1;
@@ -195,7 +195,7 @@ public final class Constants {
     public static double autoDriveCubePickupRTolerance = 1;
     
     public static double autoGrabCubeLidarTarget = 25;
-    public static double autoGrabCubeYTolerance = 3;
+    public static double autoGrabCubeYTolerance = 8;
     public static double autoGrabCubeEnableY = 4.0;
     
 
@@ -324,9 +324,9 @@ public final class Constants {
     public static ArmPosition pickupPosition = new ArmPosition(28.84, 11.5, 0, -127.6, false);//wrist roll position needs to change so this shouldn't be "final"
     public static final ArmPosition pos2 = new ArmPosition(20, 20, 0, 0, false);
     public static final ArmPosition restPosition = new ArmPosition(110.3, -170.46, 0, 0, true);
-    public static final ArmPosition scoreConeMediumPosition = new ArmPosition(35.8, 28, 0, 5, false);
+    public static final ArmPosition scoreConeMediumPosition = new ArmPosition(35.8, 26.5, 0, -5, false);
     public static final ArmPosition scoreLowPosition = new ArmPosition(25, -5, 0, -20, false);
-    public static ArmPosition grabConePosition = new ArmPosition(31.27, 2.3, 0, -140.68, false);
+    public static ArmPosition grabConePosition = new ArmPosition(31.27, 1, 0, -127.6, false);
     public static ArmPosition grabCubePosition = new ArmPosition(33.1, 8, 0, -127.6, false);
     public static final ArmPosition pickupToRestIntermediatePosition = new ArmPosition(17.44, 10.2, 0, 0, false);
     public static final ArmPosition yeetCubePosition = new ArmPosition(22.8, 47.8, 0, 0, false);
@@ -337,7 +337,7 @@ public final class Constants {
     public static final ArmPosition scoreCubeHighPosition = new ArmPosition(48, 45, 0, -100, false);
     public static final ArmPosition scoreCubeMediumPosition = new ArmPosition(40, 35, 0, -100, false);
     public static final ArmPosition pickupUprightIntermediatePosition = new ArmPosition(15.44, 10.2, 0, 0, false);
-
+    public static final ArmPosition grabFromSingleStationPosition = new ArmPosition(15, 15, 0, -23, false);
   }
   public static enum LEDModes {
     OFF,

@@ -81,7 +81,7 @@ public class SwerveModule {
   public void resetToAbsolute() {
     //System.out.println(getCanCoder().getDegrees());
     double absolutePosition = getCanCoder().getDegrees() - angleOffset.getDegrees();
-    integratedAngleEncoder.setPosition(absolutePosition);
+    integratedAngleEncoder.setPosition(absolutePosition);      
   }
 
   private void configAngleEncoder() {
@@ -102,7 +102,7 @@ public class SwerveModule {
     angleController.setD(Constants.Swerve.angleKD);
     angleController.setFF(Constants.Swerve.angleKFF);
     angleMotor.enableVoltageCompensation(Constants.Swerve.voltageComp);
-    angleMotor.burnFlash();
+    angleMotor.burnFlash();    
     resetToAbsolute();
   }
 

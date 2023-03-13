@@ -399,8 +399,12 @@ public class SwerveDrive extends SubsystemBase {
             break;
             case 8:
               if (chksum == ch) {
+                dist -= 415;
                 if (dist >= 200) {
                   dist = 200;
+                }
+                else if (dist < 0) {
+                  dist = 0;
                 }
                 rightLaserDistance = dist;
               }

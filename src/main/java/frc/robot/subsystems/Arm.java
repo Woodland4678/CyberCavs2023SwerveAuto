@@ -16,6 +16,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
+import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
@@ -67,7 +68,12 @@ public class Arm extends SubsystemBase {
 
   private DigitalInput wristPitchLimitSwitch;
 
+  AnalogInput wristRollCal = new AnalogInput(0);
+
   private boolean armMayMove = false;
+
+  boolean isClawClosed = true;
+  int clawClosedCnt = 0;
 
   private int calibrateWristState = 0;
 
@@ -202,11 +208,13 @@ public class Arm extends SubsystemBase {
   public void openClaw(){
     clawSolenoid1.set(Value.kReverse);
     clawSolenoid2.set(Value.kReverse);
+    isClawClosed = false;
   }
 
   public void closeClaw(){
     clawSolenoid1.set(Value.kForward);
     clawSolenoid2.set(Value.kForward);
+    isClawClosed = true;
   }
   public int getGamePieceMode() {
     return gamePieceMode;
@@ -286,7 +294,7 @@ public class Arm extends SubsystemBase {
       if (shoulderAngle >= 45 && shoulderAngle <= 135 && elbowAngle <= 0 && elbowAngle >= -175 ) {
         moveToAngle(shoulderAngle, elbowAngle);
       }
-      if (currentX > 17) {
+      if (currentX > 17 || targetPos.wristPitchTarget > -30) {
         wristPitchController.setReference(targetPos.wristPitchTarget, com.revrobotics.CANSparkMax.ControlType.kPosition);
         wristRollController.setReference(targetPos.wristRollTarget, com.revrobotics.CANSparkMax.ControlType.kPosition);
       }
@@ -294,10 +302,14 @@ public class Arm extends SubsystemBase {
         wristRollMotor.stopMotor();
         wristPitchMotor.stopMotor();
       }
+      
     
       
     //}
     return Math.sqrt((Math.pow(currentX - targetPos.xTarget,2)) + (Math.pow(currentY - targetPos.yTarget, 2))); //returns distance to target
+  }
+  public boolean isClawClosed() {
+    return isClawClosed;
   }
   public void moveToAngle(double shoulderAngle, double elbowAngle) {
     shoulderController.setReference((90 - shoulderAngle) , com.revrobotics.CANSparkMax.ControlType.kPosition); //90 - inverse calc
@@ -408,6 +420,7 @@ public class Arm extends SubsystemBase {
       case 2:
         wristPitchMotor.stopMotor();
         integratedwristPitchEncoder.setPosition(0);
+        calibrateWristState = 0;
         return true;
     }
     return false;
@@ -543,6 +556,8 @@ public class Arm extends SubsystemBase {
                   "Wrist Pitch Limit Switch", wristPitchLimitSwitch.get());
     SmartDashboard.putNumber( 
                   "Game Piece Mode", getGamePieceMode());
+    SmartDashboard.putNumber( 
+                  "Wrist Roll Cal", wristRollCal.getValue());
     // This method will be called once per scheduler run
     // if (elbowTopLimitSwitch.get() || elbowBottomLimitSwitch.get()) {
     //   elbowLeaderMotor.stopMotor();

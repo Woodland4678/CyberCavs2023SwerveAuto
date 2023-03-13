@@ -112,7 +112,7 @@ public class RobotContainer {
     //operatorBtnRB.onTrue(new GrabGamePiece(s_Arm));
     operatorBtnBack.onTrue(new CalibrateArm(s_Arm));
     operatorBtnRT.onTrue(new MoveArm(s_Arm,Constants.ArmConstants.grabUprightConePosition, operator));
-    operatorBtnLT.onTrue(new MoveArm(s_Arm,Constants.ArmConstants.pickupPosition, operator));
+    operatorBtnLT.onTrue(new MoveArm(s_Arm,Constants.ArmConstants.grabFromSingleStationPosition, operator));
   }
 
   public static Joystick getOperatorJoystick() {

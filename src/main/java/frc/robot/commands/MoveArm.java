@@ -21,6 +21,7 @@ public class MoveArm extends CommandBase {
   boolean armOkayToMove = true;
   boolean isDone = false;
   int isDoneCnt = 0;
+  int clawClosedCnt = 0;
   /** Creates a new MoveArm. */
   public MoveArm(Arm s_Arm, ArmPosition targetPos, Joystick operatorJoystick) {
     this.s_Arm = s_Arm;
@@ -33,6 +34,7 @@ public class MoveArm extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    clawClosedCnt = 0;
     isDone = false;
     isDoneCnt = 0;
     armOkayToMove = true;
@@ -53,6 +55,9 @@ public class MoveArm extends CommandBase {
     }
     else if (this.targetPos == Constants.ArmConstants.restPosition) {
       currentTarget = Constants.ArmConstants.pickupToRestIntermediatePosition;
+    }
+    else if (this.targetPos == Constants.ArmConstants.grabFromSingleStationPosition) {
+      currentTarget =Constants.ArmConstants.pickupToRestIntermediatePosition;
     }
     else if (this.targetPos == Constants.ArmConstants.scoreConeHighPosition && s_Arm.getGamePieceMode() == Constants.ArmConstants.cubeMode) {
       currentTarget = Constants.ArmConstants.restToScoreHighIntermediatePosition;
@@ -77,10 +82,10 @@ public class MoveArm extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if (currentTarget == targetPos && currentArmError < 5) {
+    if (currentTarget == targetPos && currentArmError < 3) {
       isDoneCnt++;
       if (isDoneCnt > 10) {
-        isDone = true;
+        //isDone = true;
       }      
     }
     if (currentTarget == Constants.ArmConstants.grabConePosition || currentTarget == Constants.ArmConstants.grabCubePosition || currentTarget == Constants.ArmConstants.grabUprightConePosition) {
@@ -110,6 +115,15 @@ public class MoveArm extends CommandBase {
           s_Arm.wristRollManual(0);
         }*/
       }
+      // if (targetPos == Constants.ArmConstants.grabFromSingleStationPosition) {
+      //   if (s_Arm.isClawClosed()) {
+      //     clawClosedCnt++;
+      //     if (clawClosedCnt > 5) {
+      //       this.targetPos = Constants.ArmConstants.restPosition;
+      //       clawClosedCnt = 0;
+      //     }
+      //   }
+      // }
     }
     
     
