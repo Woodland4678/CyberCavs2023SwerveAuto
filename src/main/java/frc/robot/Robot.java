@@ -52,8 +52,6 @@ public class Robot extends TimedRobot {
     m_robotContainer = new RobotContainer();
     DataLogManager.start();
     isArmStartOkay = false;
-
-    DataLogManager.start();
   }
 
   /**
