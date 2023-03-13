@@ -21,8 +21,8 @@ public class CalibrateArm extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    s_Arm.resetToAbsoluteEncoder();
-    s_Arm.resetCalibrateWristState();
+    //s_Arm.resetToAbsoluteEncoder();
+    //s_Arm.resetCalibrateWristState();
     isDone = false;
   }
 

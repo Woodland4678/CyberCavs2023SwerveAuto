@@ -11,7 +11,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import frc.robot.autos.BaseAuto;
 //import frc.robot.autos.*;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
@@ -29,7 +28,7 @@ public class RobotContainer {
   private static final Joystick operator = new Joystick(1);
 
   /* Drive Controls */
-  private final int translationAxis = XboxController.Axis.kLeftY.value;
+  //private final int translationAxis = driver.left;
   private final int strafeAxis = XboxController.Axis.kLeftX.value;
   private final int rotationAxis = XboxController.Axis.kRightX.value;
 
@@ -70,12 +69,10 @@ public class RobotContainer {
     s_Swerve.setDefaultCommand(
         new TeleopSwerve(
             s_Swerve,
-            -driver.getLeftY(), //translation axis
-           -driver.getLeftX(), //strafe axis
-            -driver.getRightX(), //rotation axis
-           driver.rightTrigger().getAsBoolean(), //TODO this doesn't work cause the trigger is an axis not a button
-            false,
-            false)); //driverBtnRB.getAsBoolean()
+            () -> -driver.getLeftY(),
+            () -> -driver.getLeftX(),
+            () -> -driver.getRightX(),
+            driver.leftTrigger().getAsBoolean()));
 
 
 
@@ -89,13 +86,14 @@ public class RobotContainer {
     driver.x().onTrue(new InstantCommand(() -> s_Arm.openClaw()));
     driver.b().onTrue(new InstantCommand(() -> s_Arm.closeClaw()));
     //driverBtnRB.whileTrue(new YeetCube(s_Arm));
-    driver.y().whileTrue(new AutoScoreHigh(s_Arm, s_Swerve, true)); //score high
-    driver.a().whileTrue(new AutoScoreHigh(s_Arm, s_Swerve, false)); //score medium
+    driver.y().whileTrue(new AutoScoreHigh(s_Arm, s_Swerve, true, operator.getRawAxis(1))); //score high
+    driver.a().whileTrue(new AutoScoreHigh(s_Arm, s_Swerve, false,  operator.getRawAxis(1))); //score medium
     driver.start().onTrue(new InstantCommand(() -> s_Swerve.resetSwerveModuleAngles()));
     driver.rightBumper().whileTrue(new AutoGrabUprightCone(s_Arm, s_Swerve));
     driver.leftBumper().whileTrue(new AutoGrabCube(s_Swerve, s_Arm));
     driver.leftStick().whileTrue(new AutoBalance(s_Swerve));
     driver.rightStick().onTrue(new AutoPickup(s_Arm, s_Swerve));
+    
     //driver.leftTrigger(0.5).whileTrue(new YeetCube(s_Arm));
     //followTape.whileTrue(new FollowTape(s_Swerve, driver));
     //autoBalance.whileTrue(new AutoBalance(s_Swerve));
@@ -161,6 +159,6 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
     // An example command will be run in autonomous
    // return new exampleAuto(s_Swerve);
-   return new BaseAuto(s_Swerve); //TODO place holder for now, replace once we have auto modes
+   return new MoveBack(s_Swerve, s_Arm); //TODO place holder for now, replace once we have auto modes
   }
 }

@@ -157,6 +157,7 @@ public class AutoGrabUprightCone extends CommandBase {
   public void end(boolean interrupted) {
     s_Swerve.setHeadlights(false);
     s_Swerve.stop();
+    s_Arm.setLEDMode(LEDModes.OFF);
   }
 
   // Returns true when the command should end.

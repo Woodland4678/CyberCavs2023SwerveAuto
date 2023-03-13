@@ -29,12 +29,15 @@ public class AutoScoreHigh extends CommandBase {
   ArmPosition currentTarget;
   double yTarget = 0;
   boolean isHigh = true;
+  double wristAdjustment = 0;
+  boolean isMainArmPositionSet = false;
   /** Creates a new ScoreHigh. */
-  public AutoScoreHigh(Arm s_Arm, SwerveDrive s_Swerve, boolean isHigh) {
+  public AutoScoreHigh(Arm s_Arm, SwerveDrive s_Swerve, boolean isHigh, double wristAdjustment) {
     this.s_Arm = s_Arm;
     this.s_Swerve = s_Swerve;
-    addRequirements(s_Arm, s_Swerve);
+    addRequirements(s_Arm, s_Swerve); 
     this.isHigh = isHigh;
+    this.wristAdjustment = wristAdjustment;
     // Use addRequirements() here to declare subsystem dependencies.
   }
 
@@ -62,7 +65,7 @@ public class AutoScoreHigh extends CommandBase {
     //yController.setGoal(0);
     xController.setSetpoint(0);
     rController.setSetpoint(s_Swerve.getYaw().getDegrees());
-    yController.setSetpoint(4.4);
+    yController.setSetpoint(6);
     xController.setTolerance(Constants.Swerve.autoDriveScoreXTolerance);
     yController.setTolerance(Constants.Swerve.autoDriveScoreYTolerance);
     rController.setTolerance(Constants.Swerve.autoDriveScoreRTolerance);
@@ -70,21 +73,25 @@ public class AutoScoreHigh extends CommandBase {
     s_Swerve.setLimelightPipeline(currentPipeline);
     isDone = false;
     isInPosCnt = 0;
+    isMainArmPositionSet = false;
     
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    
+    if (Math.abs(wristAdjustment) > 0.1 && isMainArmPositionSet) {
+      currentTarget.wristPitchTarget += wristAdjustment * 0.5;
+    }
     var currentArmError = s_Arm.MoveArm(currentTarget);
-    if (currentArmError < 8) {
+    if (currentArmError < 8 && !isMainArmPositionSet) {
       if (isHigh) {
         currentTarget = Constants.ArmConstants.scoreConeHighPosition;
       }
       else {
         currentTarget = Constants.ArmConstants.scoreConeMediumPosition;
       }
+      isMainArmPositionSet = true;
     }
     
     if (s_Swerve.limelightHasTarget() == 1) {

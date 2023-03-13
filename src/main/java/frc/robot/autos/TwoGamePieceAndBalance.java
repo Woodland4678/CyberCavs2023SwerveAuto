@@ -9,9 +9,11 @@ import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.AutoGrabUprightCone;
 import frc.robot.commands.AutoScoreHigh;
+import frc.robot.commands.CalibrateArm;
 import frc.robot.commands.FollowObject;
 import frc.robot.commands.YeetCube;
 import frc.robot.subsystems.Arm;
@@ -31,10 +33,10 @@ public class TwoGamePieceAndBalance extends SequentialCommandGroup {
     addCommands(
          new InstantCommand(() -> s_Swerve.resetSwerveModuleAngles()),
          new YeetCube(s_Arm),         
-         s_Swerve.followTrajectoryCommand(goTo2ndGamePiece, true),
+         new ParallelCommandGroup(s_Swerve.followTrajectoryCommand(goTo2ndGamePiece, true), new CalibrateArm(s_Arm)),
          new AutoGrabUprightCone(s_Arm, s_Swerve),
          s_Swerve.followTrajectoryCommand(bring2ndGamePieceBack, true),
-         new AutoScoreHigh(s_Arm, s_Swerve, true),
+         new AutoScoreHigh(s_Arm, s_Swerve, true, 0.0),
          s_Swerve.followTrajectoryCommand(goAutoBalance, true)
          );
   }
