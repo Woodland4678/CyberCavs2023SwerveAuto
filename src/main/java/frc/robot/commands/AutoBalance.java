@@ -58,8 +58,8 @@ public class AutoBalance extends CommandBase {
       }
       */
 
-        SmartDashboard.putNumber(
-                    "Roll slope", slope);
+        // SmartDashboard.putNumber(
+        //             "Roll slope", slope);
         SmartDashboard.putNumber(
                       "rollArray[0]", rollArray[0]);
     }

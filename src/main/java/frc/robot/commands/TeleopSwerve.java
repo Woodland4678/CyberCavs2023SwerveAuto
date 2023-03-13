@@ -12,10 +12,10 @@ import java.util.function.DoubleSupplier;
 
 public class TeleopSwerve extends CommandBase {
   private SwerveDrive s_Swerve;
-  private DoubleSupplier translationSup;
-  private DoubleSupplier strafeSup;
-  private DoubleSupplier rotationSup;
-  private BooleanSupplier robotCentricSup;
+  private double translationSup;
+  private double strafeSup;
+  private double rotationSup;
+  private boolean robotCentricSup;
 
   private SlewRateLimiter translationLimiter = new SlewRateLimiter(3.0);
   private SlewRateLimiter strafeLimiter = new SlewRateLimiter(3.0);
@@ -23,19 +23,19 @@ public class TeleopSwerve extends CommandBase {
 
   PIDController rController = new PIDController(Constants.Swerve.autoDriveScoreRP, Constants.Swerve.autoDriveScoreRI, Constants.Swerve.autoDriveScoreRD);
 
-  BooleanSupplier turnToDrivers;
-  BooleanSupplier turnToLoading;
+  boolean turnToDrivers;
+  boolean turnToLoading;
 
   double rotationVal = 0;
 
   public TeleopSwerve(
       SwerveDrive s_Swerve,
-      DoubleSupplier translationSup,
-      DoubleSupplier strafeSup,
-      DoubleSupplier rotationSup,
-      BooleanSupplier robotCentricSup,
-      BooleanSupplier turnToDrivers,
-      BooleanSupplier turnToLoading) {
+      double translationSup,
+      double strafeSup,
+      double rotationSup,
+      boolean robotCentricSup,
+      boolean turnToDrivers,
+      boolean turnToLoading) {
     this.s_Swerve = s_Swerve;
     addRequirements(s_Swerve);
 
@@ -53,10 +53,10 @@ public class TeleopSwerve extends CommandBase {
     /* Get Values, Deadband*/
     double translationVal =
         translationLimiter.calculate(
-            MathUtil.applyDeadband(translationSup.getAsDouble(), Constants.Swerve.stickDeadband));
+            MathUtil.applyDeadband(translationSup, Constants.Swerve.stickDeadband));
     double strafeVal =
         strafeLimiter.calculate(
-            MathUtil.applyDeadband(strafeSup.getAsDouble(), Constants.Swerve.stickDeadband));
+            MathUtil.applyDeadband(strafeSup, Constants.Swerve.stickDeadband));
 
     // if (turnToDrivers.getAsBoolean()) {
     //   rController.setSetpoint(180);
@@ -74,14 +74,14 @@ public class TeleopSwerve extends CommandBase {
     //else {
       rotationVal =
         rotationLimiter.calculate(
-            MathUtil.applyDeadband(rotationSup.getAsDouble(), Constants.Swerve.stickDeadband));
+            MathUtil.applyDeadband(rotationSup, Constants.Swerve.stickDeadband));
    // }
 
     /* Drive */
     s_Swerve.drive(
         new Translation2d(translationVal, strafeVal).times(Constants.Swerve.maxSpeed),
         rotationVal * Constants.Swerve.maxAngularVelocity,
-        !robotCentricSup.getAsBoolean(),
+        !robotCentricSup,
         true);
   }
 }

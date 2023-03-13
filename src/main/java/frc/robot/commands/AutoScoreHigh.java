@@ -91,8 +91,11 @@ public class AutoScoreHigh extends CommandBase {
       LimelightTarget_Retro currentLimelightTarget = s_Swerve.getBestLimelightTarget();
       if (currentLimelightTarget != null) {
         var degrees =s_Swerve.getYaw().getDegrees();
-        if (degrees < 0) {
+        if (rController.getSetpoint() > 0 && degrees < 0) {
           degrees = 360 + degrees;
+        }
+        else if (rController.getSetpoint() < 0 && degrees > 0) {
+          degrees = degrees - 360;
         }
         var rSpeed = rController.calculate(degrees);
         var xSpeed = xController.calculate(s_Swerve.getLimelightX());
@@ -125,7 +128,7 @@ public class AutoScoreHigh extends CommandBase {
           s_Swerve.stop();
         }
         else {
-          s_Swerve.drive(translation, 0, false, true);
+          s_Swerve.drive(translation, rSpeed, false, true);
         }
       }
     }

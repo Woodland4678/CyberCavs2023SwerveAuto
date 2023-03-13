@@ -28,6 +28,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.ArmPosition;
+import frc.robot.Constants.LEDModes;
 
 public class Arm extends SubsystemBase {
   private CANSparkMax shoulderLeaderMotor;
@@ -96,6 +97,10 @@ public class Arm extends SubsystemBase {
   
 
   public int gamePieceMode = Constants.ArmConstants.coneMode;
+  int blinkCnt = 0;
+  int blinkInterval = 10;
+
+  LEDModes LEDMode;
   
   /** Creates a new Arm. */
   public Arm() {
@@ -185,6 +190,8 @@ public class Arm extends SubsystemBase {
     // Set the data
     m_led.setData(m_ledBuffer);
     m_led.start();
+    LEDMode = LEDModes.OFF;
+  
   }
   public double getCurrentElbowPosition() {
     return integratedElbowEncoder.getPosition();
@@ -482,10 +489,30 @@ public class Arm extends SubsystemBase {
   }
   public void cubeMode() {
     setLEDs(75, 0, 130);
-    setGamePieceMode(Constants.ArmConstants.coneMode); //TODO change this back to cubes
+    setGamePieceMode(Constants.ArmConstants.cubeMode); //TODO change this back to cubes
+  }
+  public void setLEDMode(LEDModes mode) {
+    LEDMode = mode;
   }
   @Override
   public void periodic() {
+
+    switch (LEDMode) {
+      case OFF:
+        setLEDs(0, 0, 0);
+      break;
+      case BLINKGREEN:
+        if (blinkCnt > blinkInterval) {
+          setLEDs(0, 255, 0);
+          blinkCnt = 0;
+        }
+        else {
+          blinkCnt++;
+          setLEDs(0, 0, 0);
+        }
+
+      break;
+    }
     m_led.setData(m_ledBuffer);
     //resetToAbsoluteEncoder();
     SmartDashboard.putNumber( 
@@ -506,6 +533,8 @@ public class Arm extends SubsystemBase {
                   "Arm Y Position", getCurrentYPosition());
     SmartDashboard.putBoolean( 
                   "Wrist Pitch Limit Switch", wristPitchLimitSwitch.get());
+    SmartDashboard.putNumber( 
+                  "Game Piece Mode", getGamePieceMode());
     // This method will be called once per scheduler run
     // if (elbowTopLimitSwitch.get() || elbowBottomLimitSwitch.get()) {
     //   elbowLeaderMotor.stopMotor();

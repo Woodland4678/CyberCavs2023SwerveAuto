@@ -224,7 +224,7 @@ public final class Constants {
     public static final double autoGrabUprightConeLidarYI = 0.0;
     public static final double autoGrabUprightConeLidarYD = 0.0;
     public static final double autoGrabUprightConeLidarYTarget = 49; //cm distance we want to be to the cone
-    public static final double autoGrabUprightConeLidarYTolerance = 3;
+    public static final double autoGrabUprightConeLidarYTolerance = 5;
   }
   public static final class AutoConstants {
     public static final double kMaxSpeedMetersPerSecond = 4;
@@ -338,6 +338,18 @@ public final class Constants {
     public static final ArmPosition scoreCubeMediumPosition = new ArmPosition(40, 35, 0, 10, false);
     public static final ArmPosition pickupUprightIntermediatePosition = new ArmPosition(15.44, 10.2, 0, 0, false);
 
+  }
+  public static enum LEDModes {
+    OFF,
+    SOLIDYELLOW,
+    SOLIDPURPLE,
+    BLINKYELLOW,
+    BLINKPURPLE,
+    SOLIDGREEN,
+    BLINKGREEN,
+    RAINBOW,
+    SOLIDRED,
+    SOLIDBLUE
   }
   public static class ArmPosition{
     public double xTarget = 10; //default "homeish" position

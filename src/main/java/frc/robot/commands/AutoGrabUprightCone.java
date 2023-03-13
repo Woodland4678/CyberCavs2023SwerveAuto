@@ -9,6 +9,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
 import frc.robot.Constants.ArmPosition;
+import frc.robot.Constants.LEDModes;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.SwerveDrive;
 
@@ -139,13 +140,13 @@ public class AutoGrabUprightCone extends CommandBase {
       break;
       case 5:
         currentTarget = Constants.ArmConstants.pickupToRestIntermediatePosition;
-        if (currentArmError < 4) {
+        if (currentArmError < 2) {
           grabState++;
         }
       break;
       case 6:
         currentTarget = Constants.ArmConstants.restPosition;
-        s_Arm.setLEDs(0, 255, 0);
+        s_Arm.setLEDMode(LEDModes.BLINKGREEN);
         isDone = true;
       break;
     }
