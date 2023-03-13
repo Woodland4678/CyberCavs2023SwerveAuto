@@ -247,7 +247,7 @@ public class SwerveDrive extends SubsystemBase {
 //   }
 
   public void zeroGyro() {
-    gyro.zeroYaw();
+    gyro.zeroYaw();    
   }
 
   public SwerveModulePosition[] getModulePositions(){ //TODO this is new, might need to double check
@@ -296,17 +296,18 @@ public class SwerveDrive extends SubsystemBase {
            // Reset odometry for the first path you run during auto
            if(isFirstPath){
                this.resetOdometry(traj.getInitialHolonomicPose());
+               //this.zeroGyro();
            }
          }),
          new PPSwerveControllerCommand(
              traj, 
              this::getPose, // Pose supplier
              Constants.Swerve.swerveKinematics, // SwerveDriveKinematics
-             new PIDController(0.1, 0, 0), // X controller. Tune these values for your robot. Leaving them 0 will only use feedforwards.
-             new PIDController(0.1, 0, 0), // Y controller (usually the same values as X controller)
-             new PIDController(0.1, 0, 0), // Rotation controller. Tune these values for your robot. Leaving them 0 will only use feedforwards.
+             new PIDController(5, 0, 0), // X controller. Tune these values for your robot. Leaving them 0 will only use feedforwards.
+             new PIDController(5, 0, 0), // Y controller (usually the same values as X controller)
+             new PIDController(4, 0, 0), // Rotation controller. Tune these values for your robot. Leaving them 0 will only use feedforwards.
              this::setModuleStates, // Module states consumer
-              true, 
+              false, 
             this // Requires this drive subsystem
          )
      );
@@ -376,6 +377,7 @@ public class SwerveDrive extends SubsystemBase {
             break;
             case 3:
               dist += ((ch & 0xFF) << 8);
+              SmartDashboard.putNumber("dist", dist);
               cstate++;
             break;
             case 4:

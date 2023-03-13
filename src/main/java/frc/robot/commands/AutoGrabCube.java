@@ -65,33 +65,39 @@ public class AutoGrabCube extends CommandBase {
   @Override
   public void execute() {
       double currentArmError = s_Arm.MoveArm(currentTarget);
-      if (currentArmError < 4) {
-        currentTarget = Constants.ArmConstants.grabCubePosition;
-      }
+      
       switch(grabState) {
         case 0:
-          degrees = s_Swerve.getYaw().getDegrees();
-          // if (degrees < 0) {
-          //   degrees += 360;
-          // }
-          //var boundingBoxXY = s_Swerve.getBoundingBoxX();
-          rSpeed = rController.calculate(degrees);
-          xSpeed = xController.calculate(s_Swerve.getLimelightX()); 
-          if (Math.abs(s_Swerve.getLimelightX()) < Constants.Swerve.autoGrabCubeEnableY) { //don't move forward until x is close enough
-            ySpeed = yController.calculate(s_Swerve.getCenterLaserValue()); 
+          if (currentArmError < 4) {
+            currentTarget = Constants.ArmConstants.grabCubePosition;
           }
-          else {
-            ySpeed = 0;
-          }
-          
-          translation = new Translation2d(-ySpeed, xSpeed);
-          
-          
-          s_Swerve.drive(translation, rSpeed, false, true);
-          if (yController.atSetpoint() && xController.atSetpoint()) {
-            grabState++;
-            s_Swerve.stop();
-          }
+          if (s_Swerve.limelightHasTarget() == 1) {
+            degrees = s_Swerve.getYaw().getDegrees();
+            // if (degrees < 0) {
+            //   degrees += 360;
+            // }
+            //var boundingBoxXY = s_Swerve.getBoundingBoxX();
+            rSpeed = rController.calculate(degrees);
+            xSpeed = xController.calculate(s_Swerve.getLimelightX()); 
+            if (Math.abs(s_Swerve.getLimelightX()) < Constants.Swerve.autoGrabCubeEnableY) { //don't move forward until x is close enough
+              ySpeed = yController.calculate(s_Swerve.getCenterLaserValue()); 
+            }
+            else {
+              ySpeed = 0;
+            }
+            
+            translation = new Translation2d(-ySpeed, xSpeed);
+            
+            
+            s_Swerve.drive(translation, rSpeed, false, true);
+            if (yController.atSetpoint() && xController.atSetpoint()) {
+              grabState++;
+              s_Swerve.stop();
+            }            
+        }
+        else {
+          s_Swerve.stop();
+        }
       break;
       case 1:
           s_Arm.closeClaw();
@@ -118,6 +124,7 @@ public class AutoGrabCube extends CommandBase {
   @Override
   public void end(boolean interrupted) {
     s_Swerve.stop();
+    s_Swerve.setHeadlights(false);
   }
 
   // Returns true when the command should end.

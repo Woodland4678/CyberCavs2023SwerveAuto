@@ -181,22 +181,22 @@ public final class Constants {
     public static double autoDriveConePickupRD = 0.0;
     public static double autoDriveConePickupRTolerance = 1;
 
-    public static double autoDriveCubePickupXP = 0.12;
+    public static double autoDriveCubePickupXP = 0.05;
     public static double autoDriveCubePickupXI = 0.0;
     public static double autoDriveCubePickupXD = 0.0;
-    public static double autoDriveCubePickupXTolerance = 1;
+    public static double autoDriveCubePickupXTolerance = 2;
     public static double autoDriveCubePickupYP = 0.022;
     public static double autoDriveCubePickupYI = 0.0;
     public static double autoDriveCubePickupYD = 0.0;
-    public static double autoDriveCubePickupYTolerance = 1;
+    public static double autoDriveCubePickupYTolerance = 5;
     public static double autoDriveCubePickupRP = 0.15;
     public static double autoDriveCubePickupRI = 0.0;
     public static double autoDriveCubePickupRD = 0.0;
     public static double autoDriveCubePickupRTolerance = 1;
     
-    public static double autoGrabCubeLidarTarget = 40;
+    public static double autoGrabCubeLidarTarget = 25;
     public static double autoGrabCubeYTolerance = 3;
-    public static double autoGrabCubeEnableY = 3.0;
+    public static double autoGrabCubeEnableY = 4.0;
     
 
     public static double coneAutoDriveYTarget = 131;
@@ -323,19 +323,19 @@ public final class Constants {
     public static final ArmPosition scoreConeHighPosition = new ArmPosition(47.5, 44.5, 0, -35, false);
     public static ArmPosition pickupPosition = new ArmPosition(28.84, 11.5, 0, -127.6, false);//wrist roll position needs to change so this shouldn't be "final"
     public static final ArmPosition pos2 = new ArmPosition(20, 20, 0, 0, false);
-    public static final ArmPosition restPosition = new ArmPosition(110.3, -170.46, 90, 0, true);
+    public static final ArmPosition restPosition = new ArmPosition(110.3, -170.46, 0, 0, true);
     public static final ArmPosition scoreConeMediumPosition = new ArmPosition(35.8, 28, 0, 5, false);
     public static final ArmPosition scoreLowPosition = new ArmPosition(25, -5, 0, -20, false);
     public static ArmPosition grabConePosition = new ArmPosition(31.27, 2.3, 0, -140.68, false);
-    public static ArmPosition grabCubePosition = new ArmPosition(22.1, 6, 0, -127.6, false);
-    public static final ArmPosition pickupToRestIntermediatePosition = new ArmPosition(17.44, 10.2, 90, 0, false);
+    public static ArmPosition grabCubePosition = new ArmPosition(33.1, 8, 0, -127.6, false);
+    public static final ArmPosition pickupToRestIntermediatePosition = new ArmPosition(17.44, 10.2, 0, 0, false);
     public static final ArmPosition yeetCubePosition = new ArmPosition(22.8, 47.8, 0, 0, false);
     public static final ArmPosition grabUprightConePosition = new ArmPosition(32.7, -3.5, 0, 2, false);
     public static final ArmPosition restToScoreHighIntermediatePosition = new ArmPosition(18.205, 36, 0, 0, false);
     public static final ArmPosition restToScoreMediumIntermediatePosition = new ArmPosition(21.4, 24.2, 0, -38.51, false);
 
-    public static final ArmPosition scoreCubeHighPosition = new ArmPosition(52, 40, 0, 0, false);
-    public static final ArmPosition scoreCubeMediumPosition = new ArmPosition(40, 35, 0, 10, false);
+    public static final ArmPosition scoreCubeHighPosition = new ArmPosition(48, 45, 0, -100, false);
+    public static final ArmPosition scoreCubeMediumPosition = new ArmPosition(40, 35, 0, -100, false);
     public static final ArmPosition pickupUprightIntermediatePosition = new ArmPosition(15.44, 10.2, 0, 0, false);
 
   }

@@ -55,10 +55,15 @@ public class MoveArm extends CommandBase {
       currentTarget = Constants.ArmConstants.pickupToRestIntermediatePosition;
     }
     else if (this.targetPos == Constants.ArmConstants.scoreConeHighPosition && s_Arm.getGamePieceMode() == Constants.ArmConstants.cubeMode) {
-      currentTarget = Constants.ArmConstants.scoreCubeHighPosition;
+      currentTarget = Constants.ArmConstants.restToScoreHighIntermediatePosition;
+      this.targetPos = Constants.ArmConstants.scoreCubeHighPosition;
+    }
+    else if (this.targetPos == Constants.ArmConstants.scoreConeMediumPosition) {
+      currentTarget = Constants.ArmConstants.restToScoreMediumIntermediatePosition;
     }
     else if (this.targetPos == Constants.ArmConstants.scoreConeMediumPosition && s_Arm.getGamePieceMode() == Constants.ArmConstants.cubeMode) {
-      currentTarget = Constants.ArmConstants.scoreCubeMediumPosition;
+      currentTarget = Constants.ArmConstants.restToScoreMediumIntermediatePosition;
+      this.targetPos = Constants.ArmConstants.scoreCubeMediumPosition;
     }
     else if (this.targetPos == Constants.ArmConstants.scoreConeHighPosition) {
       currentTarget = Constants.ArmConstants.restToScoreHighIntermediatePosition;
@@ -66,6 +71,7 @@ public class MoveArm extends CommandBase {
     else {
       currentTarget = targetPos;
     }
+    currentArmError = 20;
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -80,6 +86,9 @@ public class MoveArm extends CommandBase {
     if (currentTarget == Constants.ArmConstants.grabConePosition || currentTarget == Constants.ArmConstants.grabCubePosition || currentTarget == Constants.ArmConstants.grabUprightConePosition) {
       if (s_Arm.getCurrentXPosition() < 15) {
         armOkayToMove = true;
+      }
+      else {
+        armOkayToMove = false;
       }
     }
     if (armOkayToMove) {

@@ -483,12 +483,14 @@ public class Arm extends SubsystemBase {
     }
   }
   public void coneMode() {
-    setLEDs(255, 255, 0);
+    //setLEDs(255, 255, 0);
     setGamePieceMode(1);
+    LEDMode = LEDModes.SOLIDYELLOW;
     gamePieceMode = 1;
   }
   public void cubeMode() {
-    setLEDs(75, 0, 130);
+    //setLEDs(75, 0, 130);
+    LEDMode = LEDModes.SOLIDPURPLE;
     setGamePieceMode(Constants.ArmConstants.cubeMode); //TODO change this back to cubes
   }
   public void setLEDMode(LEDModes mode) {
@@ -511,6 +513,12 @@ public class Arm extends SubsystemBase {
           setLEDs(0, 0, 0);
         }
 
+      break;
+      case SOLIDPURPLE:
+        setLEDs(75, 0, 130);
+      break;
+      case SOLIDYELLOW:
+        setLEDs(255, 255, 0);
       break;
     }
     m_led.setData(m_ledBuffer);
