@@ -10,6 +10,8 @@ import frc.robot.subsystems.Arm;
 
 public class YeetCube extends CommandBase {
   Arm s_Arm;
+  int doneCnt = 0;
+  boolean isDone;
   /** Creates a new YeetCube. */
   public YeetCube(Arm s_Arm) {
     this.s_Arm = s_Arm;
@@ -19,7 +21,10 @@ public class YeetCube extends CommandBase {
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+    isDone = false;
+    doneCnt = 0;
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
@@ -27,18 +32,23 @@ public class YeetCube extends CommandBase {
     var currentArmError = s_Arm.MoveArm(Constants.ArmConstants.yeetCubePosition);
     if (currentArmError < 40) {
       s_Arm.openClaw();
+      doneCnt++;
+    }
+    if (doneCnt > 10) {
+      isDone = true;
     }
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    s_Arm.stopArm();
+    s_Arm.MoveArm(Constants.ArmConstants.pickupToRestIntermediatePosition);
+  
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return isDone;
   }
 }
