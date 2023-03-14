@@ -26,13 +26,34 @@ public class AutoPickup extends CommandBase {
   PIDController rController = new PIDController(Constants.Swerve.autoDriveConePickupRP, Constants.Swerve.autoDriveConePickupRI, Constants.Swerve.autoDriveConePickupRD);
   boolean isDone = false;
   int isInPosCnt = 0;
-  double limelightYTarget = 99;
+  double limelightYTarget = 120;
   double[] orientationReadings = new double[100];
   int orientationReadingsIndex = 0;
   double currentArmError = 0;
   int isDoneCnt = 0;
   boolean pickupPosSet = false;
   ArmPosition currentTarget = Constants.ArmConstants.pickupToRestIntermediatePosition;
+  double degrees0Y = 153.5;
+  double degrees0X = 170;
+  double degrees0D = 0;
+  double degrees0W = -20;
+
+  double degrees90Y = 130;
+  double degrees90X = 186;
+  double degrees90D = 90;
+  double degrees90W = 0;
+
+  double degrees180Y = 120;
+  double degrees180X = 177;
+  double degrees180D = 180;
+  double degrees180W = 20;
+
+  double degreesNeg90Y = 126.5;
+  double degreesNeg90X = 169;
+  double degreesNeg90D = -90;
+  double degreesNeg90W = 0;
+
+  boolean finalOrientationSet = false;
   /** Creates a new AutoPickup. */
   public AutoPickup(Arm s_Arm, SwerveDrive s_Swerve) {
     this.s_Arm = s_Arm;
@@ -45,6 +66,7 @@ public class AutoPickup extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    finalOrientationSet = false;
     xController.reset();
     yController.reset();
     rController.reset();
@@ -58,11 +80,11 @@ public class AutoPickup extends CommandBase {
     else {
       limelightYTarget = Constants.Swerve.cubeAutoDriveYTarget;
     }
-    xController.setSetpoint(3);
+    xController.setSetpoint(170);
     rController.setSetpoint(s_Swerve.getYaw().getDegrees());
     yController.setSetpoint(limelightYTarget);
     xController.setTolerance(5);
-    yController.setTolerance(12);
+    yController.setTolerance(7);
     if (s_Arm.gamePieceMode == Constants.ArmConstants.coneMode) {
       s_Swerve.setLimelightPipeline(6); //1
     }
@@ -73,7 +95,15 @@ public class AutoPickup extends CommandBase {
     isInPosCnt = 0;
     orientationReadingsIndex = 0;
   }
-
+  private double linearInterpolateX(double myAngle, double angle1, double x1, double angle2, double x2) {
+    return (x1 + (myAngle - angle1) * ((x2 - x1)/(angle2 - angle1)));
+  }
+  private double linearInterpolateY(double myAngle, double angle1, double y1, double angle2, double y2) {
+    return (y1 + (myAngle - angle1) * ((y2 - y1)/(angle2 - angle1)));
+  }
+  private double linearInterpolateW(double myAngle, double angle1, double w1, double angle2, double w2) {
+    return (w1 + (myAngle - angle1) * ((w2 - w1)/(angle2 - angle1)));
+  }
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
@@ -86,26 +116,58 @@ public class AutoPickup extends CommandBase {
     //if (degrees < 0) {
      // degrees += 360;
    // }
-    var boundingBoxXY = s_Swerve.getBoundingBoxX()[0];
+    var boundingBoxXY = s_Swerve.getBoundingBoxX();
     var coneAngle = s_Swerve.getConeAngle();
     var rSpeed = rController.calculate(degrees);
-    var xSpeed = xController.calculate(s_Swerve.getLimelightX());
-    var ySpeed = yController.calculate(boundingBoxXY);
+    var xSpeed = xController.calculate(boundingBoxXY[1]); //s_Swerve.getLimelightX();
+    var ySpeed = yController.calculate(boundingBoxXY[0]);
     if (s_Arm.getGamePieceMode() == Constants.ArmConstants.coneMode) {
      // Constants.ArmConstants.pickupPosition.wristRollTarget = -coneAngle;
 
 
 
-      if ((boundingBoxXY < 80 && boundingBoxXY > 50) && s_Swerve.isConeFound() == 1) {
+      if ((boundingBoxXY[0] < 80 && boundingBoxXY[0] > 50) && s_Swerve.isConeFound() == 1) {
         if (orientationReadingsIndex < 100) {
           orientationReadings[orientationReadingsIndex] = -coneAngle;
           orientationReadingsIndex++;
         }
       }
-      if (boundingBoxXY > 85) {
+      if (boundingBoxXY[0] > 85 && !finalOrientationSet) {
+        finalOrientationSet = true;
         Arrays.sort(orientationReadings, 0, orientationReadingsIndex);
-        Constants.ArmConstants.pickupPosition.wristRollTarget = orientationReadings[orientationReadingsIndex / 2];
-        Constants.ArmConstants.grabConePosition.wristRollTarget = orientationReadings[orientationReadingsIndex / 2];
+        double finalOrientation = orientationReadings[orientationReadingsIndex / 2];
+        Constants.ArmConstants.pickupPosition.wristRollTarget = finalOrientation;
+        Constants.ArmConstants.grabConePosition.wristRollTarget = finalOrientation;
+        double newXTarget = xController.getSetpoint();
+        double newYTarget = yController.getSetpoint();
+        double newWristTarget = 0;
+        finalOrientation *= -1;
+        if (finalOrientation < 0 && finalOrientation > -90) {
+          newXTarget = linearInterpolateX(finalOrientation, degreesNeg90D, degreesNeg90X, degrees0D, degrees0X);
+          newYTarget = linearInterpolateY(finalOrientation, degreesNeg90D, degreesNeg90Y, degrees0D, degrees0Y);
+          newWristTarget = linearInterpolateW(finalOrientation, degreesNeg90D, degreesNeg90W, degrees0D, degrees0W);
+        }
+        else if (finalOrientation < -90 && finalOrientation > -180) {
+          newXTarget = linearInterpolateX(finalOrientation, degrees180D, degrees180X, degreesNeg90D, degreesNeg90X);
+          newYTarget = linearInterpolateY(finalOrientation, degrees180D, degrees180Y, degreesNeg90D, degreesNeg90Y);
+          newWristTarget = linearInterpolateW(finalOrientation, degrees180D, degrees180W, degreesNeg90D, degreesNeg90W);
+        }
+        else if (finalOrientation > 0 && finalOrientation < 90) {
+          newXTarget = linearInterpolateX(finalOrientation, degrees90D, degrees90X, degrees0D, degrees0X);
+          newYTarget = linearInterpolateY(finalOrientation, degrees90D, degrees90Y, degrees0D, degrees0Y);
+          newWristTarget = linearInterpolateW(finalOrientation, degrees90D, degrees90W, degrees0D, degrees0W);
+        }
+        else if (finalOrientation > 90 && finalOrientation < 180) {
+          newXTarget = linearInterpolateX(finalOrientation, degrees180D, degrees180X, degrees90D, degrees90X);
+          newYTarget = linearInterpolateY(finalOrientation, degrees180D, degrees180Y, degrees90D, degrees90Y);
+          newWristTarget = linearInterpolateW(finalOrientation, degrees180D, degrees180W, degrees90D, degrees90W);
+        }
+        SmartDashboard.putNumber("auto pickup tipped cone new x target", newXTarget);
+        SmartDashboard.putNumber("auto pickup tipped cone new y target", newYTarget);
+        SmartDashboard.putNumber("auto pickup tipped cone final orientation", finalOrientation);
+        Constants.ArmConstants.grabConePosition.wristPitchTarget += newWristTarget;
+        xController.setSetpoint(newXTarget);
+        yController.setSetpoint(newYTarget);
       }
 
 
@@ -133,7 +195,7 @@ public class AutoPickup extends CommandBase {
     else {
       currentArmError = s_Arm.MoveArm(currentTarget);   
     }
-    if (isInPosCnt > 10) {
+    if (isInPosCnt > 10 && false) { //TODO remove this false
       s_Swerve.stop();
       if (s_Arm.gamePieceMode == Constants.ArmConstants.coneMode) {
         currentArmError = s_Arm.MoveArm(Constants.ArmConstants.grabConePosition);
@@ -144,13 +206,13 @@ public class AutoPickup extends CommandBase {
       if (Math.abs(currentArmError) < 3) {
         s_Arm.closeClaw();
         isDoneCnt++;
-        if (isDoneCnt > 15) {
+        if (isDoneCnt > 40) {
           isDone = true;
         }
       }
     }
     else {
-      s_Swerve.drive(translation, rSpeed, false, true);
+      //s_Swerve.drive(translation, rSpeed, false, true);
     }
   }
 

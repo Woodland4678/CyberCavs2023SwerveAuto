@@ -42,7 +42,7 @@ public class AutoGrabCube extends CommandBase {
     rController.reset();
     xController.reset();
     yController.reset();
-    s_Swerve.setHeadlights(true);
+   // s_Swerve.setHeadlights(true);
     isDone = false;
     waitCnt = 0;
     rSpeed = 0;

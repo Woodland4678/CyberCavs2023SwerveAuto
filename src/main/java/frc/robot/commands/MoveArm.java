@@ -22,11 +22,13 @@ public class MoveArm extends CommandBase {
   boolean isDone = false;
   int isDoneCnt = 0;
   int clawClosedCnt = 0;
+  ArmPosition originalTarget;
   /** Creates a new MoveArm. */
   public MoveArm(Arm s_Arm, ArmPosition targetPos, Joystick operatorJoystick) {
     this.s_Arm = s_Arm;
     this.targetPos = targetPos;
     this.operatorJoystick = operatorJoystick;
+    originalTarget = targetPos;
     addRequirements(s_Arm);
     // Use addRequirements() here to declare subsystem dependencies.
   }
@@ -44,7 +46,7 @@ public class MoveArm extends CommandBase {
     }
     else if (this.targetPos == Constants.ArmConstants.grabUprightConePosition) {
       currentTarget = Constants.ArmConstants.pickupToRestIntermediatePosition;
-      SmartDashboard.putNumber("IS IT A CUBE WHAT??", s_Arm.getGamePieceMode()) ;
+      
       if (s_Arm.getGamePieceMode() == Constants.ArmConstants.coneMode) {
         this.targetPos = Constants.ArmConstants.grabUprightConePosition;
       }
@@ -60,6 +62,7 @@ public class MoveArm extends CommandBase {
       currentTarget =Constants.ArmConstants.pickupToRestIntermediatePosition;
     }
     else if (this.targetPos == Constants.ArmConstants.scoreConeHighPosition && s_Arm.getGamePieceMode() == Constants.ArmConstants.cubeMode) {
+      SmartDashboard.putNumber("IS IT A CUBE WHAT??", s_Arm.getGamePieceMode()) ;
       currentTarget = Constants.ArmConstants.restToScoreHighIntermediatePosition;
       this.targetPos = Constants.ArmConstants.scoreCubeHighPosition;
     }
@@ -74,7 +77,7 @@ public class MoveArm extends CommandBase {
       currentTarget = Constants.ArmConstants.restToScoreHighIntermediatePosition;
     }
     else {
-      currentTarget = targetPos;
+      currentTarget = Constants.ArmConstants.restToScoreHighIntermediatePosition;
     }
     currentArmError = 20;
   }
@@ -103,7 +106,7 @@ public class MoveArm extends CommandBase {
       else {
         currentArmError = s_Arm.MoveArm(currentTarget);
       }
-      if (Math.abs(currentArmError) < 5) { //handles intermediate positions
+      if (Math.abs(currentArmError) < 10) { //handles intermediate positions
         currentTarget = targetPos;
         //Manual wrist Roll control (doesn't work too well)
         /*double wristRollSpeed = operatorJoystick.getRawAxis(0);
@@ -133,6 +136,7 @@ public class MoveArm extends CommandBase {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
+    this.targetPos = originalTarget; 
     //s_Arm.stopArm();
   }
 
