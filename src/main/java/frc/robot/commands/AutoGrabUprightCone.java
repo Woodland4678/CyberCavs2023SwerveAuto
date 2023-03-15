@@ -28,6 +28,7 @@ public class AutoGrabUprightCone extends CommandBase {
   double degrees = 0;
   int waitCnt = 0;
   boolean isDone = false;
+  int isInPositionCnt = 0;
   /** Creates a new AutoGrabUprightCone. */
   public AutoGrabUprightCone(Arm s_Arm, SwerveDrive s_Swerve) {
     this.s_Arm = s_Arm;
@@ -39,6 +40,7 @@ public class AutoGrabUprightCone extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    isInPositionCnt = 0;
     s_Arm.openClaw();
     yController.setPID(Constants.Swerve.autoDriveConePickupYP, Constants.Swerve.autoDriveConePickupYI, Constants.Swerve.autoDriveConePickupYD);
     rController.reset();
@@ -53,7 +55,7 @@ public class AutoGrabUprightCone extends CommandBase {
     s_Swerve.limelightDown();
     s_Swerve.setLimelightPipeline(1);
     s_Swerve.setLimelightLED(false);
-    xController.setSetpoint(150);
+    xController.setSetpoint(160);
     xController.setTolerance(Constants.Swerve.autoGrabUprightConeXLimelightTolerance);
     yController.setSetpoint(Constants.Swerve.autoGrabUprightConeYLimelightTarget);
     yController.setTolerance(Constants.Swerve.autoGrabUprightConeYLimelightTolerance);
@@ -68,6 +70,7 @@ public class AutoGrabUprightCone extends CommandBase {
   public void execute() {
     double currentArmError = s_Arm.MoveArm(currentTarget);
     switch(grabState) {
+
       case 0:
         degrees =s_Swerve.getYaw().getDegrees();
         // if (degrees < 0) {
@@ -77,12 +80,15 @@ public class AutoGrabUprightCone extends CommandBase {
         rSpeed = rController.calculate(degrees);
         xSpeed = xController.calculate(boundingBoxXY[1]); 
         ySpeed = yController.calculate(s_Swerve.getLimelightY()); 
+        if (s_Swerve.getLimelightY() < yController.getSetpoint()) {
+          ySpeed = 0;
+        }
         
         translation = new Translation2d(-ySpeed, xSpeed);
         
         
         s_Swerve.drive(translation, rSpeed, false, true);
-        if (s_Swerve.getLimelightY() < Constants.Swerve.autoGrabUprightConeYSwitchToLidar && xController.atSetpoint()) {
+        if (xController.atSetpoint() && (yController.atSetpoint() || s_Swerve.getLimelightY() < yController.getSetpoint())) {
             if (currentArmError < 5) {
               grabState++;
             }
@@ -105,16 +111,18 @@ public class AutoGrabUprightCone extends CommandBase {
         rSpeed = rController.calculate(degrees);       
         ySpeed = yController.calculate(s_Swerve.getCenterLaserValue()); 
         if (s_Swerve.getLeftLaserValue() - s_Swerve.getCenterLaserValue() < -10) {
-          xSpeed = 0.5;
+          xSpeed = 0.2;
+          ySpeed = -0.25;
         }
         else if (s_Swerve.getRightLaserValue() - s_Swerve.getCenterLaserValue() < -10) {
-          xSpeed = -0.5;
+          xSpeed = -0.2;
+          ySpeed = -0.25;
         }
         else if (Math.abs(s_Swerve.getLeftLaserValue() - s_Swerve.getCenterLaserValue()) < 8) {
-          xSpeed = 0.25;
+          xSpeed = 0.1;
         }
         else if (Math.abs(s_Swerve.getRightLaserValue() - s_Swerve.getCenterLaserValue()) < 8) {
-          xSpeed = -0.25;
+          xSpeed = -0.1;
         }
         else {
           xSpeed = 0;
@@ -124,7 +132,13 @@ public class AutoGrabUprightCone extends CommandBase {
         
         s_Swerve.drive(translation, rSpeed, false, true);
         if (yController.atSetpoint() && currentArmError < 2) {
-          grabState++;
+          isInPositionCnt++;
+          if (isInPositionCnt > 2) {
+            grabState++;
+          }
+        }
+        else {
+          isInPositionCnt = 0;
         }
       break;
       case 3:

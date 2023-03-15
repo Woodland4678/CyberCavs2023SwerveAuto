@@ -30,11 +30,11 @@ public class YeetCube extends CommandBase {
   @Override
   public void execute() {
     var currentArmError = s_Arm.MoveArm(Constants.ArmConstants.yeetCubePosition);
-    if (currentArmError < 40) {
+    if (currentArmError < 42) {
       s_Arm.openClaw();
       doneCnt++;
     }
-    if (doneCnt > 10) {
+    if (doneCnt > 2) {
       isDone = true;
     }
   }

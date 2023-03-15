@@ -17,7 +17,7 @@ public class MoveArm extends CommandBase {
   double currentArmError = 0;
   boolean doneIntermediateMovement = false;
   ArmPosition currentTarget;
-  Joystick operatorJoystick;
+  //Joystick operatorJoystick;
   boolean armOkayToMove = true;
   boolean isDone = false;
   int isDoneCnt = 0;
@@ -27,7 +27,7 @@ public class MoveArm extends CommandBase {
   public MoveArm(Arm s_Arm, ArmPosition targetPos, Joystick operatorJoystick) {
     this.s_Arm = s_Arm;
     this.targetPos = targetPos;
-    this.operatorJoystick = operatorJoystick;
+    //this.operatorJoystick = operatorJoystick;
     originalTarget = targetPos;
     addRequirements(s_Arm);
     // Use addRequirements() here to declare subsystem dependencies.
@@ -54,6 +54,9 @@ public class MoveArm extends CommandBase {
         this.targetPos = Constants.ArmConstants.grabCubePosition;
       }
      
+    }
+    else if (this.targetPos == Constants.ArmConstants.restPosition && s_Arm.getCurrentXPosition() > 30) {
+      currentTarget = Constants.ArmConstants.scoreHighToRestIntermediatePosition;
     }
     else if (this.targetPos == Constants.ArmConstants.restPosition) {
       currentTarget = Constants.ArmConstants.pickupToRestIntermediatePosition;
@@ -85,10 +88,10 @@ public class MoveArm extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if (currentTarget == targetPos && currentArmError < 3) {
+    if (currentTarget == Constants.ArmConstants.restPosition) {
       isDoneCnt++;
-      if (isDoneCnt > 10) {
-        //isDone = true;
+      if (isDoneCnt > 50) {
+        isDone = true;
       }      
     }
     if (currentTarget == Constants.ArmConstants.grabConePosition || currentTarget == Constants.ArmConstants.grabCubePosition || currentTarget == Constants.ArmConstants.grabUprightConePosition) {

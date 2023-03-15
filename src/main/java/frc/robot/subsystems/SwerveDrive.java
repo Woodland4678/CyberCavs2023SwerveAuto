@@ -269,7 +269,14 @@ public class SwerveDrive extends SubsystemBase {
         }
     //
     //    // We have to invert the angle of the NavX so that rotating the robot counter-clockwise makes the angle increase.
-        return Rotation2d.fromDegrees(- gyro.getYaw());
+        double gyroYaw = -gyro.getYaw() + 180;
+        if (gyroYaw > 180) {
+          gyroYaw -= 360;
+        }
+        else if (gyroYaw < -180) {
+          gyroYaw += 360;
+        }
+        return Rotation2d.fromDegrees(gyroYaw);
   }
   public float getGyroRoll() {
     return gyro.getRoll();

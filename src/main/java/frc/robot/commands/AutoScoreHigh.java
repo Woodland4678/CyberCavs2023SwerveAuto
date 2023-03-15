@@ -31,13 +31,15 @@ public class AutoScoreHigh extends CommandBase {
   boolean isHigh = true;
   double wristAdjustment = 0;
   boolean isMainArmPositionSet = false;
+  boolean isAutoMode = false;
   /** Creates a new ScoreHigh. */
-  public AutoScoreHigh(Arm s_Arm, SwerveDrive s_Swerve, boolean isHigh, double wristAdjustment) {
+  public AutoScoreHigh(Arm s_Arm, SwerveDrive s_Swerve, boolean isHigh, double wristAdjustment, boolean isAutoMode) {
     this.s_Arm = s_Arm;
     this.s_Swerve = s_Swerve;
     addRequirements(s_Arm, s_Swerve); 
     this.isHigh = isHigh;
     this.wristAdjustment = wristAdjustment;
+    this.isAutoMode = isAutoMode;
     // Use addRequirements() here to declare subsystem dependencies.
   }
 
@@ -64,7 +66,18 @@ public class AutoScoreHigh extends CommandBase {
     //xController.setGoal(0);
     //yController.setGoal(0);
     xController.setSetpoint(0);
-    rController.setSetpoint(s_Swerve.getYaw().getDegrees());
+    if (!this.isAutoMode) {
+      rController.setSetpoint(s_Swerve.getYaw().getDegrees());
+    }
+    else {
+      if (s_Swerve.getYaw().getDegrees() < 0) {
+        rController.setSetpoint(-180);
+      }
+      else {
+        rController.setSetpoint(180);
+      }
+      
+    }
     yController.setSetpoint(6);
     xController.setTolerance(Constants.Swerve.autoDriveScoreXTolerance);
     yController.setTolerance(Constants.Swerve.autoDriveScoreYTolerance);
@@ -84,6 +97,7 @@ public class AutoScoreHigh extends CommandBase {
       currentTarget.wristPitchTarget += wristAdjustment * 0.5;
     }
     var currentArmError = s_Arm.MoveArm(currentTarget);
+    SmartDashboard.putNumber("Auto score high arm error", currentArmError);
     if (currentArmError < 8 && !isMainArmPositionSet) {
       if (isHigh) {
         currentTarget = Constants.ArmConstants.scoreConeHighPosition;
@@ -123,7 +137,7 @@ public class AutoScoreHigh extends CommandBase {
         //               "rSpeed",rSpeed);
         
         
-        if (xController.atSetpoint() && yController.atSetpoint() && rController.atSetpoint()) {
+        if (xController.atSetpoint() && yController.atSetpoint() && rController.atSetpoint() && currentArmError < 11) {
           isInPosCnt++;
         }
         else {
@@ -161,6 +175,6 @@ public class AutoScoreHigh extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return isDone;
   }
 }
