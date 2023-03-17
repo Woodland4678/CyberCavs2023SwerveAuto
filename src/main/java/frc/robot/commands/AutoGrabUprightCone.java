@@ -73,9 +73,12 @@ public class AutoGrabUprightCone extends CommandBase {
 
       case 0:
         degrees =s_Swerve.getYaw().getDegrees();
-        // if (degrees < 0) {
-        //   degrees += 360;
-        // }
+        if (rController.getSetpoint() > 0 && degrees < 0) {
+          degrees = 360 + degrees;
+        }
+        else if (rController.getSetpoint() < 0 && degrees > 0) {
+          degrees = degrees - 360;
+        }
         var boundingBoxXY = s_Swerve.getBoundingBoxX();
         rSpeed = rController.calculate(degrees);
         xSpeed = xController.calculate(boundingBoxXY[1]); 
@@ -104,9 +107,12 @@ public class AutoGrabUprightCone extends CommandBase {
       break;
       case 2:
         degrees =s_Swerve.getYaw().getDegrees();
-        // if (degrees < 0) {
-        //   degrees += 360;
-        // }
+        if (rController.getSetpoint() > 0 && degrees < 0) {
+          degrees = 360 + degrees;
+        }
+        else if (rController.getSetpoint() < 0 && degrees > 0) {
+          degrees = degrees - 360;
+        }
         //var boundingBoxXY = s_Swerve.getBoundingBoxX();
         rSpeed = rController.calculate(degrees);       
         ySpeed = yController.calculate(s_Swerve.getCenterLaserValue()); 

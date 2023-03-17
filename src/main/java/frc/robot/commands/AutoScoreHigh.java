@@ -8,6 +8,8 @@ import edu.wpi.first.hal.simulation.ConstBufferCallback;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
@@ -32,14 +34,18 @@ public class AutoScoreHigh extends CommandBase {
   double wristAdjustment = 0;
   boolean isMainArmPositionSet = false;
   boolean isAutoMode = false;
+  ArmPosition originalTarget;
+  Joystick operatorJoystick;
   /** Creates a new ScoreHigh. */
-  public AutoScoreHigh(Arm s_Arm, SwerveDrive s_Swerve, boolean isHigh, double wristAdjustment, boolean isAutoMode) {
+  public AutoScoreHigh(Arm s_Arm, SwerveDrive s_Swerve, boolean isHigh, Joystick operatorJoystick, boolean isAutoMode) {
     this.s_Arm = s_Arm;
     this.s_Swerve = s_Swerve;
     addRequirements(s_Arm, s_Swerve); 
     this.isHigh = isHigh;
     this.wristAdjustment = wristAdjustment;
     this.isAutoMode = isAutoMode;
+    this.originalTarget = Constants.ArmConstants.scoreConeHighPosition;
+    this.operatorJoystick = operatorJoystick;
     // Use addRequirements() here to declare subsystem dependencies.
   }
 
@@ -52,9 +58,11 @@ public class AutoScoreHigh extends CommandBase {
     s_Swerve.setLimeLED(true);
     if (isHigh) {
       yTarget = Constants.Swerve.autoScoreHighYTarget;
+      this.originalTarget = Constants.ArmConstants.scoreConeHighPosition;
     }
     else {
       yTarget = Constants.Swerve.autoScoreMediumYTarget;
+      this.originalTarget = Constants.ArmConstants.scoreConeMediumPosition;
     }
     if (!isHigh) {
       currentTarget = Constants.ArmConstants.restToScoreMediumIntermediatePosition;
@@ -65,7 +73,7 @@ public class AutoScoreHigh extends CommandBase {
     s_Swerve.limelightUp();
     //xController.setGoal(0);
     //yController.setGoal(0);
-    xController.setSetpoint(0);
+    xController.setSetpoint(1.75);
     if (!this.isAutoMode) {
       rController.setSetpoint(s_Swerve.getYaw().getDegrees());
     }
@@ -78,7 +86,7 @@ public class AutoScoreHigh extends CommandBase {
       }
       
     }
-    yController.setSetpoint(6);
+    yController.setSetpoint(6.5);
     xController.setTolerance(Constants.Swerve.autoDriveScoreXTolerance);
     yController.setTolerance(Constants.Swerve.autoDriveScoreYTolerance);
     rController.setTolerance(Constants.Swerve.autoDriveScoreRTolerance);
@@ -93,7 +101,7 @@ public class AutoScoreHigh extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if (Math.abs(wristAdjustment) > 0.1 && isMainArmPositionSet) {
+    if (Math.abs(operatorJoystick.getRawAxis(1)) > 0.1 && isMainArmPositionSet) {
       currentTarget.wristPitchTarget += wristAdjustment * 0.5;
     }
     var currentArmError = s_Arm.MoveArm(currentTarget);
@@ -144,7 +152,9 @@ public class AutoScoreHigh extends CommandBase {
           isInPosCnt = 0;
         }
         if (isInPosCnt > 10) {
-          isDone = true;
+          if (DriverStation.isAutonomous()) {
+            isDone = true;
+          }
           s_Arm.setLEDs(0, 255, 0);
           s_Swerve.stop();
         }

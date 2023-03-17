@@ -4,6 +4,7 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -55,7 +56,7 @@ public class MoveArm extends CommandBase {
       }
      
     }
-    else if (this.targetPos == Constants.ArmConstants.restPosition && s_Arm.getCurrentXPosition() > 30) {
+    else if (this.targetPos == Constants.ArmConstants.restPosition && s_Arm.getCurrentXPosition() > 40 && DriverStation.isAutonomous()) {
       currentTarget = Constants.ArmConstants.scoreHighToRestIntermediatePosition;
     }
     else if (this.targetPos == Constants.ArmConstants.restPosition) {

@@ -93,7 +93,7 @@ public final class Constants {
 
     /* Swerve Profiling Values */
     public static final double maxSpeed = 4.5; // meters per second
-    public static final double maxAngularVelocity = 6; //1.5
+    public static final double maxAngularVelocity = 4.75; //1.5
 
     /* Neutral Modes */
     public static final IdleMode angleNeutralMode = IdleMode.kBrake;
@@ -160,10 +160,10 @@ public final class Constants {
     public static double autoDriveScoreYI = 0.000001;
     public static double autoDriveScoreYD = 0.0;
     public static double autoDriveScoreYTolerance = 0.75;
-    public static double autoDriveScoreRP = 0.1;
-    public static double autoDriveScoreRI = 0.0;
+    public static double autoDriveScoreRP = 0.15;
+    public static double autoDriveScoreRI = 0.00001;
     public static double autoDriveScoreRD = 0.0;
-    public static double autoDriveScoreRTolerance = 1;
+    public static double autoDriveScoreRTolerance = 0.75;
 
     public static double autoScoreHighYTarget = 1;
     public static double autoScoreMediumYTarget = -5;
@@ -217,16 +217,19 @@ public final class Constants {
     /*Constants for auto grab upright cone with the lidar */
     public static final double autoGrabUprightConeYSwitchToLidar = 42;
     public static final double autoGrabUprightConeRTolerance = 1;
-    public static final double autoGrabUprightConeYLimelightTolerance = 0.5;
+    public static final double autoGrabUprightConeYLimelightTolerance = 2;
     public static final double autoGrabUprightConeYLimelightTarget = 40;
     public static final double autoGrabUprightConeXLimelightTolerance = 10;
     public static final double autoGrabUprightConeLidarYP = 0.027;
     public static final double autoGrabUprightConeLidarYI = 0.0;
     public static final double autoGrabUprightConeLidarYD = 0.0;
     public static final double autoGrabUprightConeLidarYTarget = 49; //cm distance we want to be to the cone
-    public static final double autoGrabUprightConeLidarYTolerance = 6;
+    public static final double autoGrabUprightConeLidarYTolerance = 8;
 
     public static final double AutobalanceRollTolerance = 10.5;
+
+    public static final double autoGrabTippedBaseTowardsXTarget = 0;
+    public static final double autoGrabTippedBaseTowardsYTarget = 21;
   }
   public static final class AutoConstants {
     public static final double kMaxSpeedMetersPerSecond = 4;
@@ -237,6 +240,8 @@ public final class Constants {
     public static final double kPXController = 0.5; //1.75
     public static final double kPYController = 3; //1.75
     public static final double kPThetaController = 1; //1.3
+
+    
 
     // Constraint for the motion profilied robot angle controller
     public static final TrapezoidProfile.Constraints kThetaControllerConstraints =
@@ -326,7 +331,7 @@ public final class Constants {
     public static ArmPosition pickupPosition = new ArmPosition(28.84, 11.5, 0, -127.6, false);//wrist roll position needs to change so this shouldn't be "final"
     public static final ArmPosition pos2 = new ArmPosition(20, 20, 0, 0, false);
     public static final ArmPosition restPosition = new ArmPosition(107.3, -170.46, 0, 26, true);
-    public static final ArmPosition scoreConeMediumPosition = new ArmPosition(35.8, 26.5, 0, -5, false);
+    public static final ArmPosition scoreConeMediumPosition = new ArmPosition(35.8, 24.5, 0, -5, false);
     public static final ArmPosition scoreLowPosition = new ArmPosition(25, -5, 0, -20, false);
     public static ArmPosition grabConePosition = new ArmPosition(31.27, 1.2, 0, -110, false);
     public static ArmPosition grabCubePosition = new ArmPosition(33.1, 8, 0, -127.6, false);

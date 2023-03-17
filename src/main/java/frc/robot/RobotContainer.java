@@ -72,7 +72,9 @@ public class RobotContainer {
             () -> -driver.getLeftY(),
             () -> -driver.getLeftX(),
             () -> -driver.getRightX(),
-            driver.leftTrigger().getAsBoolean()));
+            false,
+            driver.rightTrigger(),
+            driver.rightBumper()));
 
 
 
@@ -86,15 +88,18 @@ public class RobotContainer {
     driver.x().onTrue(new InstantCommand(() -> s_Arm.openClaw()));
     driver.b().onTrue(new InstantCommand(() -> s_Arm.closeClaw()));
     //driverBtnRB.whileTrue(new YeetCube(s_Arm));
-    driver.y().whileTrue(new AutoScoreHigh(s_Arm, s_Swerve, true, operator.getRawAxis(1), false)); //score high
-    driver.a().whileTrue(new AutoScoreHigh(s_Arm, s_Swerve, false,  operator.getRawAxis(1), false)); //score medium
-    driver.start().onTrue(new InstantCommand(() -> s_Swerve.resetSwerveModuleAngles()));
-    driver.rightBumper().whileTrue(new AutoGrabUprightCone(s_Arm, s_Swerve));
+    driver.y().whileTrue(new AutoScoreHigh(s_Arm, s_Swerve, true, operator, true)); //score high
+    driver.a().whileTrue(new AutoScoreHigh(s_Arm, s_Swerve, false,  operator, true)); //score medium
+    driver.start().onTrue(new InstantCommand(() -> s_Swerve.manualResetSwerveAngles()));
+    //driver.rightBumper().whileTrue(new AutoGrabUprightCone(s_Arm, s_Swerve));
     driver.leftBumper().whileTrue(new AutoGrabCube(s_Swerve, s_Arm));
     driver.leftStick().whileTrue(new OldAutoBalance(s_Swerve));
     driver.rightStick().onTrue(new AutoPickup(s_Arm, s_Swerve));
     //driver.rightTrigger().whileTrue(new YeetCube(s_Arm));
-    driver.rightTrigger().whileTrue(new AutoBalance(s_Swerve));
+    //driver.rightTrigger().whileTrue(new AutoBalance(s_Swerve));
+    driver.pov(90).whileTrue(new orientationTest(s_Swerve, s_Arm));
+    driver.leftTrigger().whileTrue(new AutoGrabTippedSimple(s_Swerve, s_Arm));
+    driver.pov(180).onTrue(new InstantCommand(() -> s_Swerve.setToXOrientation()));
     
     //driver.leftTrigger(0.5).whileTrue(new YeetCube(s_Arm));
     //followTape.whileTrue(new FollowTape(s_Swerve, driver));
@@ -127,7 +132,7 @@ public class RobotContainer {
     s_Arm.resetToAbsoluteEncoder();
   }
   public void resetSwerveModuleAngles() {
-    s_Swerve.resetSwerveModuleAngles();
+    s_Swerve.manualResetSwerveAngles();
   }
   public void moveShoulder(double speed) {
     s_Arm.runShoulderMotor(speed);
@@ -161,6 +166,6 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
     // An example command will be run in autonomous
    // return new exampleAuto(s_Swerve);
-   return new TwoGamePieceAndBalance(s_Swerve, s_Arm); //TODO place holder for now, replace once we have auto modes
+   return new NonBumpTwoGamePieceAndBalance(s_Swerve, s_Arm, operator); //TODO place holder for now, replace once we have auto modes
   }
 }

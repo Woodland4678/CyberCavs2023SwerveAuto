@@ -277,6 +277,7 @@ public class Arm extends SubsystemBase {
                   "Shoulder target angle lol", shoulderAngle);
     SmartDashboard.putNumber( 
                   "Elbow target angle lol", elbowAngle);
+    
     //Check if we might be in the danger zone
     // if (currentY < Constants.ArmConstants.armExclusionY) {
     //   if (currentX < Constants.ArmConstants.armExclusionXMax && currentX > Constants.ArmConstants.armExclusionXMin) {

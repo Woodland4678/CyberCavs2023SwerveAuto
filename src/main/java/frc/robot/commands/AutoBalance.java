@@ -47,11 +47,7 @@ public class AutoBalance extends CommandBase {
       s_Swerve.drive(translation, 0, false, true);
     }
     else {      
-      if (moveXDirectionCnt < 25) {
-        Translation2d translation = new Translation2d(0, 0.1);
-        s_Swerve.drive(translation, 0, false, true);
-      }
-      moveXDirectionCnt++;
+      s_Swerve.setToXOrientation();      
       isDone = true;      
     }
   }
