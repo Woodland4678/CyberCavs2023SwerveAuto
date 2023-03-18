@@ -6,6 +6,7 @@ package frc.robot.commands;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
 import frc.robot.Constants.ArmPosition;
@@ -29,9 +30,11 @@ public class AutoGrabUprightCone extends CommandBase {
   int waitCnt = 0;
   boolean isDone = false;
   int isInPositionCnt = 0;
+  double rTarget = 0;
   /** Creates a new AutoGrabUprightCone. */
-  public AutoGrabUprightCone(Arm s_Arm, SwerveDrive s_Swerve) {
+  public AutoGrabUprightCone(Arm s_Arm, SwerveDrive s_Swerve, double rTarget) {
     this.s_Arm = s_Arm;
+    this.rTarget = rTarget;
     this.s_Swerve = s_Swerve;
     addRequirements(s_Swerve, s_Arm);
     // Use addRequirements() here to declare subsystem dependencies.
@@ -40,6 +43,7 @@ public class AutoGrabUprightCone extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    
     isInPositionCnt = 0;
     s_Arm.openClaw();
     yController.setPID(Constants.Swerve.autoDriveConePickupYP, Constants.Swerve.autoDriveConePickupYI, Constants.Swerve.autoDriveConePickupYD);
@@ -58,11 +62,17 @@ public class AutoGrabUprightCone extends CommandBase {
     xController.setSetpoint(160);
     xController.setTolerance(Constants.Swerve.autoGrabUprightConeXLimelightTolerance);
     yController.setSetpoint(Constants.Swerve.autoGrabUprightConeYLimelightTarget);
-    yController.setTolerance(Constants.Swerve.autoGrabUprightConeYLimelightTolerance);
-    rController.setSetpoint(s_Swerve.getYaw().getDegrees());
+    yController.setTolerance(Constants.Swerve.autoGrabUprightConeYLimelightTolerance);    
+    if (DriverStation.isAutonomous()) {
+      rController.setSetpoint(rTarget);
+    }
+    else {
+      rController.setSetpoint(s_Swerve.getYaw().getDegrees());
+    }
+    
     rController.setTolerance(Constants.Swerve.autoGrabUprightConeRTolerance);
     currentTarget = Constants.ArmConstants.pickupToRestIntermediatePosition;
-    grabState = 0;
+    grabState = 0;    
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -73,10 +83,10 @@ public class AutoGrabUprightCone extends CommandBase {
 
       case 0:
         degrees =s_Swerve.getYaw().getDegrees();
-        if (rController.getSetpoint() > 0 && degrees < 0) {
+        if (rController.getSetpoint() > 160 && degrees < 0) {
           degrees = 360 + degrees;
         }
-        else if (rController.getSetpoint() < 0 && degrees > 0) {
+        else if (rController.getSetpoint() < -160 && degrees > 0) {
           degrees = degrees - 360;
         }
         var boundingBoxXY = s_Swerve.getBoundingBoxX();
@@ -107,10 +117,10 @@ public class AutoGrabUprightCone extends CommandBase {
       break;
       case 2:
         degrees =s_Swerve.getYaw().getDegrees();
-        if (rController.getSetpoint() > 0 && degrees < 0) {
+        if (rController.getSetpoint() > 160 && degrees < 0) {
           degrees = 360 + degrees;
         }
-        else if (rController.getSetpoint() < 0 && degrees > 0) {
+        else if (rController.getSetpoint() < -160 && degrees > 0) {
           degrees = degrees - 360;
         }
         //var boundingBoxXY = s_Swerve.getBoundingBoxX();

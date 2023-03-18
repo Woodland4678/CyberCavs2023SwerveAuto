@@ -16,6 +16,7 @@ public class AutoBalance extends CommandBase {
   double ySpeed = 0;
   boolean isDone = false;
   int moveXDirectionCnt = 0;
+  int isBalancedCnt = 0;
   /** Creates a new AutoBalance. */
   public AutoBalance(SwerveDrive s_Swerve) {
     this.s_Swerve = s_Swerve;
@@ -29,6 +30,7 @@ public class AutoBalance extends CommandBase {
     moveXDirectionCnt = 0;
     isDone = false;
     ySpeed = 0;
+    isBalancedCnt = 0;
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -36,6 +38,7 @@ public class AutoBalance extends CommandBase {
   public void execute() {
     double gyroRollValue = s_Swerve.getGyroRoll();
     if (Math.abs(gyroRollValue) > Constants.Swerve.AutobalanceRollTolerance) {
+      isBalancedCnt = 0;
       if (gyroRollValue < 0) {        
         ySpeed = -0.4;
         
@@ -47,8 +50,11 @@ public class AutoBalance extends CommandBase {
       s_Swerve.drive(translation, 0, false, true);
     }
     else {      
-      s_Swerve.setToXOrientation();      
-      isDone = true;      
+      isBalancedCnt++;
+      if (isBalancedCnt > 25) {
+        s_Swerve.setToXOrientation();      
+        isDone = true;      
+      }
     }
   }
 

@@ -154,10 +154,10 @@ public class SwerveDrive extends SubsystemBase {
     }    
   }
   public void setToXOrientation() {    
-    mSwerveMods[0].setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)), true);
-    mSwerveMods[1].setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-45)), true);
-    mSwerveMods[2].setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-45)), true);
-    mSwerveMods[3].setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)), true);
+    mSwerveMods[0].setDesiredState(new SwerveModuleState(0.05, Rotation2d.fromDegrees(45)), true);
+    mSwerveMods[1].setDesiredState(new SwerveModuleState(0.05, Rotation2d.fromDegrees(-45)), true);
+    mSwerveMods[2].setDesiredState(new SwerveModuleState(0.05, Rotation2d.fromDegrees(-45)), true);
+    mSwerveMods[3].setDesiredState(new SwerveModuleState(0.05, Rotation2d.fromDegrees(45)), true);
   }
   public void resetSwerveModuleAngles() {
     for (SwerveModule mod : mSwerveMods) {
@@ -347,9 +347,9 @@ public class SwerveDrive extends SubsystemBase {
              traj, 
              this::getPose, // Pose supplier
              Constants.Swerve.swerveKinematics, // SwerveDriveKinematics
-             new PIDController(5, 0, 0), // X controller. Tune these values for your robot. Leaving them 0 will only use feedforwards.
-             new PIDController(5, 0, 0), // Y controller (usually the same values as X controller)
-             new PIDController(4, 0, 0), // Rotation controller. Tune these values for your robot. Leaving them 0 will only use feedforwards.
+             new PIDController(4, 0, 0.3), // X controller. Tune these values for your robot. Leaving them 0 will only use feedforwards.
+             new PIDController(4, 0, 0.3), // Y controller (usually the same values as X controller)
+             new PIDController(4, 0, 0.3), // Rotation controller. Tune these values for your robot. Leaving them 0 will only use feedforwards.
              this::setModuleStates, // Module states consumer
               false, 
             this // Requires this drive subsystem
@@ -716,12 +716,12 @@ public class SwerveDrive extends SubsystemBase {
     Point orientationBasedOffset;
 
     switch (orientationCase) {
-      case TipDirectlyAway: orientationBasedOffset = new Point(0, 2.5); break;
-      case TipDirectlyTowards: orientationBasedOffset = new Point(0, 1); break;
-      case TipLeftAndAway: orientationBasedOffset = new Point(0, -1); break;
-      case TipLeftAndTowards: orientationBasedOffset = new Point(0, -1); break;
-      case TipRightAndAway: orientationBasedOffset = new Point(0, -1); break;
-      case TipRightAndTowards: orientationBasedOffset = new Point(0, -1); break;
+      case TipDirectlyAway: orientationBasedOffset = new Point(0, 4); break;
+      case TipDirectlyTowards: orientationBasedOffset = new Point(0, 2.25); break;
+      case TipLeftAndAway: orientationBasedOffset = new Point(0, 0.5); break;
+      case TipLeftAndTowards: orientationBasedOffset = new Point(0, 0.75); break;
+      case TipRightAndAway: orientationBasedOffset = new Point(0, 1.25); break;
+      case TipRightAndTowards: orientationBasedOffset = new Point(0, 0); break;
       default: orientationBasedOffset = new Point(0, 0);
     }
 

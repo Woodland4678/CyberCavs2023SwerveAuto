@@ -4,6 +4,10 @@
 
 package frc.robot.commands;
 
+import java.lang.management.OperatingSystemMXBean;
+
+import com.fasterxml.jackson.databind.deser.std.ContainerDeserializerBase;
+
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -18,7 +22,7 @@ public class MoveArm extends CommandBase {
   double currentArmError = 0;
   boolean doneIntermediateMovement = false;
   ArmPosition currentTarget;
-  //Joystick operatorJoystick;
+  Joystick operatorJoystick;
   boolean armOkayToMove = true;
   boolean isDone = false;
   int isDoneCnt = 0;
@@ -28,7 +32,7 @@ public class MoveArm extends CommandBase {
   public MoveArm(Arm s_Arm, ArmPosition targetPos, Joystick operatorJoystick) {
     this.s_Arm = s_Arm;
     this.targetPos = targetPos;
-    //this.operatorJoystick = operatorJoystick;
+    this.operatorJoystick = operatorJoystick;
     originalTarget = targetPos;
     addRequirements(s_Arm);
     // Use addRequirements() here to declare subsystem dependencies.
@@ -80,6 +84,9 @@ public class MoveArm extends CommandBase {
     else if (this.targetPos == Constants.ArmConstants.scoreConeHighPosition) {
       currentTarget = Constants.ArmConstants.restToScoreHighIntermediatePosition;
     }
+    else if (this.targetPos == Constants.ArmConstants.scoreLowPosition) {
+      currentTarget = Constants.ArmConstants.pickupToRestIntermediatePosition;
+    }
     else {
       currentTarget = Constants.ArmConstants.restToScoreHighIntermediatePosition;
     }
@@ -89,6 +96,11 @@ public class MoveArm extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    //TODO remove below code
+    /*TEMPORARY CODE REMEMBER TO REMOVE AFTER REVEAL VIDEO */
+    // if (operatorJoystick.getPOV() == 180 && currentTarget == Constants.ArmConstants.headTiltForVideoPosition) {
+    //   currentTarget.wristRollTarget = -265;
+    // }
     if (currentTarget == Constants.ArmConstants.restPosition) {
       isDoneCnt++;
       if (isDoneCnt > 50) {

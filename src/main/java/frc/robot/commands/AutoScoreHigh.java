@@ -86,7 +86,7 @@ public class AutoScoreHigh extends CommandBase {
       }
       
     }
-    yController.setSetpoint(6.5);
+    yController.setSetpoint(6.9); //nice
     xController.setTolerance(Constants.Swerve.autoDriveScoreXTolerance);
     yController.setTolerance(Constants.Swerve.autoDriveScoreYTolerance);
     rController.setTolerance(Constants.Swerve.autoDriveScoreRTolerance);
@@ -137,12 +137,14 @@ public class AutoScoreHigh extends CommandBase {
         //   xSpeed = 0;
         // }
         Translation2d translation = new Translation2d(ySpeed, xSpeed);
-        // SmartDashboard.putNumber(
-        //             "xSpeed",xSpeed);
-        // SmartDashboard.putNumber(
-        //               "ySpeed",ySpeed);
-        // SmartDashboard.putNumber(
-        //               "rSpeed",rSpeed);
+        SmartDashboard.putNumber(
+                    "Auto Score high arm error",currentArmError);        
+        SmartDashboard.putBoolean(
+                      "Auto score y controller",yController.atSetpoint());
+        SmartDashboard.putBoolean(
+                      "Auto score x controller",xController.atSetpoint());
+        SmartDashboard.putBoolean(
+                      "Auto score r controller",rController.atSetpoint());
         
         
         if (xController.atSetpoint() && yController.atSetpoint() && rController.atSetpoint() && currentArmError < 11) {
@@ -151,7 +153,7 @@ public class AutoScoreHigh extends CommandBase {
         else {
           isInPosCnt = 0;
         }
-        if (isInPosCnt > 10) {
+        if (isInPosCnt > 12) {
           if (DriverStation.isAutonomous()) {
             isDone = true;
           }

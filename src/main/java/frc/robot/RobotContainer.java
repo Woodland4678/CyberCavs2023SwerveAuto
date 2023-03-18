@@ -4,6 +4,10 @@
 
 package frc.robot;
 
+import com.pathplanner.lib.PathConstraints;
+import com.pathplanner.lib.PathPlanner;
+import com.pathplanner.lib.PathPlannerTrajectory;
+
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
@@ -11,6 +15,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.POVButton;
 //import frc.robot.autos.*;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
@@ -27,7 +32,34 @@ public class RobotContainer {
   private static final CommandXboxController driver = new CommandXboxController(0);
   private static final Joystick operator = new Joystick(1);
 
-  /* Drive Controls */
+    PathPlannerTrajectory goTo2ndGamePiece = PathPlanner.loadPath("Non Bump Path 1", new PathConstraints(4.1, 4));
+    PathPlannerTrajectory bring2ndGamePieceBack = PathPlanner.loadPath("Non Bump Path 2", new PathConstraints(4.1, 4.5));
+    PathPlannerTrajectory goAutoBalance = PathPlanner.loadPath("Non Bump Path Auto Balance After 2", new PathConstraints(3, 2));
+  PathPlannerTrajectory[] nonBump2GamePieceAndBalancePaths = {
+    goTo2ndGamePiece,
+    bring2ndGamePieceBack,
+    goAutoBalance,
+  };
+   
+    PathPlannerTrajectory goTo3rdGamePiece = PathPlanner.loadPath("Non Bump Path Game Piece 3", new PathConstraints(4.1, 4.1));
+    PathPlannerTrajectory bring3rdGamePieceBack = PathPlanner.loadPath("Non Bump Path Move 3rd Piece", new PathConstraints(4.1, 4.1));
+  
+  PathPlannerTrajectory[] nonBump3GamePiece = {
+    goTo2ndGamePiece,
+    bring2ndGamePieceBack,
+    goTo3rdGamePiece,
+    bring3rdGamePieceBack
+  };
+
+    PathPlannerTrajectory goBalanceAfter3rdGrabbed = PathPlanner.loadPath("Non Bump 2.5 Game Piece Balance", new PathConstraints(3, 3));
+  PathPlannerTrajectory[] nonBump2AndAHalfGamePieceAndBalance = {
+    goTo2ndGamePiece,
+    bring2ndGamePieceBack,
+    goTo3rdGamePiece,
+    goBalanceAfter3rdGrabbed
+  };
+    
+    /* Drive Controls */
   //private final int translationAxis = driver.left;
   private final int strafeAxis = XboxController.Axis.kLeftX.value;
   private final int rotationAxis = XboxController.Axis.kRightX.value;
@@ -56,7 +88,14 @@ public class RobotContainer {
   private final JoystickButton operatorBtnRT =
       new JoystickButton(operator, 8);
   private final JoystickButton operatorBtnLT =
-      new JoystickButton(operator, 7);
+      new JoystickButton(operator, 7); 
+  private final JoystickButton operatorPOV90 =
+      new JoystickButton(operator, operator.getPOV(1)); //doesn't work
+  private final JoystickButton operatorBtnRightStick =
+      new JoystickButton(operator, 12); 
+  private final JoystickButton operatorBtnLeftStick =
+      new JoystickButton(operator, 11); 
+
 
   /* Subsystems */
   private final SwerveDrive s_Swerve = new SwerveDrive();
@@ -100,6 +139,7 @@ public class RobotContainer {
     driver.pov(90).whileTrue(new orientationTest(s_Swerve, s_Arm));
     driver.leftTrigger().whileTrue(new AutoGrabTippedSimple(s_Swerve, s_Arm));
     driver.pov(180).onTrue(new InstantCommand(() -> s_Swerve.setToXOrientation()));
+    driver.pov(270).whileTrue(new AutoGrabUprightCone(s_Arm, s_Swerve, 0));
     
     //driver.leftTrigger(0.5).whileTrue(new YeetCube(s_Arm));
     //followTape.whileTrue(new FollowTape(s_Swerve, driver));
@@ -120,7 +160,10 @@ public class RobotContainer {
     operatorBtnBack.onTrue(new CalibrateArm(s_Arm));
     operatorBtnRT.onTrue(new MoveArm(s_Arm,Constants.ArmConstants.grabUprightConePosition, operator));
     operatorBtnLT.onTrue(new MoveArm(s_Arm,Constants.ArmConstants.grabFromSingleStationPosition, operator));
+    //operatorBtnRightStick.onTrue(new MoveArm(s_Arm, Constants.ArmConstants.headTiltForVideoPosition, operator));
+    //operatorBtnLeftStick.onTrue(new tempHeadTilt(s_Arm));
   }
+
 
   public static Joystick getOperatorJoystick() {
     return operator;
@@ -166,6 +209,7 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
     // An example command will be run in autonomous
    // return new exampleAuto(s_Swerve);
-   return new NonBumpTwoGamePieceAndBalance(s_Swerve, s_Arm, operator); //TODO place holder for now, replace once we have auto modes
+   return new NonBumpTwoGamePieceAndBalance(s_Swerve, s_Arm, operator, nonBump2GamePieceAndBalancePaths);
+   //return new NonBumpThreeGamePieceAuto(s_Swerve, s_Arm, operator); //TODO place holder for now, replace once we have auto modes
   }
 }

@@ -42,7 +42,7 @@ public class BumpTwoGamePieceAndBalance extends SequentialCommandGroup {
          new InstantCommand(() -> s_Swerve.resetSwerveModuleAngles()),
          new YeetCube(s_Arm),         
          new ParallelCommandGroup(s_Swerve.followTrajectoryCommand(PathPlannerTrajectory.transformTrajectoryForAlliance(goTo2ndGamePiece, DriverStation.getAlliance()), true), new CalibrateArm(s_Arm)),
-         new AutoGrabUprightCone(s_Arm, s_Swerve),
+         new AutoGrabUprightCone(s_Arm, s_Swerve, 0),
          s_Swerve.followTrajectoryCommand(PathPlannerTrajectory.transformTrajectoryForAlliance(bring2ndGamePieceBack, DriverStation.getAlliance()), true),
          new AutoScoreHigh(s_Arm, s_Swerve, true, operatorJoystick, true),
          new InstantCommand(() -> s_Arm.openClaw()),
