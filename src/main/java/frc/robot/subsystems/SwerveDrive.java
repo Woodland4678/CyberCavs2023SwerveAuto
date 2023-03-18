@@ -147,12 +147,7 @@ public class SwerveDrive extends SubsystemBase {
   }
   public void alternateDrive(double xSpeed, double ySpeed, double omegaSpeed, Pose2d robotPose2d) {
     ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, omegaSpeed, robotPose2d.getRotation());
-  }
-  public void manualResetSwerveAngles() {
-    for (SwerveModule mod : mSwerveMods) {
-      mod.manualResetToAbsolute();
-    }    
-  }
+  }  
   public void setToXOrientation() {    
     mSwerveMods[0].setDesiredState(new SwerveModuleState(0.05, Rotation2d.fromDegrees(45)), true);
     mSwerveMods[1].setDesiredState(new SwerveModuleState(0.05, Rotation2d.fromDegrees(-45)), true);
@@ -162,6 +157,7 @@ public class SwerveDrive extends SubsystemBase {
   public void resetSwerveModuleAngles() {
     for (SwerveModule mod : mSwerveMods) {
       mod.resetToAbsolute();
+      mod.setDesiredState(new SwerveModuleState(0.05, Rotation2d.fromDegrees(0)), true);
     }
   }
   public double getLeftLaserValue() {

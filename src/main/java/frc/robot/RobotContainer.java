@@ -129,7 +129,7 @@ public class RobotContainer {
     //driverBtnRB.whileTrue(new YeetCube(s_Arm));
     driver.y().whileTrue(new AutoScoreHigh(s_Arm, s_Swerve, true, operator, true)); //score high
     driver.a().whileTrue(new AutoScoreHigh(s_Arm, s_Swerve, false,  operator, true)); //score medium
-    driver.start().onTrue(new InstantCommand(() -> s_Swerve.manualResetSwerveAngles()));
+    driver.start().onTrue(new InstantCommand(() -> s_Swerve.resetSwerveModuleAngles()));
     //driver.rightBumper().whileTrue(new AutoGrabUprightCone(s_Arm, s_Swerve));
     driver.leftBumper().whileTrue(new AutoGrabCube(s_Swerve, s_Arm));
     driver.leftStick().whileTrue(new OldAutoBalance(s_Swerve));
@@ -173,10 +173,7 @@ public class RobotContainer {
   }
   public void resetArmAngles() {
     s_Arm.resetToAbsoluteEncoder();
-  }
-  public void resetSwerveModuleAngles() {
-    s_Swerve.manualResetSwerveAngles();
-  }
+  }  
   public void moveShoulder(double speed) {
     s_Arm.runShoulderMotor(speed);
   }
