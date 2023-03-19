@@ -31,6 +31,7 @@ public class AutoGrabUprightCone extends CommandBase {
   boolean isDone = false;
   int isInPositionCnt = 0;
   double rTarget = 0;
+  boolean autonomousForceStop = false;
   /** Creates a new AutoGrabUprightCone. */
   public AutoGrabUprightCone(Arm s_Arm, SwerveDrive s_Swerve, double rTarget) {
     this.s_Arm = s_Arm;
@@ -43,7 +44,7 @@ public class AutoGrabUprightCone extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    
+    autonomousForceStop =false;
     isInPositionCnt = 0;
     s_Arm.openClaw();
     yController.setPID(Constants.Swerve.autoDriveConePickupYP, Constants.Swerve.autoDriveConePickupYI, Constants.Swerve.autoDriveConePickupYD);
@@ -78,6 +79,12 @@ public class AutoGrabUprightCone extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    var fieldPose = s_Swerve.getPose();
+    //if we're in auto and getting close to the middle of the field then something has gone wrong and we should stop
+    if (DriverStation.isAutonomous() && fieldPose.getTranslation().getX() > 7.44) {
+      grabState = 3;
+      autonomousForceStop = true;
+    }
     double currentArmError = s_Arm.MoveArm(currentTarget);
     switch(grabState) {
 
@@ -159,7 +166,9 @@ public class AutoGrabUprightCone extends CommandBase {
       break;
       case 3:
         s_Swerve.stop();
-        s_Arm.closeClaw();
+        if (!autonomousForceStop) {
+          s_Arm.closeClaw();
+        }
         grabState++;
       break;
       case 4:
@@ -176,8 +185,11 @@ public class AutoGrabUprightCone extends CommandBase {
       break;
       case 6:
         currentTarget = Constants.ArmConstants.restPosition;
-        s_Arm.setLEDMode(LEDModes.BLINKGREEN);
-        isDone = true;
+        
+        if (!autonomousForceStop) { //only return isdone = true if we didn't have to force stop auto
+          isDone = true;
+          s_Arm.setLEDMode(LEDModes.BLINKGREEN);
+        }
       break;
     }
   }

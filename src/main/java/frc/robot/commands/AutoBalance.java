@@ -51,7 +51,8 @@ public class AutoBalance extends CommandBase {
     }
     else {      
       isBalancedCnt++;
-      if (isBalancedCnt > 25) {
+      s_Swerve.stop();
+      if (isBalancedCnt > 35) {
         s_Swerve.setToXOrientation();      
         isDone = true;      
       }
