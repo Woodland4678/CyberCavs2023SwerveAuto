@@ -36,14 +36,16 @@ public class AutoScoreHigh extends CommandBase {
   boolean isAutoMode = false;
   ArmPosition originalTarget;
   Joystick operatorJoystick;
+  int waitScoreCnt = 0;
   /** Creates a new ScoreHigh. */
-  public AutoScoreHigh(Arm s_Arm, SwerveDrive s_Swerve, boolean isHigh, Joystick operatorJoystick, boolean isAutoMode) {
+  public AutoScoreHigh(Arm s_Arm, SwerveDrive s_Swerve, boolean isHigh, Joystick operatorJoystick, boolean isAutoMode, int waitScoreCnt) {
     this.s_Arm = s_Arm;
     this.s_Swerve = s_Swerve;
     addRequirements(s_Arm, s_Swerve); 
     this.isHigh = isHigh;
     this.wristAdjustment = wristAdjustment;
     this.isAutoMode = isAutoMode;
+    this.waitScoreCnt = waitScoreCnt;
     this.originalTarget = Constants.ArmConstants.scoreConeHighPosition;
     this.operatorJoystick = operatorJoystick;
     // Use addRequirements() here to declare subsystem dependencies.
@@ -86,7 +88,7 @@ public class AutoScoreHigh extends CommandBase {
       }
       
     }
-    yController.setSetpoint(6.9); //nice
+    yController.setSetpoint(7.25); //nice
     xController.setTolerance(Constants.Swerve.autoDriveScoreXTolerance);
     yController.setTolerance(Constants.Swerve.autoDriveScoreYTolerance);
     rController.setTolerance(Constants.Swerve.autoDriveScoreRTolerance);
@@ -101,17 +103,27 @@ public class AutoScoreHigh extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if (Math.abs(operatorJoystick.getRawAxis(1)) > 0.1 && isMainArmPositionSet) {
-      currentTarget.wristPitchTarget += wristAdjustment * 0.5;
+    if (operatorJoystick.getRawAxis(1) > 0.1 && isMainArmPositionSet) {
+      if (currentTarget.wristPitchTarget > -120) { 
+        currentTarget.wristPitchTarget += -operatorJoystick.getRawAxis(1) * 2.5;
+      }
+    }
+    else if (operatorJoystick.getRawAxis(1) < 0.1 && isMainArmPositionSet) {
+      if (currentTarget.wristPitchTarget < 15) {
+        currentTarget.wristPitchTarget += -operatorJoystick.getRawAxis(1) * 2.5;
+      }
     }
     var currentArmError = s_Arm.MoveArm(currentTarget);
     SmartDashboard.putNumber("Auto score high arm error", currentArmError);
     if (currentArmError < 8 && !isMainArmPositionSet) {
       if (isHigh) {
         currentTarget = Constants.ArmConstants.scoreConeHighPosition;
+        currentTarget.wristPitchTarget = -35;
       }
       else {
         currentTarget = Constants.ArmConstants.scoreConeMediumPosition;
+        currentTarget.wristPitchTarget = -5;
+
       }
       isMainArmPositionSet = true;
     }
@@ -126,9 +138,13 @@ public class AutoScoreHigh extends CommandBase {
         else if (rController.getSetpoint() < 0 && degrees > 0) {
           degrees = degrees - 360;
         }
+        var ySpeed = yController.calculate(s_Swerve.getLimelightY());
+        // if (Math.abs(xController.getPositionError()) > 7.5) {
+        //   ySpeed = 0;
+        // }
         var rSpeed = rController.calculate(degrees);
         var xSpeed = xController.calculate(s_Swerve.getLimelightX());
-        var ySpeed = yController.calculate(s_Swerve.getLimelightY());
+        
         // if (Math.abs(rSpeed) < 0.7) {
         //   xSpeed = rLimiter.calculate(rController.calculate(s_Swerve.getYaw().getDegrees()));
         // }
@@ -147,13 +163,13 @@ public class AutoScoreHigh extends CommandBase {
                       "Auto score r controller",rController.atSetpoint());
         
         
-        if (xController.atSetpoint() && yController.atSetpoint() && rController.atSetpoint() && currentArmError < 11) {
+        if (xController.atSetpoint() && yController.atSetpoint() && rController.atSetpoint() && currentArmError < 10.5) {
           isInPosCnt++;
         }
         else {
           isInPosCnt = 0;
         }
-        if (isInPosCnt > 12) {
+        if (isInPosCnt > waitScoreCnt) {
           if (DriverStation.isAutonomous()) {
             isDone = true;
           }

@@ -60,11 +60,14 @@ public class MoveArm extends CommandBase {
       }
      
     }
-    else if (this.targetPos == Constants.ArmConstants.restPosition && s_Arm.getCurrentXPosition() > 40 && DriverStation.isAutonomous()) {
+    else if ((this.targetPos == Constants.ArmConstants.restPosition || this.targetPos == Constants.ArmConstants.restPositionAuto) && s_Arm.getCurrentXPosition() > 40 && DriverStation.isAutonomous()) {
       currentTarget = Constants.ArmConstants.scoreHighToRestIntermediatePosition;
     }
     else if (this.targetPos == Constants.ArmConstants.restPosition) {
       currentTarget = Constants.ArmConstants.pickupToRestIntermediatePosition;
+    }
+    else if (this.targetPos == Constants.ArmConstants.restPositionAuto) {
+      currentTarget = Constants.ArmConstants.pickupToRestIntermediatePositionAuto;
     }
     else if (this.targetPos == Constants.ArmConstants.grabFromSingleStationPosition) {
       currentTarget =Constants.ArmConstants.pickupToRestIntermediatePosition;
@@ -101,7 +104,7 @@ public class MoveArm extends CommandBase {
     // if (operatorJoystick.getPOV() == 180 && currentTarget == Constants.ArmConstants.headTiltForVideoPosition) {
     //   currentTarget.wristRollTarget = -265;
     // }
-    if (currentTarget == Constants.ArmConstants.restPosition) {
+    if (currentTarget == Constants.ArmConstants.restPosition || currentTarget == Constants.ArmConstants.restPositionAuto) {
       isDoneCnt++;
       if (isDoneCnt > 50) {
         isDone = true;

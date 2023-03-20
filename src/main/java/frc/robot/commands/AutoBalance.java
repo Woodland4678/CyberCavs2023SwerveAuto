@@ -4,9 +4,13 @@
 
 package frc.robot.commands;
 
+import java.sql.Driver;
+
 import com.ctre.phoenixpro.signals.System_StateValue;
 
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
 import frc.robot.subsystems.SwerveDrive;
@@ -37,7 +41,7 @@ public class AutoBalance extends CommandBase {
   @Override
   public void execute() {
     double gyroRollValue = s_Swerve.getGyroRoll();
-    if (Math.abs(gyroRollValue) > Constants.Swerve.AutobalanceRollTolerance) {
+    if (Math.abs(gyroRollValue) > Constants.Swerve.AutobalanceRollTolerance && DriverStation.getMatchTime() > 0.11) {
       isBalancedCnt = 0;
       if (gyroRollValue < 0) {        
         ySpeed = -0.4;
@@ -52,7 +56,7 @@ public class AutoBalance extends CommandBase {
     else {      
       isBalancedCnt++;
       s_Swerve.stop();
-      if (isBalancedCnt > 35) {
+      if (isBalancedCnt > 45 || DriverStation.getMatchTime() < 0.1) {
         s_Swerve.setToXOrientation();      
         isDone = true;      
       }

@@ -345,7 +345,7 @@ public class SwerveDrive extends SubsystemBase {
              Constants.Swerve.swerveKinematics, // SwerveDriveKinematics
              new PIDController(4, 0, 0.3), // X controller. Tune these values for your robot. Leaving them 0 will only use feedforwards.
              new PIDController(4, 0, 0.3), // Y controller (usually the same values as X controller)
-             new PIDController(4, 0, 0.3), // Rotation controller. Tune these values for your robot. Leaving them 0 will only use feedforwards.
+             new PIDController(3.2, 0, 0.3), // Rotation controller. Tune these values for your robot. Leaving them 0 will only use feedforwards.
              this::setModuleStates, // Module states consumer
               false, 
             this // Requires this drive subsystem

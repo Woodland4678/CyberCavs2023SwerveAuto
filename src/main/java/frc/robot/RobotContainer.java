@@ -31,6 +31,7 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private static final CommandXboxController driver = new CommandXboxController(0);
   private static final Joystick operator = new Joystick(1);
+  private static final Joystick autoBox = new Joystick(2);
 
     PathPlannerTrajectory goTo2ndGamePiece = PathPlanner.loadPath("Non Bump Path 1", new PathConstraints(4.1, 4));
     PathPlannerTrajectory bring2ndGamePieceBack = PathPlanner.loadPath("Non Bump Path 2", new PathConstraints(4.1, 4.5));
@@ -51,14 +52,31 @@ public class RobotContainer {
     bring3rdGamePieceBack
   };
 
-    PathPlannerTrajectory goBalanceAfter3rdGrabbed = PathPlanner.loadPath("Non Bump 2.5 Game Piece Balance", new PathConstraints(3, 3));
+    PathPlannerTrajectory goBalanceAfter3rdGrabbed = PathPlanner.loadPath("Non Bump 2.5 Game Piece Balance", new PathConstraints(2.2, 3));
   PathPlannerTrajectory[] nonBump2AndAHalfGamePieceAndBalance = {
     goTo2ndGamePiece,
     bring2ndGamePieceBack,
     goTo3rdGamePiece,
     goBalanceAfter3rdGrabbed
   };
-    
+
+    PathPlannerTrajectory bumpGoTo2ndGamePiece = PathPlanner.loadPath("Bump Auto Path 1", new PathConstraints(3, 4.1));
+    PathPlannerTrajectory bumpBring2ndGamePieceBack = PathPlanner.loadPath("Bump Auto Path 2", new PathConstraints(3, 3));
+    PathPlannerTrajectory bumpGoAutoBalance = PathPlanner.loadPath("Bump Auto Balance After 2", new PathConstraints(2.5, 2));
+    PathPlannerTrajectory[] bumpTwoGamePieceAndBalancePaths = {
+      bumpGoTo2ndGamePiece,
+      bumpBring2ndGamePieceBack,
+      bumpGoAutoBalance
+    };
+
+    PathPlannerTrajectory bumpGoTo3rdGamePiece = PathPlanner.loadPath("Bump Go To 3rd Piece", new PathConstraints(3, 4.1));
+    PathPlannerTrajectory bumpBring3rdGamePieceBack = PathPlanner.loadPath("Bump Bring 3rd Piece Back", new PathConstraints(2,3));
+    PathPlannerTrajectory[] bumpThreeGamePiecePaths = {
+      bumpGoTo2ndGamePiece,
+      bumpBring2ndGamePieceBack,
+      bumpGoTo3rdGamePiece,
+      bumpBring3rdGamePieceBack
+    };
     /* Drive Controls */
   //private final int translationAxis = driver.left;
   private final int strafeAxis = XboxController.Axis.kLeftX.value;
@@ -127,8 +145,8 @@ public class RobotContainer {
     driver.x().onTrue(new InstantCommand(() -> s_Arm.openClaw()));
     driver.b().onTrue(new InstantCommand(() -> s_Arm.closeClaw()));
     //driverBtnRB.whileTrue(new YeetCube(s_Arm));
-    driver.y().whileTrue(new AutoScoreHigh(s_Arm, s_Swerve, true, operator, true)); //score high
-    driver.a().whileTrue(new AutoScoreHigh(s_Arm, s_Swerve, false,  operator, true)); //score medium
+    driver.y().whileTrue(new AutoScoreHigh(s_Arm, s_Swerve, true, operator, true, 20)); //score high
+    driver.a().whileTrue(new AutoScoreHigh(s_Arm, s_Swerve, false,  operator, true, 20)); //score medium
     driver.start().onTrue(new InstantCommand(() -> s_Swerve.resetSwerveModuleAngles()));
     //driver.rightBumper().whileTrue(new AutoGrabUprightCone(s_Arm, s_Swerve));
     driver.leftBumper().whileTrue(new AutoGrabCube(s_Swerve, s_Arm));
@@ -204,9 +222,51 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
+    int autoBoxSwitch1 = 0;
+    int autoBoxSwitch2 = 0;
+    if (autoBox.getRawButton(1)) {
+      autoBoxSwitch1 += 1;
+    }
+    if (autoBox.getRawButton(2)) {
+      autoBoxSwitch1 += 2;
+    }
+    if (autoBox.getRawButton(3)) {
+      autoBoxSwitch1 += 4;
+    }
+
+    if (autoBox.getRawButton(8)) {
+      autoBoxSwitch2 += 1;
+    }
+    if (autoBox.getRawButton(9)) {
+      autoBoxSwitch2 += 2;
+    }
+    if (autoBox.getRawButton(10)) {
+      autoBoxSwitch2 += 4;
+    }
+    if (autoBoxSwitch2 == 1) {
+      if (autoBoxSwitch1 == 3) {
+        return new NonBumpThreeGamePieceAuto(s_Swerve, s_Arm, operator, nonBump3GamePiece);
+      }
+      else if (autoBoxSwitch1 == 2) {
+        return new NonBump2AndAHalfAndBalance(s_Swerve, s_Arm, operator, nonBump2AndAHalfGamePieceAndBalance);
+      }
+      else if (autoBoxSwitch1 == 4) {
+        return new NonBumpTwoGamePieceAndBalance(s_Swerve, s_Arm, operator, nonBump2GamePieceAndBalancePaths);
+      }
+    }
+    else if (autoBoxSwitch2 == 2) {
+      if (autoBoxSwitch1 == 2) {
+        return new BumpTwoGamePieceAndBalance(s_Swerve, s_Arm, operator, bumpTwoGamePieceAndBalancePaths);
+      }
+      if (autoBoxSwitch1 == 3) {
+        return new BumpThreeGamePiece(s_Swerve, s_Arm, operator, bumpThreeGamePiecePaths);
+      }
+    }
+   return new MoveBack(s_Swerve, s_Arm);
     // An example command will be run in autonomous
    // return new exampleAuto(s_Swerve);
-   return new NonBumpTwoGamePieceAndBalance(s_Swerve, s_Arm, operator, nonBump2GamePieceAndBalancePaths);
-   //return new NonBumpThreeGamePieceAuto(s_Swerve, s_Arm, operator); //TODO place holder for now, replace once we have auto modes
+   
+   //return new NonBumpTwoGamePieceAndBalance(s_Swerve, s_Arm, operator, nonBump2GamePieceAndBalancePaths);
+   //return new NonBumpThreeGamePieceAuto(s_Swerve, s_Arm, operator, nonBump3GamePiece); //TODO place holder for now, replace once we have auto modes
   }
 }

@@ -4,6 +4,7 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
 import frc.robot.subsystems.Arm;
@@ -42,7 +43,12 @@ public class YeetCube extends CommandBase {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    s_Arm.MoveArm(Constants.ArmConstants.pickupToRestIntermediatePosition);
+    if (DriverStation.isAutonomous()) {
+      s_Arm.MoveArm(Constants.ArmConstants.pickupToRestIntermediatePositionAuto);
+    }
+    else {
+      s_Arm.MoveArm(Constants.ArmConstants.pickupToRestIntermediatePosition);
+    }
   
   }
 

@@ -46,9 +46,9 @@ public class NonBumpTwoGamePieceAndBalance extends SequentialCommandGroup {
          new ParallelCommandGroup(s_Swerve.followTrajectoryCommand(PathPlannerTrajectory.transformTrajectoryForAlliance(paths[0], DriverStation.getAlliance()), true), new CalibrateArm(s_Arm)),
          new AutoGrabUprightCone(s_Arm, s_Swerve, 0),
          s_Swerve.followTrajectoryCommand(PathPlannerTrajectory.transformTrajectoryForAlliance(paths[1], DriverStation.getAlliance()), true),
-         new AutoScoreHigh(s_Arm, s_Swerve, true, operatorJoystick, true),
+         new AutoScoreHigh(s_Arm, s_Swerve, true, operatorJoystick, true, 20),
          new InstantCommand(() -> s_Arm.openClaw()),
-         new ParallelCommandGroup(s_Swerve.followTrajectoryCommand(PathPlannerTrajectory.transformTrajectoryForAlliance(paths[3], DriverStation.getAlliance()), true), new MoveArm(s_Arm, Constants.ArmConstants.restPosition, null)),
+         new ParallelCommandGroup(s_Swerve.followTrajectoryCommand(PathPlannerTrajectory.transformTrajectoryForAlliance(paths[2], DriverStation.getAlliance()), true), new MoveArm(s_Arm, Constants.ArmConstants.restPositionAuto, null)),
          new AutoBalance(s_Swerve)
         //  s_Swerve.followTrajectoryCommand(bring2ndGamePieceBack, true),
         //  new AutoScoreHigh(s_Arm, s_Swerve, true, 0.0),

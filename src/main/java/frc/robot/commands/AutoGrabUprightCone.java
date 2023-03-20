@@ -4,6 +4,8 @@
 
 package frc.robot.commands;
 
+import java.sql.Driver;
+
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -72,7 +74,7 @@ public class AutoGrabUprightCone extends CommandBase {
     }
     
     rController.setTolerance(Constants.Swerve.autoGrabUprightConeRTolerance);
-    currentTarget = Constants.ArmConstants.pickupToRestIntermediatePosition;
+    currentTarget = Constants.ArmConstants.pickupToRestIntermediatePositionAuto;
     grabState = 0;    
   }
 
@@ -109,7 +111,7 @@ public class AutoGrabUprightCone extends CommandBase {
         
         s_Swerve.drive(translation, rSpeed, false, true);
         if (xController.atSetpoint() && (yController.atSetpoint() || s_Swerve.getLimelightY() < yController.getSetpoint())) {
-            if (currentArmError < 5) {
+            if (currentArmError < 3) {
               grabState++;
             }
         }
@@ -154,9 +156,9 @@ public class AutoGrabUprightCone extends CommandBase {
         
         
         s_Swerve.drive(translation, rSpeed, false, true);
-        if (yController.atSetpoint() && currentArmError < 2) {
+        if (yController.atSetpoint() && currentArmError < 1.5) {
           isInPositionCnt++;
-          if (isInPositionCnt > 2) {
+          if (isInPositionCnt > 7) {
             grabState++;
           }
         }
@@ -178,13 +180,24 @@ public class AutoGrabUprightCone extends CommandBase {
         }
       break;
       case 5:
-        currentTarget = Constants.ArmConstants.pickupToRestIntermediatePosition;
+        if (DriverStation.isAutonomous()) {
+          currentTarget = Constants.ArmConstants.pickupToRestIntermediatePositionAuto;
+        }
+        else {
+          currentTarget = Constants.ArmConstants.pickupToRestIntermediatePosition;
+        }
         if (currentArmError < 2) {
           grabState++;
         }
       break;
       case 6:
-        currentTarget = Constants.ArmConstants.restPosition;
+        if (DriverStation.isAutonomous()) {
+          currentTarget = Constants.ArmConstants.restPositionAuto;
+        }
+        else {
+          currentTarget = Constants.ArmConstants.restPositionAuto;
+        }
+        
         
         if (!autonomousForceStop) { //only return isdone = true if we didn't have to force stop auto
           isDone = true;
