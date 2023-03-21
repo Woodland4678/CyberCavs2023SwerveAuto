@@ -30,6 +30,7 @@ import frc.robot.autos.*;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private static final CommandXboxController driver = new CommandXboxController(0);
+  //private static final CommandXboxController operator = new CommandXboxController(1);
   private static final Joystick operator = new Joystick(1);
   private static final Joystick autoBox = new Joystick(2);
 

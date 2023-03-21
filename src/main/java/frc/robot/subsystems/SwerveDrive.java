@@ -712,8 +712,8 @@ public class SwerveDrive extends SubsystemBase {
     Point orientationBasedOffset;
 
     switch (orientationCase) {
-      case TipDirectlyAway: orientationBasedOffset = new Point(0, 4); break;
-      case TipDirectlyTowards: orientationBasedOffset = new Point(0, 2.25); break;
+      case TipDirectlyAway: orientationBasedOffset = new Point(0, 1); break;
+      case TipDirectlyTowards: orientationBasedOffset = new Point(0, 3.25); break;
       case TipLeftAndAway: orientationBasedOffset = new Point(0, 0.5); break;
       case TipLeftAndTowards: orientationBasedOffset = new Point(0, 0.75); break;
       case TipRightAndAway: orientationBasedOffset = new Point(0, 1.25); break;

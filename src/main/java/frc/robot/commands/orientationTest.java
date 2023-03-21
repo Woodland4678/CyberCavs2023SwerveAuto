@@ -108,7 +108,9 @@ public class orientationTest extends CommandBase {
         double rSpeed = rController.calculate(s_Swerve.getYaw().getDegrees());
         if (yController.atSetpoint() && xController.atSetpoint() && finalOrientationSet) {
           s_Swerve.stop();
-          grabState++;
+          if (Math.abs(s_Arm.getCurrentWristRollPosition() - currentTarget.wristRollTarget) < 3) {
+            grabState++;
+          }
         }
         else {
           Translation2d translation = new Translation2d(-ySpeed, xSpeed);
@@ -124,7 +126,7 @@ public class orientationTest extends CommandBase {
       case 2:
         if (currentArmError < 3) {
           grabCnt++;
-          if (grabCnt > 3) {
+          if (grabCnt > 10) {
             grabState++;
             grabCnt = 0;
           }

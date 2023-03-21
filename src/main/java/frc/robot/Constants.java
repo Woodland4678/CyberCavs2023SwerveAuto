@@ -152,7 +152,7 @@ public final class Constants {
     /////////////////////////////////////////////////////////////
     //**Auto drive values (for scoring and game piece pickup) */
     /////////////////////////////////////////////////////////////
-    public static double autoDriveScoreXP = 0.16;
+    public static double autoDriveScoreXP = 0.1;
     public static double autoDriveScoreXI = 0.00001;
     public static double autoDriveScoreXD = 0.00;
     public static double autoDriveScoreXTolerance = 0.85;
@@ -160,7 +160,7 @@ public final class Constants {
     public static double autoDriveScoreYI = 0.00001;
     public static double autoDriveScoreYD = 0.00;
     public static double autoDriveScoreYTolerance = 0.65;
-    public static double autoDriveScoreRP = 0.04;
+    public static double autoDriveScoreRP = 0.07;
     public static double autoDriveScoreRI = 0.0001;
     public static double autoDriveScoreRD = 0.005;
     public static double autoDriveScoreRTolerance = 1;
@@ -196,13 +196,13 @@ public final class Constants {
     
     public static double autoGrabCubeLidarTarget = 25;
     public static double autoGrabCubeYTolerance = 8;
-    public static double autoGrabCubeEnableY = 4.0;
+    public static double autoGrabCubeEnableY = 8.0;
     
 
     public static double coneAutoDriveYTarget = 131;
     public static double cubeAutoDriveYTarget = 131;
 
-    public static int limelightHighScorePipeline = 3;
+    public static int limelightHighScorePipeline = 7; //TODO maybe 3
     public static int limelightMediumScorePipeline = 5;
     
     public static int distanceLaserLeftChannel = 6;
@@ -300,7 +300,7 @@ public final class Constants {
     public static final double wristPitchD = 0.0;
     public static final double wristPitchFF = 0.0;
 
-    public static final double wristRollP = 0.013;
+    public static final double wristRollP = 0.007;
     public static final double wristRollI = 0.0;
     public static final double wristRollD = 0.0;
     public static final double wristRollFF = 0.0;
@@ -330,10 +330,10 @@ public final class Constants {
     public static final ArmPosition scoreConeHighPosition = new ArmPosition(48.5, 44.5, 0, -35, false);
     public static ArmPosition pickupPosition = new ArmPosition(28.84, 11.5, 0, -127.6, false);//wrist roll position needs to change so this shouldn't be "final"
     public static final ArmPosition pos2 = new ArmPosition(20, 20, 0, 0, false);
-    public static final ArmPosition restPosition = new ArmPosition(107.3, -170.46, 90, 20, true);
+    public static final ArmPosition restPosition = new ArmPosition(107.3, -170.46, 90, 15, true);
     public static final ArmPosition restPositionAuto = new ArmPosition(107.3, -170.46, 0, 20, true);
-    public static final ArmPosition pickupToRestIntermediatePosition = new ArmPosition(17.44, 10.2, 90, 20, false);
-    public static final ArmPosition pickupToRestIntermediatePositionAuto = new ArmPosition(17.44, 10.2, 0, 20, false);
+    public static final ArmPosition pickupToRestIntermediatePosition = new ArmPosition(17.44, 10.2, 90, 15, false);
+    public static final ArmPosition pickupToRestIntermediatePositionAuto = new ArmPosition(17.44, 10.2, 0, 15, false);
     public static final ArmPosition scoreConeMediumPosition = new ArmPosition(35.8, 24.5, 0, -5, false);
     public static final ArmPosition scoreLowPosition = new ArmPosition(25, -5, 0, -20, false);
     public static ArmPosition grabConePosition = new ArmPosition(31.27, 1.2, 0, -110, false);
