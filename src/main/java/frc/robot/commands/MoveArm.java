@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants;
 import frc.robot.Constants.ArmPosition;
 import frc.robot.subsystems.Arm;
@@ -22,14 +23,14 @@ public class MoveArm extends CommandBase {
   double currentArmError = 0;
   boolean doneIntermediateMovement = false;
   ArmPosition currentTarget;
-  Joystick operatorJoystick;
+  CommandXboxController operatorJoystick;
   boolean armOkayToMove = true;
   boolean isDone = false;
   int isDoneCnt = 0;
   int clawClosedCnt = 0;
   ArmPosition originalTarget;
   /** Creates a new MoveArm. */
-  public MoveArm(Arm s_Arm, ArmPosition targetPos, Joystick operatorJoystick) {
+  public MoveArm(Arm s_Arm, ArmPosition targetPos, CommandXboxController operatorJoystick) {
     this.s_Arm = s_Arm;
     this.targetPos = targetPos;
     this.operatorJoystick = operatorJoystick;
@@ -47,6 +48,7 @@ public class MoveArm extends CommandBase {
     armOkayToMove = true;
     //if we're going to pickup position set the target as the intermediate position first
     if (this.targetPos == Constants.ArmConstants.pickupPosition) {
+      this.targetPos.wristRollTarget = 0;
      currentTarget = Constants.ArmConstants.pickupToRestIntermediatePosition; 
     }
     else if (this.targetPos == Constants.ArmConstants.grabUprightConePosition) {
@@ -62,9 +64,11 @@ public class MoveArm extends CommandBase {
     }
     else if ((this.targetPos == Constants.ArmConstants.restPosition || this.targetPos == Constants.ArmConstants.restPositionAuto) && s_Arm.getCurrentXPosition() > 40 && DriverStation.isAutonomous()) {
       currentTarget = Constants.ArmConstants.scoreHighToRestIntermediatePosition;
+      
     }
     else if (this.targetPos == Constants.ArmConstants.restPosition) {
       currentTarget = Constants.ArmConstants.pickupToRestIntermediatePosition;
+      this.targetPos.wristRollTarget = 90;
     }
     else if (this.targetPos == Constants.ArmConstants.restPositionAuto) {
       currentTarget = Constants.ArmConstants.pickupToRestIntermediatePositionAuto;
@@ -77,7 +81,7 @@ public class MoveArm extends CommandBase {
       currentTarget = Constants.ArmConstants.restToScoreHighIntermediatePosition;
       this.targetPos = Constants.ArmConstants.scoreCubeHighPosition;
     }
-    else if (this.targetPos == Constants.ArmConstants.scoreConeMediumPosition) {
+    else if (this.targetPos == Constants.ArmConstants.scoreConeMediumPosition && s_Arm.getGamePieceMode() == Constants.ArmConstants.coneMode) {
       currentTarget = Constants.ArmConstants.restToScoreMediumIntermediatePosition;
     }
     else if (this.targetPos == Constants.ArmConstants.scoreConeMediumPosition && s_Arm.getGamePieceMode() == Constants.ArmConstants.cubeMode) {

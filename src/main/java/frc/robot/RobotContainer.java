@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj2.command.button.POVButton;
 //import frc.robot.autos.*;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
+import frc.robot.Constants.LEDModes;
 import frc.robot.autos.*;
 
 /**
@@ -30,8 +31,8 @@ import frc.robot.autos.*;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private static final CommandXboxController driver = new CommandXboxController(0);
-  //private static final CommandXboxController operator = new CommandXboxController(1);
-  private static final Joystick operator = new Joystick(1);
+  private static final CommandXboxController operator = new CommandXboxController(1);
+  //private static final Joystick operator = new Joystick(1);
   private static final Joystick autoBox = new Joystick(2);
 
     PathPlannerTrajectory goTo2ndGamePiece = PathPlanner.loadPath("Non Bump Path 1", new PathConstraints(4.1, 4));
@@ -43,8 +44,8 @@ public class RobotContainer {
     goAutoBalance,
   };
    
-    PathPlannerTrajectory goTo3rdGamePiece = PathPlanner.loadPath("Non Bump Path Game Piece 3", new PathConstraints(4.1, 4.1));
-    PathPlannerTrajectory bring3rdGamePieceBack = PathPlanner.loadPath("Non Bump Path Move 3rd Piece", new PathConstraints(4.1, 4.1));
+    PathPlannerTrajectory goTo3rdGamePiece = PathPlanner.loadPath("Non Bump Path Game Piece 3", new PathConstraints(4.2, 4.5));
+    PathPlannerTrajectory bring3rdGamePieceBack = PathPlanner.loadPath("Non Bump Path Move 3rd Piece", new PathConstraints(4.3, 4.5));
   
   PathPlannerTrajectory[] nonBump3GamePiece = {
     goTo2ndGamePiece,
@@ -60,6 +61,7 @@ public class RobotContainer {
     goTo3rdGamePiece,
     goBalanceAfter3rdGrabbed
   };
+
 
     PathPlannerTrajectory bumpGoTo2ndGamePiece = PathPlanner.loadPath("Bump Auto Path 1", new PathConstraints(3, 4.1));
     PathPlannerTrajectory bumpBring2ndGamePieceBack = PathPlanner.loadPath("Bump Auto Path 2", new PathConstraints(3, 3));
@@ -88,37 +90,36 @@ public class RobotContainer {
   
 
   /* Operator Buttons */
-  private final JoystickButton operatorBtnY =
-      new JoystickButton(operator, 4);
-  private final JoystickButton operatorBtnX =
-      new JoystickButton(operator, 1);
-  private final JoystickButton operatorBtnA =
-      new JoystickButton(operator, 2);
-  private final JoystickButton operatorBtnB =
-      new JoystickButton(operator, 3);
-  private final JoystickButton operatorBtnLB =
-      new JoystickButton(operator, 5);
-  private final JoystickButton operatorBtnRB =
-      new JoystickButton(operator, 6);
-  private final JoystickButton operatorBtnBack =
-      new JoystickButton(operator, 9);
-  private final JoystickButton operatorBtnStart =
-      new JoystickButton(operator, 10);
-  private final JoystickButton operatorBtnRT =
-      new JoystickButton(operator, 8);
-  private final JoystickButton operatorBtnLT =
-      new JoystickButton(operator, 7); 
-  private final JoystickButton operatorPOV90 =
-      new JoystickButton(operator, operator.getPOV(1)); //doesn't work
-  private final JoystickButton operatorBtnRightStick =
-      new JoystickButton(operator, 12); 
-  private final JoystickButton operatorBtnLeftStick =
-      new JoystickButton(operator, 11); 
+  // private final JoystickButton operatorBtnY =
+  //     new JoystickButton(operator, 4);
+  // private final JoystickButton operatorBtnX =
+  //     new JoystickButton(operator, 1);
+  // private final JoystickButton operatorBtnA =
+  //     new JoystickButton(operator, 2);
+  // private final JoystickButton operatorBtnB =
+  //     new JoystickButton(operator, 3);
+  // private final JoystickButton operatorBtnLB =
+  //     new JoystickButton(operator, 5);
+  // private final JoystickButton operatorBtnRB =
+  //     new JoystickButton(operator, 6);
+  // private final JoystickButton operatorBtnBack =
+  //     new JoystickButton(operator, 9);
+  // private final JoystickButton operatorBtnStart =
+  //     new JoystickButton(operator, 10);
+  // private final JoystickButton operatorBtnRT =
+  //     new JoystickButton(operator, 8);
+  // private final JoystickButton operatorBtnLT =
+  //     new JoystickButton(operator, 7); 
+  // private final JoystickButton operatorPOV90 =
+  //     new JoystickButton(operator, operator.getPOV(1)); //doesn't work
+  // private final JoystickButton operatorBtnRightStick =
+  //     new JoystickButton(operator, 12); 
+  // private final JoystickButton operatorBtnLeftStick =
+  //     new JoystickButton(operator, 11); 
 
 
   /* Subsystems */
   private final SwerveDrive s_Swerve = new SwerveDrive();
-  private final Intake intake = new Intake();
   private final Arm s_Arm = new Arm();
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
@@ -151,14 +152,14 @@ public class RobotContainer {
     driver.start().onTrue(new InstantCommand(() -> s_Swerve.resetSwerveModuleAngles()));
     //driver.rightBumper().whileTrue(new AutoGrabUprightCone(s_Arm, s_Swerve));
     driver.leftBumper().whileTrue(new AutoGrabCube(s_Swerve, s_Arm));
-    driver.leftStick().whileTrue(new OldAutoBalance(s_Swerve));
-    driver.rightStick().onTrue(new AutoPickup(s_Arm, s_Swerve));
+    driver.leftStick().whileTrue(new YeetCube(s_Arm));
+    driver.rightStick().onTrue(new InstantCommand(() -> s_Swerve.setToXOrientation()));
     //driver.rightTrigger().whileTrue(new YeetCube(s_Arm));
     //driver.rightTrigger().whileTrue(new AutoBalance(s_Swerve));
-    driver.pov(90).whileTrue(new orientationTest(s_Swerve, s_Arm));
+    driver.pov(180).whileTrue(new orientationTest(s_Swerve, s_Arm));
     driver.leftTrigger().whileTrue(new AutoGrabTippedSimple(s_Swerve, s_Arm));
-    driver.pov(180).onTrue(new InstantCommand(() -> s_Swerve.setToXOrientation()));
-    driver.pov(270).whileTrue(new AutoGrabUprightCone(s_Arm, s_Swerve, 0));
+    //driver.pov(180).onTrue(new InstantCommand(() -> s_Swerve.setToXOrientation()));
+    driver.pov(0).whileTrue(new AutoGrabUprightCone(s_Arm, s_Swerve, 0, false));
     
     //driver.leftTrigger(0.5).whileTrue(new YeetCube(s_Arm));
     //followTape.whileTrue(new FollowTape(s_Swerve, driver));
@@ -169,22 +170,25 @@ public class RobotContainer {
     //moveArmPos2.whileTrue(new ArmMovePIDOnly(s_Arm, 2));
 
     /* Operator Buttons */
-    operatorBtnY.onTrue(new MoveArm(s_Arm,Constants.ArmConstants.scoreConeHighPosition, operator));
-    operatorBtnB.onTrue(new MoveArm(s_Arm,Constants.ArmConstants.scoreConeMediumPosition, operator));
-    operatorBtnA.onTrue(new MoveArm(s_Arm,Constants.ArmConstants.scoreLowPosition, operator));
-    operatorBtnX.onTrue(new MoveArm(s_Arm,Constants.ArmConstants.restPosition, operator));
-    operatorBtnLB.onTrue(new InstantCommand(() -> s_Arm.coneMode()));
-    operatorBtnRB.onTrue(new InstantCommand(() -> s_Arm.cubeMode()));
+    operator.y().onTrue(new MoveArm(s_Arm,Constants.ArmConstants.scoreConeHighPosition, operator));
+    operator.b().onTrue(new MoveArm(s_Arm,Constants.ArmConstants.scoreConeMediumPosition, operator));
+    operator.a().onTrue(new MoveArm(s_Arm,Constants.ArmConstants.scoreLowPosition, operator));
+    operator.x().onTrue(new MoveArm(s_Arm,Constants.ArmConstants.restPosition, operator));
+    operator.leftBumper().onTrue(new InstantCommand(() -> s_Arm.coneMode()));
+    operator.rightBumper().onTrue(new InstantCommand(() -> s_Arm.cubeMode()));
     //operatorBtnRB.onTrue(new GrabGamePiece(s_Arm));
-    operatorBtnBack.onTrue(new CalibrateArm(s_Arm));
-    operatorBtnRT.onTrue(new MoveArm(s_Arm,Constants.ArmConstants.grabUprightConePosition, operator));
-    operatorBtnLT.onTrue(new MoveArm(s_Arm,Constants.ArmConstants.grabFromSingleStationPosition, operator));
+    operator.back().onTrue(new CalibrateArm(s_Arm));
+    operator.rightTrigger().onTrue(new MoveArm(s_Arm,Constants.ArmConstants.grabUprightConePosition, operator));
+    operator.leftTrigger().onTrue(new MoveArm(s_Arm,Constants.ArmConstants.grabFromSingleStationPosition, operator));
+    operator.pov(90).onTrue(new MoveArm(s_Arm, Constants.ArmConstants.pickupPosition, operator));
+    operator.pov(180).whileTrue(new AutoBalance(s_Swerve));
+    operator.pov(270).onTrue(new InstantCommand(() -> s_Arm.resetToAbsoluteEncoder()));
     //operatorBtnRightStick.onTrue(new MoveArm(s_Arm, Constants.ArmConstants.headTiltForVideoPosition, operator));
     //operatorBtnLeftStick.onTrue(new tempHeadTilt(s_Arm));
   }
 
 
-  public static Joystick getOperatorJoystick() {
+  public static CommandXboxController getOperatorJoystick() {
     return operator;
   }
   public static CommandXboxController getDriverJoystick() {
@@ -217,6 +221,9 @@ public class RobotContainer {
   public void setArmMayMove(boolean mayMove) {
     s_Arm.setArmCanMove(mayMove);
   }
+  public void setLEDsToDisabledMode() {
+    s_Arm.setLEDMode(LEDModes.ROBOTDISABLEDPATTERN);
+  }
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
    *
@@ -234,6 +241,13 @@ public class RobotContainer {
     if (autoBox.getRawButton(3)) {
       autoBoxSwitch1 += 4;
     }
+    if (autoBoxSwitch1 == 0) {
+      autoBoxSwitch1 = 6;
+    }
+    else if (autoBoxSwitch1 > 5) {
+      autoBoxSwitch1 = autoBoxSwitch1 + 1;
+    }
+    
 
     if (autoBox.getRawButton(8)) {
       autoBoxSwitch2 += 1;
@@ -244,26 +258,50 @@ public class RobotContainer {
     if (autoBox.getRawButton(10)) {
       autoBoxSwitch2 += 4;
     }
+    if (autoBoxSwitch2 == 0) {
+      autoBoxSwitch2 = 6;
+    }
+    else if (autoBoxSwitch2 > 5) {
+      autoBoxSwitch2 = autoBoxSwitch2 + 1;
+    }
     if (autoBoxSwitch2 == 1) {
-      if (autoBoxSwitch1 == 3) {
-        return new NonBumpThreeGamePieceAuto(s_Swerve, s_Arm, operator, nonBump3GamePiece);
+      if (autoBoxSwitch1 == 1) {
+        return new MiddleScoreAndAutoBalance(s_Swerve, s_Arm);
       }
       else if (autoBoxSwitch1 == 2) {
         return new NonBump2AndAHalfAndBalance(s_Swerve, s_Arm, operator, nonBump2AndAHalfGamePieceAndBalance);
       }
+      else if (autoBoxSwitch1 == 3) {
+        return new NonBumpThreeGamePieceAuto(s_Swerve, s_Arm, operator, nonBump3GamePiece);
+      }      
       else if (autoBoxSwitch1 == 4) {
         return new NonBumpTwoGamePieceAndBalance(s_Swerve, s_Arm, operator, nonBump2GamePieceAndBalancePaths);
       }
+      else if (autoBoxSwitch1 == 5) {
+        return new ScoreOnly(s_Arm, s_Swerve);
+      }
+      else if (autoBoxSwitch1 == 6) {
+        return new MoveBack(s_Swerve, s_Arm);
+      }     
     }
     else if (autoBoxSwitch2 == 2) {
-      if (autoBoxSwitch1 == 2) {
+      if (autoBoxSwitch1 == 1) {
+        return new MiddleScoreAndAutoBalance(s_Swerve, s_Arm);
+      }
+      else if (autoBoxSwitch1 == 2) {
         return new BumpTwoGamePieceAndBalance(s_Swerve, s_Arm, operator, bumpTwoGamePieceAndBalancePaths);
       }
       if (autoBoxSwitch1 == 3) {
         return new BumpThreeGamePiece(s_Swerve, s_Arm, operator, bumpThreeGamePiecePaths);
       }
+      else if (autoBoxSwitch1 == 5) {
+        return new ScoreOnly(s_Arm, s_Swerve);
+      }
+      else if (autoBoxSwitch1 == 6) {
+        return new MoveBack(s_Swerve, s_Arm);
+      }
     }
-   return new MoveBack(s_Swerve, s_Arm);
+   return new DoNothing(s_Swerve, s_Arm);
     // An example command will be run in autonomous
    // return new exampleAuto(s_Swerve);
    

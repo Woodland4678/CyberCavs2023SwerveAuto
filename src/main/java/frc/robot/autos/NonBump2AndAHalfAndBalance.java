@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants;
 import frc.robot.commands.AutoBalance;
 import frc.robot.commands.AutoGrabUprightCone;
@@ -32,7 +33,7 @@ import frc.robot.subsystems.SwerveDrive;
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 public class NonBump2AndAHalfAndBalance extends SequentialCommandGroup {
   /** Creates a new TwoGamePieceAndBalance. */
-  public NonBump2AndAHalfAndBalance(SwerveDrive s_Swerve, Arm s_Arm,  Joystick operatorJoystick, PathPlannerTrajectory[] paths) {
+  public NonBump2AndAHalfAndBalance(SwerveDrive s_Swerve, Arm s_Arm,  CommandXboxController operatorJoystick, PathPlannerTrajectory[] paths) {
     // PathPlannerTrajectory goTo2ndGamePiece = PathPlanner.loadPath("Non Bump Path 1", new PathConstraints(4.1, 4.1));
     // PathPlannerTrajectory bring2ndGamePieceBack = PathPlanner.loadPath("Non Bump Path 2", new PathConstraints(4.1, 4.1));
     // PathPlannerTrajectory goTo3rdGamePiece = PathPlanner.loadPath("Non Bump Path Game Piece 3", new PathConstraints(4.1, 4.1));
@@ -44,14 +45,14 @@ public class NonBump2AndAHalfAndBalance extends SequentialCommandGroup {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     addCommands(
-        new ParallelCommandGroup(new InstantCommand(() -> s_Swerve.zeroGyro()), new InstantCommand(() -> s_Swerve.resetSwerveModuleAngles()),new YeetCube(s_Arm)),    
-         new ParallelCommandGroup(s_Swerve.followTrajectoryCommand(PathPlannerTrajectory.transformTrajectoryForAlliance(paths[0], DriverStation.getAlliance()), true), new CalibrateArm(s_Arm), new InstantCommand(() -> s_Swerve.setHeadlights(true)), new InstantCommand(() -> s_Swerve.limelightDown())),
-         new AutoGrabUprightCone(s_Arm, s_Swerve, 0),
+      new ParallelCommandGroup(new InstantCommand(() -> s_Swerve.zeroGyro()), new InstantCommand(() -> s_Swerve.resetSwerveModuleAngles()), new InstantCommand(() -> s_Swerve.limelightDown()), new InstantCommand(() -> s_Swerve.setLimelightPipeline(6)), new YeetCube(s_Arm)),        
+         new ParallelCommandGroup(s_Swerve.followTrajectoryCommand(PathPlannerTrajectory.transformTrajectoryForAlliance(paths[0], DriverStation.getAlliance()), true), new CalibrateArm(s_Arm), new InstantCommand(() -> s_Swerve.setHeadlights(true))),
+         new AutoGrabUprightCone(s_Arm, s_Swerve, 0, true),
          s_Swerve.followTrajectoryCommand(PathPlannerTrajectory.transformTrajectoryForAlliance(paths[1], DriverStation.getAlliance()), true),
          new AutoScoreHigh(s_Arm, s_Swerve, true, operatorJoystick, true, 17),
          new InstantCommand(() -> s_Arm.openClaw()),
          new ParallelCommandGroup(s_Swerve.followTrajectoryCommand(PathPlannerTrajectory.transformTrajectoryForAlliance(paths[2], DriverStation.getAlliance()), true), new MoveArm(s_Arm, Constants.ArmConstants.restPositionAuto, null)),
-         new AutoGrabUprightCone(s_Arm, s_Swerve, thirdGamePieceGrabAngle),
+         new AutoGrabUprightCone(s_Arm, s_Swerve, thirdGamePieceGrabAngle, true),
          s_Swerve.followTrajectoryCommand(PathPlannerTrajectory.transformTrajectoryForAlliance(paths[3], DriverStation.getAlliance()), true),
          new AutoBalance(s_Swerve)
         //  s_Swerve.followTrajectoryCommand(bring2ndGamePieceBack, true),

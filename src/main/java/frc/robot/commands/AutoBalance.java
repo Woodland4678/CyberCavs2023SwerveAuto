@@ -40,15 +40,15 @@ public class AutoBalance extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    double gyroRollValue = s_Swerve.getGyroRoll();
-    if (Math.abs(gyroRollValue) > Constants.Swerve.AutobalanceRollTolerance && DriverStation.getMatchTime() > 0.11) {
+    double gyroPitchValue = s_Swerve.getGyroPitch();
+    if (Math.abs(gyroPitchValue) > Constants.Swerve.AutobalanceRollTolerance && DriverStation.getMatchTime() > 0.11) {
       isBalancedCnt = 0;
-      if (gyroRollValue < 0) {        
-        ySpeed = -0.4;
+      if (gyroPitchValue < 0) {        
+        ySpeed = -0.45;
         
       }
       else {
-        ySpeed = 0.4;
+        ySpeed = 0.6;
       }
       Translation2d translation = new Translation2d(ySpeed, 0);
       s_Swerve.drive(translation, 0, false, true);
@@ -56,7 +56,7 @@ public class AutoBalance extends CommandBase {
     else {      
       isBalancedCnt++;
       s_Swerve.stop();
-      if (isBalancedCnt > 45 || DriverStation.getMatchTime() < 0.1) {
+      if (isBalancedCnt > 60 || DriverStation.getMatchTime() < 0.1) {
         s_Swerve.setToXOrientation();      
         isDone = true;      
       }

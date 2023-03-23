@@ -90,7 +90,7 @@ public class AutoGrabCube extends CommandBase {
             
             
             s_Swerve.drive(translation, rSpeed, false, true);
-            if (yController.atSetpoint() && xController.atSetpoint()) {
+            if (yController.atSetpoint() && xController.atSetpoint() && currentArmError < 3 && currentTarget == Constants.ArmConstants.grabCubePosition) {
               grabState++;
               s_Swerve.stop();
             }            

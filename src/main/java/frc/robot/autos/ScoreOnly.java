@@ -4,30 +4,25 @@
 
 package frc.robot.autos;
 
-import com.pathplanner.lib.PathConstraints;
-import com.pathplanner.lib.PathPlanner;
-import com.pathplanner.lib.PathPlannerTrajectory;
-
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.CalibrateArm;
+import frc.robot.commands.YeetCube;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.SwerveDrive;
 
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
-public class MoveBack extends SequentialCommandGroup {
-  /** Creates a new MoveBack. */
-  public MoveBack(SwerveDrive s_Swerve, Arm s_Arm) {
-    PathPlannerTrajectory move = PathPlanner.loadPath("Move Out Of Zone", new PathConstraints(2, 2));
+public class ScoreOnly extends SequentialCommandGroup {
+  /** Creates a new ScoreOnly. */
+  public ScoreOnly(Arm s_Arm, SwerveDrive s_Swerve) {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     addCommands(
-      new InstantCommand(() -> s_Swerve.zeroGyro()),
-      new InstantCommand(() -> s_Swerve.resetSwerveModuleAngles()),
-      new ParallelCommandGroup(s_Swerve.followTrajectoryCommand(move, true), new CalibrateArm(s_Arm))
+      new ParallelCommandGroup(new InstantCommand(() -> s_Swerve.zeroGyro()), new InstantCommand(() -> s_Swerve.resetSwerveModuleAngles()), new InstantCommand(() -> s_Swerve.limelightDown()), new InstantCommand(() -> s_Swerve.setLimelightPipeline(6)), new YeetCube(s_Arm)),
+      new CalibrateArm(s_Arm)
     );
   }
 }

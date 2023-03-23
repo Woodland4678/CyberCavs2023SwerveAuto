@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants;
 import frc.robot.commands.AutoBalance;
 import frc.robot.commands.AutoGrabUprightCone;
@@ -31,7 +32,7 @@ import frc.robot.subsystems.SwerveDrive;
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 public class NonBumpTwoGamePieceAndBalance extends SequentialCommandGroup {
   /** Creates a new TwoGamePieceAndBalance. */
-  public NonBumpTwoGamePieceAndBalance(SwerveDrive s_Swerve, Arm s_Arm, Joystick operatorJoystick, PathPlannerTrajectory[] paths) {
+  public NonBumpTwoGamePieceAndBalance(SwerveDrive s_Swerve, Arm s_Arm, CommandXboxController operatorJoystick, PathPlannerTrajectory[] paths) {
     //PathPlannerTrajectory goTo2ndGamePiece = PathPlanner.loadPath("Non Bump Path 1", new PathConstraints(4.1, 4));
     //PathPlannerTrajectory bring2ndGamePieceBack = PathPlanner.loadPath("Non Bump Path 2", new PathConstraints(4.1, 4.5));
     //PathPlannerTrajectory goAutoBalance = PathPlanner.loadPath("Non Bump Path Auto Balance After 2", new PathConstraints(3, 2));
@@ -40,11 +41,9 @@ public class NonBumpTwoGamePieceAndBalance extends SequentialCommandGroup {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     addCommands(
-        new InstantCommand(() -> s_Swerve.zeroGyro()), 
-         new InstantCommand(() -> s_Swerve.resetSwerveModuleAngles()),
-         new YeetCube(s_Arm),         
+      new ParallelCommandGroup(new InstantCommand(() -> s_Swerve.zeroGyro()), new InstantCommand(() -> s_Swerve.resetSwerveModuleAngles()), new InstantCommand(() -> s_Swerve.limelightDown()), new InstantCommand(() -> s_Swerve.setLimelightPipeline(6)), new YeetCube(s_Arm)),          
          new ParallelCommandGroup(s_Swerve.followTrajectoryCommand(PathPlannerTrajectory.transformTrajectoryForAlliance(paths[0], DriverStation.getAlliance()), true), new CalibrateArm(s_Arm)),
-         new AutoGrabUprightCone(s_Arm, s_Swerve, 0),
+         new AutoGrabUprightCone(s_Arm, s_Swerve, 0, true),
          s_Swerve.followTrajectoryCommand(PathPlannerTrajectory.transformTrajectoryForAlliance(paths[1], DriverStation.getAlliance()), true),
          new AutoScoreHigh(s_Arm, s_Swerve, true, operatorJoystick, true, 20),
          new InstantCommand(() -> s_Arm.openClaw()),

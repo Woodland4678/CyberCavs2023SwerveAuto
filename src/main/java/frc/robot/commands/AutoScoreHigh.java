@@ -12,12 +12,15 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants;
 import frc.robot.Constants.Swerve;
 import frc.robot.LimelightHelpers.LimelightTarget_Retro;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.Constants.ArmPosition;
+import frc.robot.Constants.LEDModes;
+import edu.wpi.first.wpilibj.Timer;
 
 public class AutoScoreHigh extends CommandBase {
   Arm s_Arm;
@@ -35,10 +38,11 @@ public class AutoScoreHigh extends CommandBase {
   boolean isMainArmPositionSet = false;
   boolean isAutoMode = false;
   ArmPosition originalTarget;
-  Joystick operatorJoystick;
+  CommandXboxController operatorJoystick;
   int waitScoreCnt = 0;
+  double timeStart = 0;
   /** Creates a new ScoreHigh. */
-  public AutoScoreHigh(Arm s_Arm, SwerveDrive s_Swerve, boolean isHigh, Joystick operatorJoystick, boolean isAutoMode, int waitScoreCnt) {
+  public AutoScoreHigh(Arm s_Arm, SwerveDrive s_Swerve, boolean isHigh, CommandXboxController operatorJoystick, boolean isAutoMode, int waitScoreCnt) {
     this.s_Arm = s_Arm;
     this.s_Swerve = s_Swerve;
     addRequirements(s_Arm, s_Swerve); 
@@ -48,12 +52,14 @@ public class AutoScoreHigh extends CommandBase {
     this.waitScoreCnt = waitScoreCnt;
     this.originalTarget = Constants.ArmConstants.scoreConeHighPosition;
     this.operatorJoystick = operatorJoystick;
+    
     // Use addRequirements() here to declare subsystem dependencies.
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    timeStart = Timer.getFPGATimestamp();
     xController.reset();
     yController.reset();
     rController.reset();
@@ -88,7 +94,7 @@ public class AutoScoreHigh extends CommandBase {
       }
       
     }
-    yController.setSetpoint(7.25); //nice
+    yController.setSetpoint(7.0); //nice
     xController.setTolerance(Constants.Swerve.autoDriveScoreXTolerance);
     yController.setTolerance(Constants.Swerve.autoDriveScoreYTolerance);
     rController.setTolerance(Constants.Swerve.autoDriveScoreRTolerance);
@@ -103,6 +109,7 @@ public class AutoScoreHigh extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    double currentTime = Timer.getFPGATimestamp();
     if (operatorJoystick.getRawAxis(1) > 0.1 && isMainArmPositionSet) {
       if (currentTarget.wristPitchTarget > -120) { 
         currentTarget.wristPitchTarget += -operatorJoystick.getRawAxis(1) * 2.5;
@@ -163,13 +170,13 @@ public class AutoScoreHigh extends CommandBase {
                       "Auto score r controller",rController.atSetpoint());
         
         
-        if (xController.atSetpoint() && yController.atSetpoint() && rController.atSetpoint() && currentArmError < 10.5) {
+        if (xController.atSetpoint() && yController.atSetpoint() && rController.atSetpoint() && currentArmError < 12) {
           isInPosCnt++;
         }
         else {
           isInPosCnt = 0;
         }
-        if (isInPosCnt > waitScoreCnt) {
+        if (isInPosCnt > waitScoreCnt || (currentTime - timeStart) > 3.5) {
           if (DriverStation.isAutonomous()) {
             isDone = true;
           }
@@ -193,10 +200,10 @@ public class AutoScoreHigh extends CommandBase {
     s_Swerve.stop();
     s_Swerve.setLimeLED(false);
     if (s_Arm.getGamePieceMode() == Constants.ArmConstants.coneMode) {
-      s_Arm.coneMode();
+      s_Arm.setLEDMode(LEDModes.SOLIDYELLOW);
     }
     else {
-      s_Arm.cubeMode();
+      s_Arm.setLEDMode(LEDModes.SOLIDPURPLE);
     }
   }
 

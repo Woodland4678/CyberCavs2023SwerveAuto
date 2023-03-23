@@ -68,6 +68,8 @@ public class Arm extends SubsystemBase {
 
   private DigitalInput wristPitchLimitSwitch;
 
+  int disabledLEDPatternIndex = 0;
+
   AnalogInput wristRollCal = new AnalogInput(0);
 
   private boolean armMayMove = false;
@@ -76,7 +78,10 @@ public class Arm extends SubsystemBase {
   int clawClosedCnt = 0;
 
   private int calibrateWristState = 0;
+  ArmPosition currentArmPosition = Constants.ArmConstants.restPosition;
 
+  int blinkState = 0;
+  int overallBlinkCnt = 0;
   AddressableLED m_led = new AddressableLED(0);
 
     // Reuse buffer
@@ -110,6 +115,7 @@ public class Arm extends SubsystemBase {
   
   /** Creates a new Arm. */
   public Arm() {
+    disabledLEDPatternIndex = 0;
     shoulderLeaderMotor = new CANSparkMax(ArmConstants.shoulderLeaderMotorCanId, MotorType.kBrushless);
     shoulderFollowerMotor = new CANSparkMax(ArmConstants.shoulderFollowerMotorCanId, MotorType.kBrushless);
 
@@ -267,7 +273,7 @@ public class Arm extends SubsystemBase {
     return false;
   }
   public double MoveArm(ArmPosition targetPos) { //TODO we shouldn't recalculate angles each time, if we use this method change it
-    
+    currentArmPosition = targetPos;
     double elbowAngle = calcElbowAngle(targetPos.xTarget, targetPos.yTarget);
     double shoulderAngle = calcShoulderAngle(targetPos.xTarget, targetPos.yTarget, elbowAngle);
     double currentX = getCurrentXPosition();
@@ -307,7 +313,14 @@ public class Arm extends SubsystemBase {
     
       
     //}
-    return Math.sqrt((Math.pow(currentX - targetPos.xTarget,2)) + (Math.pow(currentY - targetPos.yTarget, 2))); //returns distance to target
+    double error = Math.sqrt((Math.pow(currentX - targetPos.xTarget,2)) + (Math.pow(currentY - targetPos.yTarget, 2))); //returns distance to target
+    if (error < 11) {
+      currentArmPosition = targetPos;
+    }
+    return error;
+  }
+  public ArmPosition getCurrentArmPosition() {
+    return currentArmPosition;
   }
   public boolean isClawClosed() {
     return isClawClosed;
@@ -499,16 +512,53 @@ public class Arm extends SubsystemBase {
   public void coneMode() {
     //setLEDs(255, 255, 0);
     setGamePieceMode(1);
-    LEDMode = LEDModes.SOLIDYELLOW;
+    LEDMode = LEDModes.BLINKYELLOW;
     gamePieceMode = 1;
   }
   public void cubeMode() {
     //setLEDs(75, 0, 130);
-    LEDMode = LEDModes.SOLIDPURPLE;
+    LEDMode = LEDModes.BLINKPURPLE;
     setGamePieceMode(Constants.ArmConstants.cubeMode); //TODO change this back to cubes
   }
   public void setLEDMode(LEDModes mode) {
     LEDMode = mode;
+  }
+  public void blinkLEDs(int r, int g, int b) {
+    switch (blinkState) {
+      case 0:
+        overallBlinkCnt++;
+        if (overallBlinkCnt > 8) {
+          overallBlinkCnt = 0;
+          if (this.gamePieceMode == Constants.ArmConstants.coneMode) {
+            this.LEDMode = LEDModes.SOLIDYELLOW;
+            
+          }
+          else {
+            this.LEDMode = LEDModes.SOLIDPURPLE;
+          }
+          
+        }
+        setLEDs(r,g,b);
+        blinkState++;
+      break;
+      case 1:
+        blinkCnt++;
+        if (blinkCnt > 10) {
+          blinkCnt = 0;
+          blinkState++;
+        }
+      break;
+      case 2:
+        setLEDs(0,0,0);
+        blinkState++;
+      break;
+      case 3:
+        blinkCnt++;
+        if (blinkCnt > 5) {
+          blinkState = 0;
+        }
+      break;
+    }
   }
   @Override
   public void periodic() {
@@ -518,14 +568,7 @@ public class Arm extends SubsystemBase {
         setLEDs(0, 0, 0);
       break;
       case BLINKGREEN:
-        if (blinkCnt > blinkInterval) {
-          setLEDs(0, 255, 0);
-          blinkCnt = 0;
-        }
-        else {
-          blinkCnt++;
-          setLEDs(0, 0, 0);
-        }
+        blinkLEDs(0, 255, 0);
 
       break;
       case SOLIDPURPLE:
@@ -533,6 +576,43 @@ public class Arm extends SubsystemBase {
       break;
       case SOLIDYELLOW:
         setLEDs(255, 255, 0);
+      break;
+      case ROBOTDISABLEDPATTERN:        
+        // for (int i = 0; i < 7; i++) {
+        //   int index = disabledLEDPatternIndex - i;
+        //   if (index >= 0 && index <= 29) {
+        //     int value = 70 + (108 * i) + (-15 * i * i);
+        //     if (value > 255) {
+        //       value = 255;
+        //     }
+        //     m_ledBuffer.setHSV(m_ledBuffer.getLength() - 1 - disabledLEDPatternIndex, 240, 255, value);
+        //     m_ledBuffer.setHSV(index, 240, 255, value);
+        //   }
+          
+        // }
+        // for (int i = 0; i < disabledLEDPatternIndex - 7; i++) {
+        //   m_ledBuffer.setHSV(i, 0,0,0);
+        //   m_ledBuffer.setHSV(59 - i, 0,0,0);
+        // }
+        // for (int i = 29; i > disabledLEDPatternIndex; i--) {
+        //   m_ledBuffer.setHSV(i, 0,0,0);
+        //   m_ledBuffer.setHSV(59-i, 0,0,0);
+        // }
+        
+        // if (blinkCnt > 2) {
+        //   disabledLEDPatternIndex++;
+        //   if (disabledLEDPatternIndex > 35) {
+        //     disabledLEDPatternIndex = 0;
+        //   }
+        //   blinkCnt = 0;
+        // }
+        // blinkCnt++;
+      break;
+      case BLINKPURPLE:
+        blinkLEDs(75, 0, 130);
+      break;
+      case BLINKYELLOW:
+        blinkLEDs(255, 255, 0);
       break;
     }
     m_led.setData(m_ledBuffer);

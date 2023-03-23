@@ -24,7 +24,7 @@ import frc.robot.subsystems.SwerveDrive;
 public class MiddleScoreAndAutoBalance extends SequentialCommandGroup {
   /** Creates a new MoveBack. */
   public MiddleScoreAndAutoBalance(SwerveDrive s_Swerve, Arm s_Arm) {
-    PathPlannerTrajectory moveOverChargeStationAndBackOn = PathPlanner.loadPath("Middle Auto Over Charge Station", new PathConstraints(2, 2));
+    PathPlannerTrajectory moveOverChargeStationAndBackOn = PathPlanner.loadPath("Middle Auto Over Charge Station", new PathConstraints(1.2, 2));
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     addCommands(

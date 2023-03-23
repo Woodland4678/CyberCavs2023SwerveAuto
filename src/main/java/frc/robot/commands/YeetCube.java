@@ -31,7 +31,7 @@ public class YeetCube extends CommandBase {
   @Override
   public void execute() {
     var currentArmError = s_Arm.MoveArm(Constants.ArmConstants.yeetCubePosition);
-    if (currentArmError < 42) {
+    if (currentArmError < 43.3) {
       s_Arm.openClaw();
       doneCnt++;
     }
@@ -43,7 +43,7 @@ public class YeetCube extends CommandBase {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    if (DriverStation.isAutonomous()) {
+    if (DriverStation.isAutonomous() || true) {
       s_Arm.MoveArm(Constants.ArmConstants.pickupToRestIntermediatePositionAuto);
     }
     else {

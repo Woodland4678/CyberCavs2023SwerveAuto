@@ -58,7 +58,12 @@ public class orientationTest extends CommandBase {
     xController.setTolerance(12);
     yController.setTolerance(1);
     finalOrientationSet = false;
-    currentTarget = Constants.ArmConstants.pickupToRestIntermediatePosition;
+    if (s_Arm.getCurrentArmPosition() == Constants.ArmConstants.pickupPosition) {
+      currentTarget = Constants.ArmConstants.pickupPosition;
+    }
+    else {
+      currentTarget = Constants.ArmConstants.pickupToRestIntermediatePosition;
+    }
     orientationReadingsIndex = 0;
   }
 

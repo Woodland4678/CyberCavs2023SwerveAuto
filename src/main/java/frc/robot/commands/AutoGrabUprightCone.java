@@ -6,10 +6,17 @@ package frc.robot.commands;
 
 import java.sql.Driver;
 
+import com.pathplanner.lib.PathConstraints;
+import com.pathplanner.lib.PathPlanner;
+import com.pathplanner.lib.PathPlannerTrajectory;
+import com.pathplanner.lib.PathPoint;
+
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import frc.robot.Constants;
 import frc.robot.Constants.ArmPosition;
 import frc.robot.Constants.LEDModes;
@@ -34,11 +41,13 @@ public class AutoGrabUprightCone extends CommandBase {
   int isInPositionCnt = 0;
   double rTarget = 0;
   boolean autonomousForceStop = false;
+  boolean doesNeedToBalance = false;
   /** Creates a new AutoGrabUprightCone. */
-  public AutoGrabUprightCone(Arm s_Arm, SwerveDrive s_Swerve, double rTarget) {
+  public AutoGrabUprightCone(Arm s_Arm, SwerveDrive s_Swerve, double rTarget, boolean doesNeedToBalance) {
     this.s_Arm = s_Arm;
     this.rTarget = rTarget;
     this.s_Swerve = s_Swerve;
+    this.doesNeedToBalance = doesNeedToBalance;
     addRequirements(s_Swerve, s_Arm);
     // Use addRequirements() here to declare subsystem dependencies.
   }
@@ -83,7 +92,7 @@ public class AutoGrabUprightCone extends CommandBase {
   public void execute() {
     var fieldPose = s_Swerve.getPose();
     //if we're in auto and getting close to the middle of the field then something has gone wrong and we should stop
-    if (DriverStation.isAutonomous() && fieldPose.getTranslation().getX() > 7.44) {
+    if (DriverStation.isAutonomous() && fieldPose.getTranslation().getX() > 6.8 && !autonomousForceStop) {
       grabState = 3;
       autonomousForceStop = true;
     }
@@ -91,6 +100,7 @@ public class AutoGrabUprightCone extends CommandBase {
     switch(grabState) {
 
       case 0:
+        
         degrees =s_Swerve.getYaw().getDegrees();
         if (rController.getSetpoint() > 160 && degrees < 0) {
           degrees = 360 + degrees;
@@ -108,8 +118,9 @@ public class AutoGrabUprightCone extends CommandBase {
         
         translation = new Translation2d(-ySpeed, xSpeed);
         
-        
-        s_Swerve.drive(translation, rSpeed, false, true);
+        if (s_Swerve.limelightHasTarget() == 1) {
+          s_Swerve.drive(translation, rSpeed, false, true);
+        }
         if (xController.atSetpoint() && (yController.atSetpoint() || s_Swerve.getLimelightY() < yController.getSetpoint())) {
             if (currentArmError < 3) {
               grabState++;
@@ -135,13 +146,13 @@ public class AutoGrabUprightCone extends CommandBase {
         //var boundingBoxXY = s_Swerve.getBoundingBoxX();
         rSpeed = rController.calculate(degrees);       
         ySpeed = yController.calculate(s_Swerve.getCenterLaserValue()); 
-        if (s_Swerve.getLeftLaserValue() - s_Swerve.getCenterLaserValue() < -10) {
-          xSpeed = 0.2;
-          ySpeed = -0.25;
+        if (s_Swerve.getLeftLaserValue() - s_Swerve.getCenterLaserValue() < -20) {
+          xSpeed = 0.15;
+          ySpeed = -0.5;
         }
-        else if (s_Swerve.getRightLaserValue() - s_Swerve.getCenterLaserValue() < -10) {
-          xSpeed = -0.2;
-          ySpeed = -0.25;
+        else if (s_Swerve.getRightLaserValue() - s_Swerve.getCenterLaserValue() < -20) {
+          xSpeed = -0.15;
+          ySpeed = -0.5;
         }
         else if (Math.abs(s_Swerve.getLeftLaserValue() - s_Swerve.getCenterLaserValue()) < 8) {
           xSpeed = 0.1;
@@ -195,7 +206,7 @@ public class AutoGrabUprightCone extends CommandBase {
           currentTarget = Constants.ArmConstants.restPositionAuto;
         }
         else {
-          currentTarget = Constants.ArmConstants.restPositionAuto;
+          currentTarget = Constants.ArmConstants.restPosition;
         }
         
         
@@ -203,6 +214,24 @@ public class AutoGrabUprightCone extends CommandBase {
           isDone = true;
           s_Arm.setLEDMode(LEDModes.BLINKGREEN);
         }
+        else if (doesNeedToBalance) {
+          grabState++;
+        }
+      break;
+      case 7:
+        PathPlannerTrajectory goBalance = PathPlanner.generatePath(
+          new PathConstraints(2, 2), 
+          new PathPoint(new Translation2d(s_Swerve.getPose().getX(), s_Swerve.getPose().getY()), Rotation2d.fromDegrees(180), Rotation2d.fromDegrees(s_Swerve.getYaw().getDegrees())), // position, heading
+          new PathPoint(new Translation2d(5.56, 2.72), Rotation2d.fromDegrees(180),  Rotation2d.fromDegrees(180)), // position, heading
+          new PathPoint(new Translation2d(3.46, 2.72), Rotation2d.fromDegrees(180),  Rotation2d.fromDegrees(180))
+        );
+        new RunCommand(() -> s_Swerve.followTrajectoryCommand(PathPlannerTrajectory.transformTrajectoryForAlliance(goBalance, DriverStation.getAlliance()), true),
+        s_Swerve);
+        new RunCommand(() -> new AutoBalance(s_Swerve), s_Swerve);
+        grabState++;
+      break;
+      case 8:
+
       break;
     }
   }
@@ -212,7 +241,8 @@ public class AutoGrabUprightCone extends CommandBase {
   public void end(boolean interrupted) {
     s_Swerve.setHeadlights(false);
     s_Swerve.stop();
-    s_Arm.setLEDMode(LEDModes.OFF);
+    s_Arm.setLEDMode(LEDModes.BLINKGREEN);
+    s_Swerve.limelightUp();
   }
 
   // Returns true when the command should end.

@@ -13,9 +13,11 @@ import com.pathplanner.lib.PathPlannerTrajectory;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants;
 import frc.robot.commands.AutoBalance;
 import frc.robot.commands.AutoGrabUprightCone;
@@ -32,7 +34,7 @@ import frc.robot.subsystems.SwerveDrive;
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 public class BumpThreeGamePiece extends SequentialCommandGroup {
   /** Creates a new TwoGamePieceAndBalance. */
-  public BumpThreeGamePiece(SwerveDrive s_Swerve, Arm s_Arm,  Joystick operatorJoystick, PathPlannerTrajectory[] paths) {
+  public BumpThreeGamePiece(SwerveDrive s_Swerve, Arm s_Arm,  CommandXboxController operatorJoystick, PathPlannerTrajectory[] paths) {
     // PathPlannerTrajectory goTo2ndGamePiece = PathPlanner.loadPath("Bump Auto Path 1", new PathConstraints(2, 2));
     // PathPlannerTrajectory bring2ndGamePieceBack = PathPlanner.loadPath("Bump Auto Path 2", new PathConstraints(2, 2));
     // PathPlannerTrajectory goTo3rdGamePiece = PathPlanner.loadPath("Bump Go To 3rd Piece", new PathConstraints(2, 2));
@@ -49,12 +51,12 @@ public class BumpThreeGamePiece extends SequentialCommandGroup {
          new InstantCommand(() -> s_Swerve.resetSwerveModuleAngles()),
          new YeetCube(s_Arm),         
          new ParallelCommandGroup(s_Swerve.followTrajectoryCommand(PathPlannerTrajectory.transformTrajectoryForAlliance(paths[0], DriverStation.getAlliance()), true), new CalibrateArm(s_Arm), new InstantCommand(() -> s_Swerve.setHeadlights(true)), new InstantCommand(() -> s_Swerve.limelightDown())),
-         new AutoGrabUprightCone(s_Arm, s_Swerve, 0),
+         new AutoGrabUprightCone(s_Arm, s_Swerve, 0, false),
          s_Swerve.followTrajectoryCommand(PathPlannerTrajectory.transformTrajectoryForAlliance(paths[1], DriverStation.getAlliance()), true),
-         new AutoScoreHigh(s_Arm, s_Swerve, true, operatorJoystick, true, 20),
+         new AutoScoreHigh(s_Arm, s_Swerve, true, operatorJoystick, true, 10),
          new InstantCommand(() -> s_Arm.openClaw()),
          new ParallelCommandGroup(s_Swerve.followTrajectoryCommand(PathPlannerTrajectory.transformTrajectoryForAlliance(paths[2], DriverStation.getAlliance()), true), new MoveArm(s_Arm, Constants.ArmConstants.restPositionAuto, null)),
-         new AutoGrabUprightCone(s_Arm, s_Swerve, thirdGamePieceGrabAngle),
+         new AutoGrabUprightCone(s_Arm, s_Swerve, thirdGamePieceGrabAngle, false),
          s_Swerve.followTrajectoryCommand(PathPlannerTrajectory.transformTrajectoryForAlliance(paths[3], DriverStation.getAlliance()), true)
         //  new AutoScoreHigh(s_Arm, s_Swerve, true, operatorJoystick, true, 20),
         //  new InstantCommand(() -> s_Arm.openClaw()),

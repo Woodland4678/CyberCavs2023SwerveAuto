@@ -86,7 +86,7 @@ public class SwerveDrive extends SubsystemBase {
     rpi = NetworkTableInstance.getDefault().getTable("rpi");
     limelight = NetworkTableInstance.getDefault().getTable("limelight");
     //limelight.getEntry("pipeline").setNumber(1);
-    gyro = new AHRS(SPI.Port.kMXP, (byte) 200); // NavX connected over MXP
+    gyro = new AHRS(SerialPort.Port.kUSB); // NavX connected over MXP //, (byte) 200
     //gyro.restoreFactoryDefaults(); //for Pigeon
     gyro.calibrate();
     zeroGyro();
@@ -296,10 +296,10 @@ public class SwerveDrive extends SubsystemBase {
     //     ? Rotation2d.fromDegrees(360 - gyro.getYaw())
     //     : Rotation2d.fromDegrees(gyro.getYaw());
 
-    if (gyro.isMagnetometerCalibrated()) {
-        // We will only get valid fused headings if the magnetometer is calibrated
-        return Rotation2d.fromDegrees(gyro.getFusedHeading());
-        }
+    // if (gyro.isMagnetometerCalibrated()) {
+    //     // We will only get valid fused headings if the magnetometer is calibrated
+    //     return Rotation2d.fromDegrees(gyro.getFusedHeading());
+    //     }
     //
     //    // We have to invert the angle of the NavX so that rotating the robot counter-clockwise makes the angle increase.
         double gyroYaw = -gyro.getYaw() + 180;
@@ -313,6 +313,9 @@ public class SwerveDrive extends SubsystemBase {
   }
   public float getGyroRoll() {
     return gyro.getRoll();
+  }
+  public float getGyroPitch() {
+    return gyro.getPitch();
   }
   public LimelightTarget_Retro getBestLimelightTarget() {
     int bestResult = 0;
@@ -803,8 +806,10 @@ public class SwerveDrive extends SubsystemBase {
             break;
             case 8:
               if (chksum == ch) {
-                dist -= 415;
-                if (dist >= 200) {
+                // if (dist > 400) {
+                //   dist -= 415;
+                // }
+                if (dist >= 200 || dist == 0) {
                   dist = 200;
                 }
                 else if (dist < 0) {
