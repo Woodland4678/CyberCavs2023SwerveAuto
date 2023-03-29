@@ -93,7 +93,7 @@ public final class Constants {
 
     /* Swerve Profiling Values */
     public static final double maxSpeed = 4.5; // meters per second
-    public static final double maxAngularVelocity = 4.75; //1.5
+    public static final double maxAngularVelocity = 9; //1.5
 
     /* Neutral Modes */
     public static final IdleMode angleNeutralMode = IdleMode.kBrake;
@@ -112,7 +112,7 @@ public final class Constants {
       public static final int driveMotorID = 1;
       public static final int angleMotorID = 2;
       public static final int canCoderID = 3;
-      public static final Rotation2d angleOffset = Rotation2d.fromDegrees( 49.5); 
+      public static final Rotation2d angleOffset = Rotation2d.fromDegrees( 50.5); 
       public static final SwerveModuleConstants constants =
           new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
     }
@@ -122,7 +122,7 @@ public final class Constants {
       public static final int driveMotorID = 3;
       public static final int angleMotorID = 4;
       public static final int canCoderID = 0;
-      public static final Rotation2d angleOffset = Rotation2d.fromDegrees(212.5);
+      public static final Rotation2d angleOffset = Rotation2d.fromDegrees(211.8);
       public static final SwerveModuleConstants constants =
           new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
     }
@@ -132,7 +132,7 @@ public final class Constants {
       public static final int driveMotorID = 7;
       public static final int angleMotorID = 8;
       public static final int canCoderID = 2;
-      public static final Rotation2d angleOffset = Rotation2d.fromDegrees(122.23); //81.7
+      public static final Rotation2d angleOffset = Rotation2d.fromDegrees(122.5); //81.7
       public static final SwerveModuleConstants constants =
           new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
     }
@@ -142,7 +142,7 @@ public final class Constants {
       public static final int driveMotorID = 16;
       public static final int angleMotorID = 6;
       public static final int canCoderID = 1;
-      public static final Rotation2d angleOffset = Rotation2d.fromDegrees(81.01); //122.2
+      public static final Rotation2d angleOffset = Rotation2d.fromDegrees(20.8); //122.2
       public static final SwerveModuleConstants constants =
           new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
     }
@@ -155,11 +155,11 @@ public final class Constants {
     public static double autoDriveScoreXP = 0.08;
     public static double autoDriveScoreXI = 0.0000;
     public static double autoDriveScoreXD = 0.00;
-    public static double autoDriveScoreXTolerance = 1.1;
+    public static double autoDriveScoreXTolerance = 1.4;
     public static double autoDriveScoreYP = 0.16;
     public static double autoDriveScoreYI = 0.0000;
     public static double autoDriveScoreYD = 0.00;
-    public static double autoDriveScoreYTolerance = 0.65;
+    public static double autoDriveScoreYTolerance = 0.9;
     public static double autoDriveScoreRP = 0.07;
     public static double autoDriveScoreRI = 0.0001;
     public static double autoDriveScoreRD = 0.005;
@@ -197,6 +197,8 @@ public final class Constants {
     public static double autoGrabCubeLidarTarget = 30;
     public static double autoGrabCubeYTolerance = 8;
     public static double autoGrabCubeEnableY = 8.0;
+
+    public static double autoAlignEnableY = 8.0;
     
 
     public static double coneAutoDriveYTarget = 131;
@@ -217,9 +219,9 @@ public final class Constants {
     /*Constants for auto grab upright cone with the lidar */
     public static final double autoGrabUprightConeYSwitchToLidar = 42;
     public static final double autoGrabUprightConeRTolerance = 1;
-    public static final double autoGrabUprightConeYLimelightTolerance = 2;
-    public static final double autoGrabUprightConeYLimelightTarget = 40;
-    public static final double autoGrabUprightConeXLimelightTolerance = 15;
+    public static final double autoGrabUprightConeYLimelightTolerance = 0.25;
+    public static final double autoGrabUprightConeYLimelightTarget = 15.5;
+    public static final double autoGrabUprightConeXLimelightTolerance = 9;
     public static final double autoGrabUprightConeLidarYP = 0.03;
     public static final double autoGrabUprightConeLidarYI = 0.0;
     public static final double autoGrabUprightConeLidarYD = 0.0;
@@ -339,7 +341,7 @@ public final class Constants {
     public static ArmPosition grabConePosition = new ArmPosition(31.27, 1.2, 0, -110, false);
     public static ArmPosition grabCubePosition = new ArmPosition(33.1, 8, 0, -127.6, false);    
     public static final ArmPosition yeetCubePosition = new ArmPosition(22.8, 47.8, 0, 0, false);
-    public static final ArmPosition grabUprightConePosition = new ArmPosition(32.7, -2, 0, -7, false);
+    public static final ArmPosition grabUprightConePosition = new ArmPosition(32.7, -2, 0, -17, false);
     public static final ArmPosition restToScoreHighIntermediatePosition = new ArmPosition(18.205, 36, 0, 0, false);
     public static final ArmPosition scoreHighToRestIntermediatePosition = new ArmPosition(18.205, 50, 0, 0, false);
     public static final ArmPosition restToScoreMediumIntermediatePosition = new ArmPosition(21.4, 24.2, 0, -38.51, false);

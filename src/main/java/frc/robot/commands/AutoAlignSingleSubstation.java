@@ -4,18 +4,22 @@
 
 package frc.robot.commands;
 
+import javax.xml.xpath.XPath;
+
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
 import frc.robot.Constants.ArmPosition;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.SwerveDrive;
 
-public class AutoGrabCube extends CommandBase {
+public class AutoAlignSingleSubstation extends CommandBase {
   Arm s_Arm;
   SwerveDrive s_Swerve;
-  PIDController xController = new PIDController(Constants.Swerve.autoDriveCubePickupXP, Constants.Swerve.autoDriveCubePickupXI, Constants.Swerve.autoDriveCubePickupXD);
+  PIDController xController = new PIDController(0.02, 0,0.0022);
   PIDController yController = new PIDController(Constants.Swerve.autoDriveCubePickupYP, Constants.Swerve.autoDriveCubePickupYI, Constants.Swerve.autoDriveCubePickupYD);
   PIDController rController = new PIDController(Constants.Swerve.autoDriveCubePickupRP, Constants.Swerve.autoDriveCubePickupRI, Constants.Swerve.autoDriveCubePickupRD);
   boolean isDone = false;
@@ -28,7 +32,7 @@ public class AutoGrabCube extends CommandBase {
   double degrees = 0;
   Translation2d translation;
   /** Creates a new AutoGrabCube. */
-  public AutoGrabCube(SwerveDrive s_Swerve, Arm s_Arm) {
+  public AutoAlignSingleSubstation(SwerveDrive s_Swerve, Arm s_Arm) {
     this.s_Arm = s_Arm;
     this.s_Swerve = s_Swerve;
     addRequirements(s_Swerve, s_Arm);
@@ -51,13 +55,23 @@ public class AutoGrabCube extends CommandBase {
     s_Swerve.limelightDown();
     s_Swerve.setLimelightPipeline(0);
     s_Swerve.setLimelightLED(false);
-    xController.setSetpoint(0);
-    xController.setTolerance(Constants.Swerve.autoDriveCubePickupXTolerance);
+    xController.setSetpoint(160);
+    xController.setTolerance(8);
     yController.setSetpoint(Constants.Swerve.autoGrabCubeLidarTarget);
     yController.setTolerance(Constants.Swerve.autoGrabCubeYTolerance);
-    rController.setSetpoint(s_Swerve.getYaw().getDegrees());
+    if (DriverStation.getAlliance() == Alliance.Blue) {
+      rController.setSetpoint(90);
+    }
+    else {
+      rController.setSetpoint(-90);
+    }
     rController.setTolerance(Constants.Swerve.autoGrabUprightConeRTolerance);
-    currentTarget = Constants.ArmConstants.pickupToRestIntermediatePosition;
+    if (s_Arm.getCurrentArmPosition() == Constants.ArmConstants.grabFromSingleStationPosition) {
+      currentTarget = Constants.ArmConstants.grabFromSingleStationPosition;
+    }
+    else {
+      currentTarget = Constants.ArmConstants.pickupToRestIntermediatePosition;
+    }
     grabState = 0;
   }
 
@@ -69,38 +83,38 @@ public class AutoGrabCube extends CommandBase {
       switch(grabState) {
         case 0:
           if (currentArmError < 4) {
-            if (currentTarget != Constants.ArmConstants.grabCubePosition) {
-              currentTarget = Constants.ArmConstants.grabCubePosition;
-              currentArmError = 20;
-            }
+            currentTarget = Constants.ArmConstants.grabFromSingleStationPosition;
           }
           if (s_Swerve.limelightHasTarget() == 1) {
             degrees = s_Swerve.getYaw().getDegrees();
             // if (degrees < 0) {
             //   degrees += 360;
             // }
-            //var boundingBoxXY = s_Swerve.getBoundingBoxX();
+            var boundingBoxXY = s_Swerve.getBoundingBoxX();
             rSpeed = rController.calculate(degrees);
-            xSpeed = xController.calculate(s_Swerve.getLimelightX()); 
-            if (Math.abs(s_Swerve.getLimelightX()) < Constants.Swerve.autoGrabCubeEnableY) { //don't move forward until x is close enough
-              double centerLaserVal = s_Swerve.getCenterLaserValue();
-              if (s_Swerve.getlimelightLowestYValue() > 195) {
-                centerLaserVal = 15;
-              }
-              ySpeed = yController.calculate(centerLaserVal); 
+            if (xController.atSetpoint()) {
+              xSpeed = 0;
+            }
+            else {
+              xSpeed = xController.calculate(boundingBoxXY[1]); 
+            }
+            if (boundingBoxXY[1] > 100 && boundingBoxXY[1] < 220 && s_Swerve.getBoundingBoxWidth() < 220) { //don't move forward until x is close enough
+              ySpeed = 1; 
             }
             else {
               ySpeed = 0;
             }
-            
-            translation = new Translation2d(-ySpeed, xSpeed);
+            if (rController.getPositionError() > 5) {
+              xSpeed = 0;
+              ySpeed = 0;
+            }
+            translation = new Translation2d(ySpeed, xSpeed);
             
             
             s_Swerve.drive(translation, rSpeed, false, true);
-            if (yController.atSetpoint() && xController.atSetpoint() && currentArmError < 1.75 && currentTarget == Constants.ArmConstants.grabCubePosition) {
-              grabState++;
-              s_Swerve.stop();
-            }            
+            // if (yController.atSetpoint() && xController.atSetpoint() && currentArmError < 3 && currentTarget == Constants.ArmConstants.grabCubePosition) {              
+            //   s_Swerve.stop();
+            // }            
         }
         else {
           s_Swerve.stop();

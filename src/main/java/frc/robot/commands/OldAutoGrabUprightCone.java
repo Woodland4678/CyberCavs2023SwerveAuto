@@ -23,7 +23,7 @@ public class OldAutoGrabUprightCone extends CommandBase {
   SwerveDrive s_Swerve;
   PIDController xController = new PIDController(Constants.Swerve.autoDriveConePickupXP, Constants.Swerve.autoDriveConePickupXI, Constants.Swerve.autoDriveConePickupXD);
   PIDController yController = new PIDController(Constants.Swerve.autoDriveConePickupYP, Constants.Swerve.autoDriveConePickupYI, Constants.Swerve.autoDriveConePickupYD);
-  PIDController rController = new PIDController(Constants.Swerve.autoDriveConePickupRP, Constants.Swerve.autoDriveConePickupRI, Constants.Swerve.autoDriveConePickupRD);
+  PIDController rController = new PIDController(0.07, 0.0001, 0.005);
   boolean isDone = false;
   int isInPosCnt = 0;
   int isDoneCnt = 0;
