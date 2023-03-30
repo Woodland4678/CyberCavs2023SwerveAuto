@@ -30,7 +30,7 @@ public class AutoGrabUprightCone extends CommandBase {
   SwerveDrive s_Swerve;
   PIDController xController = new PIDController(Constants.Swerve.autoDriveConePickupXP, Constants.Swerve.autoDriveConePickupXI, Constants.Swerve.autoDriveConePickupXD);
   PIDController yController = new PIDController(Constants.Swerve.autoDriveConePickupYP, Constants.Swerve.autoDriveConePickupYI, Constants.Swerve.autoDriveConePickupYD);
-  PIDController rController = new PIDController(0.07, 0.0001, 0.005);
+  PIDController rController = new PIDController(0.07, 0.0001, 0.005); //0.07 0.0001 0.005
   ArmPosition currentTarget;
   double rSpeed = 0;
   double xSpeed = 0;
@@ -92,6 +92,8 @@ public class AutoGrabUprightCone extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    // var testPIDs = s_Swerve.getRotationPID();
+    // rController.setPID(testPIDs[0], testPIDs[1], testPIDs[2]);
     var fieldPose = s_Swerve.getPose();
     //if we're in auto and getting close to the middle of the field then something has gone wrong and we should stop
     if (DriverStation.isAutonomous() && fieldPose.getTranslation().getX() > 7 && !autonomousForceStop) {
@@ -118,15 +120,16 @@ public class AutoGrabUprightCone extends CommandBase {
           ySpeed = 0;
         }
         if (rController.getPositionError() > 3.75) {
-          xSpeed = 0;
-          ySpeed = 0;
+          xSpeed = xSpeed * 0.5;
+          ySpeed = ySpeed * 0.5;
         }
-        translation = new Translation2d(-ySpeed, xSpeed);
+        SmartDashboard.putNumber("rSpeed", rSpeed);
+        translation = new Translation2d(-ySpeed, xSpeed); //-yspeed
         
         if (s_Swerve.limelightHasTarget() == 1) {
           s_Swerve.drive(translation, rSpeed, false, true);
         }
-        if (xController.atSetpoint() && rController.atSetpoint() && (yController.atSetpoint() || s_Swerve.getLimelightY() < 19)) {
+        if (xController.atSetpoint() && rController.atSetpoint() && (yController.atSetpoint() || s_Swerve.getLimelightY() < yController.getSetpoint() + 3.5)) {
             if (currentArmError < 3) {
               grabState++;
               waitCnt = 0;
@@ -140,11 +143,11 @@ public class AutoGrabUprightCone extends CommandBase {
         yController.setPID(Constants.Swerve.autoGrabUprightConeLidarYP, Constants.Swerve.autoGrabUprightConeLidarYI, Constants.Swerve.autoGrabUprightConeLidarYD);
         yController.setSetpoint(Constants.Swerve.autoGrabUprightConeLidarYTarget);
         yController.setTolerance(Constants.Swerve.autoGrabUprightConeLidarYTolerance);
-        s_Swerve.setModulesStraight();
-        waitCnt++;
-        if (waitCnt > 5) {
+        //s_Swerve.setModulesStraight();
+        //waitCnt++;
+        //if (waitCnt > 5) {
           grabState++;
-        }
+        //}
       break;
       case 2:
         degrees =s_Swerve.getYaw().getDegrees();
@@ -166,28 +169,29 @@ public class AutoGrabUprightCone extends CommandBase {
 
         ySpeed = yController.calculate(minLidarReading); 
         if (s_Swerve.getLeftLaserValue() - s_Swerve.getCenterLaserValue() < -20) {
-          xSpeed = 0.12;
+          xSpeed = 0.5;
           ySpeed = ySpeed * 0.7;
         }
         else if (s_Swerve.getRightLaserValue() - s_Swerve.getCenterLaserValue() < -20) {
-          xSpeed = -0.12;
+          xSpeed = -0.5;
           ySpeed = -ySpeed * 0.7;
         }
-        else if (Math.abs(s_Swerve.getLeftLaserValue() - s_Swerve.getCenterLaserValue()) < 8) {
-          xSpeed = 0.08;
+        else if (Math.abs(s_Swerve.getLeftLaserValue() - s_Swerve.getCenterLaserValue()) < 12) {
+          xSpeed = 0.25;
         }
-        else if (Math.abs(s_Swerve.getRightLaserValue() - s_Swerve.getCenterLaserValue()) < 8) {
-          xSpeed = -0.08;
+        else if (Math.abs(s_Swerve.getRightLaserValue() - s_Swerve.getCenterLaserValue()) < 12) {
+          xSpeed = -0.25;
         }
         else {
           xSpeed = 0;
         }
-        if (rController.getPositionError()> 4 || s_Swerve.getCenterLaserValue() > 170) {
+        if (rController.getPositionError()> 4) {
           xSpeed = xSpeed * 0.5;
           ySpeed = ySpeed * 0.5;
         }
-        translation = new Translation2d(-ySpeed, xSpeed); 
+        translation = new Translation2d(-ySpeed, xSpeed); //-ySpeed
         SmartDashboard.putNumber("rSpeed", rSpeed);
+        SmartDashboard.putNumber("xSpeed", xSpeed);
         
         s_Swerve.drive(translation, rSpeed, false, true);
         if (yController.atSetpoint() && currentArmError < 1.5) {

@@ -63,6 +63,10 @@ public class SwerveDrive extends SubsystemBase {
 
   private PowerDistribution pdp;
 
+  private double rotationP = 0;
+  private double rotationI = 0;
+  private double rotationD = 0;
+
   private DutyCycle distanceLaserLeft;
   private DutyCycle distanceLaserCenter;
   //private DutyCycle distanceLaserRight;
@@ -82,6 +86,7 @@ public class SwerveDrive extends SubsystemBase {
 
   private SerialPort serPort = new SerialPort(19200, Port.kMXP);
   private static double boundingBoxWidth = 0;
+  private static double boundingBoxHeight = 0;
   private static double lowestLimelightTargetY = 0;
   public SwerveDrive() {
     rpi = NetworkTableInstance.getDefault().getTable("rpi");
@@ -123,6 +128,15 @@ public class SwerveDrive extends SubsystemBase {
       limelight.getEntry("ledMode").setNumber(1); //turn off
     else
       limelight.getEntry("ledMode").setNumber(3); //turn on
+  }
+  public void setRotationPID(double p, double i, double d) {
+    rotationP = p;
+    rotationI = i;
+    rotationD = d;
+  }
+  public double[] getRotationPID() {
+    double[] pids = {rotationP, rotationI, rotationD};
+    return pids;
   }
   public void setHeadlights(boolean on) {
     if (!on) {
@@ -192,6 +206,9 @@ public class SwerveDrive extends SubsystemBase {
   }
   public Pose2d getPose() {
     return swerveOdometry.getPoseMeters();
+  }
+  public double getBoundingBoxHeight() {
+    return boundingBoxHeight;
   }
   public LimelightResults getLimelightResults() {
     return LimelightHelpers.getLatestResults("limelight");
@@ -270,6 +287,7 @@ public class SwerveDrive extends SubsystemBase {
     double yMidpoint = (maxY + minY) / 2;
     double [] midpoint = {yMidpoint, xMidpoint};
     boundingBoxWidth = maxX - minX;
+    boundingBoxHeight = maxY - minY;
     lowestLimelightTargetY = maxY; //largest y value is lowest on the image
     return midpoint;
   }
@@ -880,12 +898,13 @@ public class SwerveDrive extends SubsystemBase {
     SmartDashboard.putNumber(
                     "Wonky swerve motor", mSwerveMods[3].getSetVelocity());
     SmartDashboard.putNumber(
-                    "Left Laser Distance", getLeftLaserValue());
+                    "Lidar Left Laser Distance", getLeftLaserValue());
     SmartDashboard.putNumber(
-                    "Center Laser Distance", getCenterLaserValue());
+                    "Lidar Center Laser Distance", getCenterLaserValue());
     SmartDashboard.putNumber(
-                    "Right Laser Distance", getRightLaserValue());
+                    "Lidar Right Laser Distance", getRightLaserValue());
     SmartDashboard.putNumber("Bounding box width", getBoundingBoxWidth());
+    SmartDashboard.putNumber("Bounding box height", getBoundingBoxHeight());
     SmartDashboard.putNumber(
                   "gyro Roll", gyro.getRoll());
                   SmartDashboard.putNumber(

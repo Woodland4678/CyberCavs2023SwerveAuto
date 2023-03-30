@@ -64,6 +64,8 @@ public class AutoGrabCube extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    var testPIDs = s_Swerve.getRotationPID();
+    rController.setPID(testPIDs[0], testPIDs[1], testPIDs[2]);
       double currentArmError = s_Arm.MoveArm(currentTarget);
       
       switch(grabState) {
@@ -81,17 +83,22 @@ public class AutoGrabCube extends CommandBase {
             // }
             //var boundingBoxXY = s_Swerve.getBoundingBoxX();
             rSpeed = rController.calculate(degrees);
-            xSpeed = xController.calculate(s_Swerve.getLimelightX()); 
-            if (Math.abs(s_Swerve.getLimelightX()) < Constants.Swerve.autoGrabCubeEnableY) { //don't move forward until x is close enough
-              double centerLaserVal = s_Swerve.getCenterLaserValue();
-              if (s_Swerve.getlimelightLowestYValue() > 195) {
-                centerLaserVal = 15;
-              }
-              ySpeed = yController.calculate(centerLaserVal); 
+            xSpeed = xController.calculate(s_Swerve.getLimelightX());
+            double yMeasurement = s_Swerve.getLimelightY();
+            if (s_Swerve.getlimelightLowestYValue() > 195) {
+              yMeasurement = yController.getSetpoint() - 3;
             }
-            else {
-              ySpeed = 0;
-            }
+            ySpeed = yController.calculate(yMeasurement);
+            // if (Math.abs(s_Swerve.getLimelightX()) < Constants.Swerve.autoGrabCubeEnableY) { //don't move forward until x is close enough
+            //   double centerLaserVal = s_Swerve.getCenterLaserValue();
+            //   if (s_Swerve.getlimelightLowestYValue() > 195) {
+            //     centerLaserVal = 15;
+            //   }
+            //   ySpeed = yController.calculate(centerLaserVal); 
+            // }
+            // else {
+            //   ySpeed = 0;
+            // }
             
             translation = new Translation2d(-ySpeed, xSpeed);
             

@@ -27,7 +27,7 @@ public class TeleopSwerve extends CommandBase {
 
   private SlewRateLimiter autoRotateLimiter = new SlewRateLimiter(2);
 
-  PIDController rController = new PIDController(0.04, 0.0001, 0.005);
+  PIDController rController = new PIDController(0.02, 0.0, 0.0015);
   PIDController rControllerLoading = new PIDController(rController.getP(), rController.getI(), rController.getD());
 
   Trigger turnToDrivers;
@@ -60,6 +60,9 @@ public class TeleopSwerve extends CommandBase {
 
   @Override
   public void execute() {
+  //  var rotationPID = s_Swerve.getRotationPID();
+  //  rController.setPID(rotationPID[0], rotationPID[1], rotationPID[2]);
+  //  rControllerLoading.setPID(rotationPID[0], rotationPID[1], rotationPID[2]);
     /* Get Values, Deadband*/
     double translationVal =
         translationLimiter.calculate(

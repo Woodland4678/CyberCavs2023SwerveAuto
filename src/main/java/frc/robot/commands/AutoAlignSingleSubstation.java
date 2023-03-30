@@ -55,8 +55,8 @@ public class AutoAlignSingleSubstation extends CommandBase {
     s_Swerve.limelightDown();
     s_Swerve.setLimelightPipeline(0);
     s_Swerve.setLimelightLED(false);
-    xController.setSetpoint(160);
-    xController.setTolerance(8);
+    xController.setSetpoint(195);
+    xController.setTolerance(12);
     yController.setSetpoint(Constants.Swerve.autoGrabCubeLidarTarget);
     yController.setTolerance(Constants.Swerve.autoGrabCubeYTolerance);
     if (DriverStation.getAlliance() == Alliance.Blue) {
@@ -92,21 +92,28 @@ public class AutoAlignSingleSubstation extends CommandBase {
             // }
             var boundingBoxXY = s_Swerve.getBoundingBoxX();
             rSpeed = rController.calculate(degrees);
+            xSpeed = xController.calculate(boundingBoxXY[1]); 
             if (xController.atSetpoint()) {
-              xSpeed = 0;
+              //xSpeed = 0;
             }
             else {
-              xSpeed = xController.calculate(boundingBoxXY[1]); 
+              //whats here
             }
-            if (boundingBoxXY[1] > 100 && boundingBoxXY[1] < 220 && s_Swerve.getBoundingBoxWidth() < 220) { //don't move forward until x is close enough
-              ySpeed = 1; 
+            if (boundingBoxXY[1] > 100 && boundingBoxXY[1] < 220) { //don't move forward until x is close enough
+              ySpeed = 1.5; 
+            }
+            else if (boundingBoxXY[1] <= 100) {
+              xSpeed = 1.5;
+            }
+            else if (boundingBoxXY[1] >= 220) {
+              xSpeed = -1.5;
             }
             else {
               ySpeed = 0;
             }
             if (rController.getPositionError() > 5) {
-              xSpeed = 0;
-              ySpeed = 0;
+              xSpeed = xSpeed * 0.7;
+              ySpeed = ySpeed * 0.7;
             }
             translation = new Translation2d(ySpeed, xSpeed);
             
@@ -117,7 +124,7 @@ public class AutoAlignSingleSubstation extends CommandBase {
             // }            
         }
         else {
-          s_Swerve.stop();
+         // s_Swerve.stop();
         }
       break;
       case 1:

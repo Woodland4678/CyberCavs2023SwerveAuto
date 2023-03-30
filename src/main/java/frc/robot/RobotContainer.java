@@ -152,7 +152,7 @@ public class RobotContainer {
     driver.start().onTrue(new InstantCommand(() -> s_Swerve.resetSwerveModuleAngles()));
     //driver.rightBumper().whileTrue(new AutoGrabUprightCone(s_Arm, s_Swerve));
     driver.leftBumper().whileTrue(new AutoGrabCube(s_Swerve, s_Arm));
-    //driver.leftStick().whileTrue(new YeetCube(s_Arm));
+    driver.leftStick().whileTrue(new YeetCube(s_Arm));
     driver.rightStick().onTrue(new InstantCommand(() -> s_Swerve.setToXOrientation()));
     //driver.rightTrigger().whileTrue(new YeetCube(s_Arm));
     //driver.rightTrigger().whileTrue(new AutoBalance(s_Swerve));
@@ -180,7 +180,7 @@ public class RobotContainer {
     operator.back().onTrue(new CalibrateArm(s_Arm));
     operator.rightTrigger().onTrue(new MoveArm(s_Arm,Constants.ArmConstants.grabUprightConePosition, operator));
     operator.leftTrigger().onTrue(new MoveArm(s_Arm,Constants.ArmConstants.grabFromSingleStationPosition, operator));
-    operator.pov(90).onTrue(new InstantCommand(() -> s_Swerve.setToXOrientation()));
+    operator.rightStick().onTrue(new InstantCommand(() -> s_Swerve.setToXOrientation()));
     operator.pov(180).whileTrue(new AutoBalance(s_Swerve));
     operator.pov(270).onTrue(new InstantCommand(() -> s_Arm.resetToAbsoluteEncoder()));
     //operatorBtnRightStick.onTrue(new MoveArm(s_Arm, Constants.ArmConstants.headTiltForVideoPosition, operator));
@@ -214,6 +214,9 @@ public class RobotContainer {
   }
   public void setWristRollPIDF(double p, double i, double iZone, double d, double f) {
     s_Arm.setWristRollPIDF(p, i, iZone, d, f);
+  }
+  public void setSwerveRotationPID(double p, double i, double d) {
+    s_Swerve.setRotationPID(p, i, d);
   }
   public boolean isArmStartOkay() {
     return s_Arm.isArmStartOkay();

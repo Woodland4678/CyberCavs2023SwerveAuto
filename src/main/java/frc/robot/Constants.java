@@ -142,7 +142,7 @@ public final class Constants {
       public static final int driveMotorID = 16;
       public static final int angleMotorID = 6;
       public static final int canCoderID = 1;
-      public static final Rotation2d angleOffset = Rotation2d.fromDegrees(20.8); //122.2
+      public static final Rotation2d angleOffset = Rotation2d.fromDegrees(48.0); //122.2
       public static final SwerveModuleConstants constants =
           new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
     }
@@ -176,26 +176,26 @@ public final class Constants {
     public static double autoDriveConePickupYI = 0.0;
     public static double autoDriveConePickupYD = 0.0;
     public static double autoDriveConePickupYTolerance = 1;
-    public static double autoDriveConePickupRP = 0.07;
-    public static double autoDriveConePickupRI = 0.0001;
-    public static double autoDriveConePickupRD = 0.005;
+    public static double autoDriveConePickupRP = 0.02;
+    public static double autoDriveConePickupRI = 0.0;
+    public static double autoDriveConePickupRD = 0.0015;
     public static double autoDriveConePickupRTolerance = 1;
 
     public static double autoDriveCubePickupXP = 0.05;
     public static double autoDriveCubePickupXI = 0.0;
     public static double autoDriveCubePickupXD = 0.0;
-    public static double autoDriveCubePickupXTolerance = 2;
-    public static double autoDriveCubePickupYP = 0.027;
+    public static double autoDriveCubePickupXTolerance = 3;
+    public static double autoDriveCubePickupYP = 0.15;
     public static double autoDriveCubePickupYI = 0.0;
-    public static double autoDriveCubePickupYD = 0.0;
-    public static double autoDriveCubePickupYTolerance = 8;
-    public static double autoDriveCubePickupRP = 0.15;
-    public static double autoDriveCubePickupRI = 0.0;
-    public static double autoDriveCubePickupRD = 0.0;
+    public static double autoDriveCubePickupYD = 0.0015;
+    public static double autoDriveCubePickupYTolerance = 0.75;
+    public static double autoDriveCubePickupRP = 0.07;
+    public static double autoDriveCubePickupRI = 0.0001;
+    public static double autoDriveCubePickupRD = 0.005;
     public static double autoDriveCubePickupRTolerance = 1;
     
-    public static double autoGrabCubeLidarTarget = 30;
-    public static double autoGrabCubeYTolerance = 8;
+    public static double autoGrabCubeLidarTarget = -1.5;
+    public static double autoGrabCubeYTolerance = 0.5;
     public static double autoGrabCubeEnableY = 8.0;
 
     public static double autoAlignEnableY = 8.0;
@@ -218,9 +218,9 @@ public final class Constants {
 
     /*Constants for auto grab upright cone with the lidar */
     public static final double autoGrabUprightConeYSwitchToLidar = 42;
-    public static final double autoGrabUprightConeRTolerance = 1;
+    public static final double autoGrabUprightConeRTolerance = 2.5;
     public static final double autoGrabUprightConeYLimelightTolerance = 0.25;
-    public static final double autoGrabUprightConeYLimelightTarget = 15.5;
+    public static final double autoGrabUprightConeYLimelightTarget = 10.5;
     public static final double autoGrabUprightConeXLimelightTolerance = 9;
     public static final double autoGrabUprightConeLidarYP = 0.03;
     public static final double autoGrabUprightConeLidarYI = 0.0;

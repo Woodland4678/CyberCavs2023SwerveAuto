@@ -130,11 +130,11 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
-    // SmartDashboard.putNumber("Elbow P Gain", elbowKP);
-    // SmartDashboard.putNumber("Elbow I Gain", elbowKI);
-    // SmartDashboard.putNumber("Elbow D Gain", elbowKD);
-    // SmartDashboard.putNumber("Elbow I Zone", elbowKIz);
-    // SmartDashboard.putNumber("Elbow Feed Forward", elbowKFF);
+    SmartDashboard.putNumber("Elbow P Gain", elbowKP);
+    SmartDashboard.putNumber("Elbow I Gain", elbowKI);
+    SmartDashboard.putNumber("Elbow D Gain", elbowKD);
+    SmartDashboard.putNumber("Elbow I Zone", elbowKIz);
+    SmartDashboard.putNumber("Elbow Feed Forward", elbowKFF);
 
     // SmartDashboard.putNumber("Shoulder P Gain", shoulderKP);
     // SmartDashboard.putNumber("Shoulder I Gain", shoulderKI);
@@ -148,11 +148,11 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {
     //m_robotContainer.moveShoulder(-0.10);
     //m_robotContainer.moveElbow(0.05);
-    // double elbowP = SmartDashboard.getNumber("Elbow P Gain", 0);
-    // double elbowI = SmartDashboard.getNumber("Elbow I Gain", 0);
-    // double elbowD = SmartDashboard.getNumber("Elbow D Gain", 0);
-    // double elbowIZ = SmartDashboard.getNumber("Elbow I Zone", 0);
-    // double elbowFF = SmartDashboard.getNumber("Elbow Feed Forward", 0);
+    double elbowP = SmartDashboard.getNumber("Elbow P Gain", 0);
+    double elbowI = SmartDashboard.getNumber("Elbow I Gain", 0);
+    double elbowD = SmartDashboard.getNumber("Elbow D Gain", 0);
+    double elbowIZ = SmartDashboard.getNumber("Elbow I Zone", 0);
+    double elbowFF = SmartDashboard.getNumber("Elbow Feed Forward", 0);
 
     // double shoulderP = SmartDashboard.getNumber("Shoulder P Gain", 0);
     // double shoulderI = SmartDashboard.getNumber("Shoulder I Gain", 0);
@@ -160,13 +160,19 @@ public class Robot extends TimedRobot {
     // double shoulderIZ = SmartDashboard.getNumber("Shoulder I Zone", 0);
     // double shoulderFF = SmartDashboard.getNumber("Shoulder Feed Forward", 0);
 
-    // // if PID coefficients on SmartDashboard have changed, write new values to controller
+    // if PID coefficients on SmartDashboard have changed, write new values to controller
     // if((elbowP != elbowKP)) { m_robotContainer.setElbowPIDF(elbowP, elbowI, elbowIZ, elbowD, elbowFF); elbowKP = elbowP; }
     // if((elbowI != elbowKI)) { m_robotContainer.setElbowPIDF(elbowP, elbowI, elbowIZ, elbowD, elbowFF); elbowKI = elbowI; }
     // if((elbowD != elbowKD)) { m_robotContainer.setElbowPIDF(elbowP, elbowI, elbowIZ, elbowD, elbowFF); elbowKD = elbowD; }
     // if((elbowIZ != elbowIZ)) { m_robotContainer.setElbowPIDF(elbowP, elbowI, elbowIZ, elbowD, elbowFF); elbowKIz = elbowIZ; }
     // if((elbowFF != elbowKFF)) { m_robotContainer.setElbowPIDF(elbowP, elbowI, elbowIZ, elbowD, elbowFF); elbowKFF = elbowFF; }
   
+    if((elbowP != elbowKP)) { m_robotContainer.setSwerveRotationPID(elbowP, elbowI, elbowD); elbowKP = elbowP; }
+    if((elbowI != elbowKI)) { m_robotContainer.setSwerveRotationPID(elbowP, elbowI, elbowD); elbowKI = elbowI; }
+    if((elbowD != elbowKD)) { m_robotContainer.setSwerveRotationPID(elbowP, elbowI, elbowD); elbowKD = elbowD; }
+   // if((elbowIZ != elbowIZ)) { m_robotContainer.setElbowPIDF(elbowP, elbowI, elbowIZ, elbowD, elbowFF); elbowKIz = elbowIZ; }
+   // if((elbowFF != elbowKFF)) { m_robotContainer.setElbowPIDF(elbowP, elbowI, elbowIZ, elbowD, elbowFF); elbowKFF = elbowFF; }
+
     // if((shoulderP != shoulderKP)) { m_robotContainer.setShoulderPIDF(shoulderP, shoulderI, shoulderIZ, shoulderD, shoulderFF); shoulderKP = shoulderP; }
     // if((shoulderI != shoulderKI)) { m_robotContainer.setShoulderPIDF(shoulderP, shoulderI, shoulderIZ, shoulderD, shoulderFF); shoulderKI = shoulderI; }
     // if((shoulderD != shoulderKD)) { m_robotContainer.setShoulderPIDF(shoulderP, shoulderI, shoulderIZ, shoulderD, shoulderFF); shoulderKD = shoulderD; }
