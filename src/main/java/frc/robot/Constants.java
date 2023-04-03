@@ -155,20 +155,20 @@ public final class Constants {
     public static double autoDriveScoreXP = 0.08;
     public static double autoDriveScoreXI = 0.0000;
     public static double autoDriveScoreXD = 0.00;
-    public static double autoDriveScoreXTolerance = 1.4;
+    public static double autoDriveScoreXTolerance = 1.55; //was 1.4
     public static double autoDriveScoreYP = 0.16;
     public static double autoDriveScoreYI = 0.0000;
     public static double autoDriveScoreYD = 0.00;
-    public static double autoDriveScoreYTolerance = 0.9;
+    public static double autoDriveScoreYTolerance = 1; //was 0.9
     public static double autoDriveScoreRP = 0.07;
     public static double autoDriveScoreRI = 0.0001;
     public static double autoDriveScoreRD = 0.005;
-    public static double autoDriveScoreRTolerance = 1;
+    public static double autoDriveScoreRTolerance = 1.2;
 
     public static double autoScoreHighYTarget = 1;
     public static double autoScoreMediumYTarget = -5;
 
-    public static double autoDriveConePickupXP = 0.025;
+    public static double autoDriveConePickupXP = 0.015;
     public static double autoDriveConePickupXI = 0.0;
     public static double autoDriveConePickupXD = 0.0;
     public static double autoDriveConePickupXTolerance = 1;
@@ -195,7 +195,7 @@ public final class Constants {
     public static double autoDriveCubePickupRTolerance = 1;
     
     public static double autoGrabCubeLidarTarget = -1.5;
-    public static double autoGrabCubeYTolerance = 0.5;
+    public static double autoGrabCubeYTolerance = 0.75;
     public static double autoGrabCubeEnableY = 8.0;
 
     public static double autoAlignEnableY = 8.0;
@@ -228,7 +228,7 @@ public final class Constants {
     public static final double autoGrabUprightConeLidarYTarget = 53.5; //cm distance we want to be to the cone
     public static final double autoGrabUprightConeLidarYTolerance = 8;
 
-    public static final double AutobalanceRollTolerance = 8.5;
+    public static final double AutobalanceRollTolerance = 9.5;
 
     public static final double autoGrabTippedBaseTowardsXTarget = 0;
     public static final double autoGrabTippedBaseTowardsYTarget = 21;
@@ -349,8 +349,8 @@ public final class Constants {
     public static final ArmPosition scoreCubeHighPosition = new ArmPosition(45, 45, 0, -100, false);
     public static final ArmPosition scoreCubeMediumPosition = new ArmPosition(40, 32, 0, -100, false);
     public static final ArmPosition pickupUprightIntermediatePosition = new ArmPosition(15.44, 10.2, 0, 0, false);
-    public static final ArmPosition grabFromSingleStationPosition = new ArmPosition(17.5, 19.5, 0, -23, false);
-  
+    public static final ArmPosition grabFromSingleStationPosition = new ArmPosition(15.5, 18.5, 0, -23, false);
+    //17.5 19.5
     public static ArmPosition headTiltForVideoPosition = new ArmPosition(18.205, 35, 90, -90, false);
   }
   public static enum LEDModes {

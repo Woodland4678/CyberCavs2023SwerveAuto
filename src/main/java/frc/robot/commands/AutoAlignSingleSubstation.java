@@ -53,7 +53,8 @@ public class AutoAlignSingleSubstation extends CommandBase {
     xSpeed = 0;
     ySpeed = 0;
     s_Swerve.limelightDown();
-    s_Swerve.setLimelightPipeline(0);
+
+    s_Swerve.setLimelightPipeline(6);
     s_Swerve.setLimelightLED(false);
     xController.setSetpoint(195);
     xController.setTolerance(12);
@@ -100,7 +101,7 @@ public class AutoAlignSingleSubstation extends CommandBase {
               //whats here
             }
             if (boundingBoxXY[1] > 100 && boundingBoxXY[1] < 220) { //don't move forward until x is close enough
-              ySpeed = 1.5; 
+              ySpeed = 2; 
             }
             else if (boundingBoxXY[1] <= 100) {
               xSpeed = 1.5;

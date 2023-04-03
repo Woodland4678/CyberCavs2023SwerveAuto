@@ -46,7 +46,7 @@ public class AutoGrabTippedSimple extends CommandBase {
     xController.reset();
     yController.reset();
     rController.reset();    
-    s_Swerve.setLimelightPipeline(1);
+    s_Swerve.setLimelightPipeline(6);
     s_Swerve.setLimelightLED(false);
     xController.setSetpoint(Constants.Swerve.autoGrabTippedBaseTowardsXTarget);
     yController.setSetpoint(Constants.Swerve.autoGrabTippedBaseTowardsYTarget);

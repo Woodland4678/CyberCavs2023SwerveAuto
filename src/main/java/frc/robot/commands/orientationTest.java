@@ -49,7 +49,7 @@ public class orientationTest extends CommandBase {
     isInPickup = false;
     //s_Swerve.setHeadlights(true);
     s_Swerve.limelightDown();
-    s_Swerve.setLimelightPipeline(1);
+    s_Swerve.setLimelightPipeline(6);
     s_Swerve.setLimelightLED(false);
     yController.reset();
     yController.setSetpoint(15);

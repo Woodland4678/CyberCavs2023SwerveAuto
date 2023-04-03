@@ -44,11 +44,11 @@ public class AutoBalance extends CommandBase {
     if (Math.abs(gyroPitchValue) > Constants.Swerve.AutobalanceRollTolerance && DriverStation.getMatchTime() > 0.11) {
       isBalancedCnt = 0;
       if (gyroPitchValue < 0) {        
-        ySpeed = -0.45;
+        ySpeed = -0.4;
         
       }
       else {
-        ySpeed = 0.6;
+        ySpeed = 0.5;
       }
       Translation2d translation = new Translation2d(ySpeed, 0);
       s_Swerve.drive(translation, 0, false, true);

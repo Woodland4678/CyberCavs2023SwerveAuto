@@ -574,6 +574,9 @@ public class Arm extends SubsystemBase {
       case SOLIDPURPLE:
         setLEDs(75, 0, 130);
       break;
+      case SOLIDRED:
+        setLEDs(255, 0, 0);
+      break;
       case SOLIDYELLOW:
         setLEDs(255, 255, 0);
       break;

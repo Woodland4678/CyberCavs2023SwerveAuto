@@ -30,7 +30,7 @@ public class AutoGrabUprightCone extends CommandBase {
   SwerveDrive s_Swerve;
   PIDController xController = new PIDController(Constants.Swerve.autoDriveConePickupXP, Constants.Swerve.autoDriveConePickupXI, Constants.Swerve.autoDriveConePickupXD);
   PIDController yController = new PIDController(Constants.Swerve.autoDriveConePickupYP, Constants.Swerve.autoDriveConePickupYI, Constants.Swerve.autoDriveConePickupYD);
-  PIDController rController = new PIDController(0.07, 0.0001, 0.005); //0.07 0.0001 0.005
+  PIDController rController = new PIDController(0.1, 0.0, 0.005); //0.07 0.0001 0.005
   ArmPosition currentTarget;
   double rSpeed = 0;
   double xSpeed = 0;
@@ -57,6 +57,8 @@ public class AutoGrabUprightCone extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    rController.setP(0.1);
+    rController.setD(0.005);
     autonomousForceStop =false;
     isInPositionCnt = 0;
     s_Arm.openClaw();
@@ -96,7 +98,7 @@ public class AutoGrabUprightCone extends CommandBase {
     // rController.setPID(testPIDs[0], testPIDs[1], testPIDs[2]);
     var fieldPose = s_Swerve.getPose();
     //if we're in auto and getting close to the middle of the field then something has gone wrong and we should stop
-    if (DriverStation.isAutonomous() && fieldPose.getTranslation().getX() > 7 && !autonomousForceStop) {
+    if (DriverStation.isAutonomous() && fieldPose.getTranslation().getX() > 7.1 && !autonomousForceStop) {
       grabState = 3;
       autonomousForceStop = true;
     }
@@ -112,16 +114,25 @@ public class AutoGrabUprightCone extends CommandBase {
         else if (rController.getSetpoint() < -160 && degrees > 0) {
           degrees = degrees - 360;
         }
+        
         var boundingBoxXY = s_Swerve.getBoundingBoxX();
         rSpeed = rController.calculate(degrees);
         xSpeed = xController.calculate(boundingBoxXY[1]); 
         ySpeed = yController.calculate(s_Swerve.getLimelightY()); 
+        if (rController.getPositionError() < 3.5) {
+          rController.setP(0.025);
+          rController.setD(0);
+        }
+        else {
+          rController.setP(0.1);
+          rController.setD(0.005);
+        }
         if (s_Swerve.getLimelightY() < yController.getSetpoint()) {
           ySpeed = 0;
         }
         if (rController.getPositionError() > 3.75) {
-          xSpeed = xSpeed * 0.5;
-          ySpeed = ySpeed * 0.5;
+          //xSpeed = xSpeed * 0.8;
+          ySpeed = ySpeed * 0.8;
         }
         SmartDashboard.putNumber("rSpeed", rSpeed);
         translation = new Translation2d(-ySpeed, xSpeed); //-yspeed
@@ -186,7 +197,7 @@ public class AutoGrabUprightCone extends CommandBase {
           xSpeed = 0;
         }
         if (rController.getPositionError()> 4) {
-          xSpeed = xSpeed * 0.5;
+          //xSpeed = xSpeed * 0.5;
           ySpeed = ySpeed * 0.5;
         }
         translation = new Translation2d(-ySpeed, xSpeed); //-ySpeed
@@ -214,7 +225,7 @@ public class AutoGrabUprightCone extends CommandBase {
       break;
       case 4:
         waitCnt++;
-        if (waitCnt > 15) {
+        if (waitCnt > 13) {
           grabState++;
         }
       break;
@@ -238,12 +249,12 @@ public class AutoGrabUprightCone extends CommandBase {
         }
         
         
-        if (!autonomousForceStop) { //only return isdone = true if we didn't have to force stop auto
+        if (!autonomousForceStop || doesNeedToBalance) { //only return isdone = true if we didn't have to force stop auto
           isDone = true;
           s_Arm.setLEDMode(LEDModes.BLINKGREEN);
         }
-        else if (doesNeedToBalance) {
-          grabState++;
+        else if (!doesNeedToBalance) {
+          grabState = 8;
         }
       break;
       case 7:

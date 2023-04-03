@@ -4,6 +4,8 @@
 
 package frc.robot.commands;
 
+import java.sql.Driver;
+
 import edu.wpi.first.hal.simulation.ConstBufferCallback;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -172,15 +174,22 @@ public class AutoScoreHigh extends CommandBase {
         
         if (xController.atSetpoint() && yController.atSetpoint() && rController.atSetpoint() && currentArmError < 12) {
           isInPosCnt++;
+          s_Arm.setLEDMode(LEDModes.SOLIDGREEN);
         }
         else {
           isInPosCnt = 0;
+          s_Arm.setLEDMode(LEDModes.SOLIDRED);
         }
-        if (isInPosCnt > waitScoreCnt || (currentTime - timeStart) > 3.5) {
+        if (isInPosCnt > waitScoreCnt || (currentTime - timeStart) > 1.85) { //1.75 second time out
           if (DriverStation.isAutonomous()) {
             isDone = true;
           }
-          s_Arm.setLEDs(0, 255, 0);
+          if (isInPosCnt > waitScoreCnt) {
+            s_Arm.setLEDMode(LEDModes.SOLIDGREEN);
+          }
+          else {
+            s_Arm.setLEDMode(LEDModes.SOLIDRED);
+          }
           s_Swerve.stop();
         }
         else {
@@ -199,11 +208,13 @@ public class AutoScoreHigh extends CommandBase {
     //s_Swerve.limelightDown();
     s_Swerve.stop();
     s_Swerve.setLimeLED(false);
-    if (s_Arm.getGamePieceMode() == Constants.ArmConstants.coneMode) {
-      s_Arm.setLEDMode(LEDModes.SOLIDYELLOW);
-    }
-    else {
-      s_Arm.setLEDMode(LEDModes.SOLIDPURPLE);
+    if (!DriverStation.isAutonomous()) {
+      if (s_Arm.getGamePieceMode() == Constants.ArmConstants.coneMode) {
+        s_Arm.setLEDMode(LEDModes.SOLIDYELLOW);
+      }
+      else {
+        s_Arm.setLEDMode(LEDModes.SOLIDPURPLE);
+      }
     }
   }
 
