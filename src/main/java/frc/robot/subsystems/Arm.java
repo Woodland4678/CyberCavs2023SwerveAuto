@@ -298,10 +298,10 @@ public class Arm extends SubsystemBase {
     // }
     //if we're not in the danger zone set the motors
     //else {
-      if (shoulderAngle >= 45 && shoulderAngle <= 135 && elbowAngle <= 0 && elbowAngle >= -175 ) {
+      if (shoulderAngle >= 45 && shoulderAngle <= 138 && elbowAngle <= 0 && elbowAngle >= -175 ) {
         moveToAngle(shoulderAngle, elbowAngle);
       }
-      if (currentX > 17 || targetPos.wristPitchTarget > -30) {
+      if (currentX > 17 || targetPos.wristPitchTarget > -30 || currentY > 25) {
         wristPitchController.setReference(targetPos.wristPitchTarget, com.revrobotics.CANSparkMax.ControlType.kPosition);
         wristRollController.setReference(targetPos.wristRollTarget, com.revrobotics.CANSparkMax.ControlType.kPosition);
       }
@@ -461,6 +461,18 @@ public class Arm extends SubsystemBase {
       wristPitchMotor.set(speed);
     }
   }
+  public boolean isElbowReady() {
+    if (elbowAbsolute.getAbsolutePosition()*360 < 276 && elbowAbsolute.getAbsolutePosition()*360 > 101) {
+      return true;
+    }
+    return false;
+  }
+  public boolean isShoulderReady() {
+    if (shoulderAbsolute.getAbsolutePosition() * 360 < 178 && shoulderAbsolute.getAbsolutePosition()*360 > 89) {
+      return true;
+    }
+    return false;
+  }
   public void resetToAbsoluteEncoder() {
     integratedShoulderEncoder.setPosition(((shoulderAbsolute.getAbsolutePosition()) * 360) - ArmConstants.shoulderAngleOffset);
     integratedElbowEncoder.setPosition(((elbowAbsolute.getAbsolutePosition()) * 360) - ArmConstants.elbowAngleOffset);
@@ -502,6 +514,51 @@ public class Arm extends SubsystemBase {
     m_rainbowFirstPixelHue += 3;
     // Check bounds
     m_rainbowFirstPixelHue %= 180;
+  }
+  public void setLEDsForDiagnostics(int bval) {
+	  var i = 0;
+	  if (bval == 255) { // if all is good, go entirely blue
+	    setLEDMode(LEDModes.SOLIDBLUE);
+	  }
+	  else { // Something other than "all is well".  Light up the required segments that have a 0 bit in bval
+      setLEDMode(LEDModes.ROBOTDISABLEDPATTERN);
+      for (i = 0; i < m_ledBuffer.getLength(); i++) {
+        // Set the value
+        m_ledBuffer.setRGB(i, 255, 0, 0); // Everything is red to start with.
+      }
+      if((bval & 0x01) != 0) {
+        for(i = 0;i<=6;i++) // First set of LEDs goes green (lower left)
+          m_ledBuffer.setRGB(i, 0, 255, 0); 
+      }
+      if((bval & 0x02) != 0) {
+        for(i = 7;i<=13;i++) 
+          m_ledBuffer.setRGB(i, 0, 255, 0); 
+      }
+      if((bval & 0x04) != 0) {
+        for(i = 14;i<=20;i++) 
+          m_ledBuffer.setRGB(i, 0, 255, 0); 
+      }
+      if((bval & 0x08) != 0) {
+        for(i = 21;i<=29;i++) 
+          m_ledBuffer.setRGB(i, 0, 255, 0); 
+      }
+      if((bval & 0x10) != 0) {
+        for(i = 30;i<=38;i++) 
+          m_ledBuffer.setRGB(i, 0, 255, 0); 
+      }
+      if((bval & 0x20) != 0) {
+        for(i = 39;i<=45;i++) 
+          m_ledBuffer.setRGB(i, 0, 255, 0); 
+      }
+      if((bval & 0x40) != 0) {
+        for(i = 46;i<=52;i++) 
+          m_ledBuffer.setRGB(i, 0, 255, 0); 
+      }
+      if((bval & 0x80) != 0) {
+        for(i = 53;i<=59;i++) 
+          m_ledBuffer.setRGB(i, 0, 255, 0); 
+      }
+	  }
   }
   public void setLEDs(int r, int g, int b) {
     for (var i = 0; i < m_ledBuffer.getLength(); i++) {
@@ -579,6 +636,9 @@ public class Arm extends SubsystemBase {
       break;
       case SOLIDYELLOW:
         setLEDs(255, 255, 0);
+      break;
+      case SOLIDBLUE:
+        setLEDs(0,0,255);
       break;
       case ROBOTDISABLEDPATTERN:        
         // for (int i = 0; i < 7; i++) {

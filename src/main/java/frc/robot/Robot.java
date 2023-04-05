@@ -92,7 +92,49 @@ public class Robot extends TimedRobot {
 
   @Override
   public void disabledPeriodic() {
+    var bval = 0;
     m_robotContainer.resetArmAngles();
+	// 0x01 is first set of LEDs (lower right).  Front right Swerve
+	// 0x02 is second set (mid lower right). Shoulder encoder
+	// 0x04 is third set (mid upper right). Elbow encoder
+	// 0x08 is 4th set (upper right).  Rear right Swerve
+	// 0x10 is 5th set (upper left). Rear left Swerve
+	// 0x20 is 6th set (mid upper left).  Gyro
+	// 0x40 is 7th set (mid lower left).  Limelight
+	// 0x80 is 8th set (lower left).  Front left Swerve
+    if (m_robotContainer.isElbowReady()){
+		bval += 0x04; 
+	}
+    if (m_robotContainer.isShoulderReady()){
+		bval += 0x02; 
+	}
+    if (m_robotContainer.isFrontLeftSwerveReady()){
+		bval += 0x01; 
+	}
+    if (m_robotContainer.isFrontRightSwerveReady()){
+		bval += 0x80; 
+	}
+    if (m_robotContainer.isBackLeftSwerveReady()){
+		bval += 0x08; 
+	}
+    if (m_robotContainer.isBackRightSwerveReady()){
+		bval += 0x10; 
+	}
+    if (m_robotContainer.isGyroReady()){
+		bval += 0x20; 
+	}
+    if (m_robotContainer.isLimelightReady()){
+		bval += 0x40; 
+	}
+  m_robotContainer.setLEDsForDiagnostics(bval);
+  SmartDashboard.putBoolean("is Elbow Ready", m_robotContainer.isElbowReady());
+  SmartDashboard.putBoolean("is shoulder Ready", m_robotContainer.isShoulderReady());
+  SmartDashboard.putBoolean("is mod 0 Ready", m_robotContainer.isFrontLeftSwerveReady());
+  SmartDashboard.putBoolean("is mod 1 Ready", m_robotContainer.isFrontRightSwerveReady());
+  SmartDashboard.putBoolean("is mod 2 Ready", m_robotContainer.isBackLeftSwerveReady());
+  SmartDashboard.putBoolean("is mod 3 Ready", m_robotContainer.isBackRightSwerveReady());
+  SmartDashboard.putBoolean("is gyro Ready", m_robotContainer.isGyroReady());
+  SmartDashboard.putBoolean("is limelight Ready", m_robotContainer.isLimelightReady());
   }
 
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */

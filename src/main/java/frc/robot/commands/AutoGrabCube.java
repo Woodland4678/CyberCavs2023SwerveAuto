@@ -6,6 +6,7 @@ package frc.robot.commands;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
 import frc.robot.Constants.ArmPosition;
@@ -27,6 +28,7 @@ public class AutoGrabCube extends CommandBase {
   int grabState = 0;
   double degrees = 0;
   Translation2d translation;
+  double maxLidarValue = 50;
   /** Creates a new AutoGrabCube. */
   public AutoGrabCube(SwerveDrive s_Swerve, Arm s_Arm) {
     this.s_Arm = s_Arm;
@@ -38,11 +40,12 @@ public class AutoGrabCube extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    maxLidarValue = 50;
     s_Arm.openClaw();
     rController.reset();
     xController.reset();
     yController.reset();
-    //s_Swerve.setHeadlights(true);
+    s_Swerve.setHeadlights(true);
     isDone = false;
     waitCnt = 0;
     rSpeed = 0;
@@ -85,9 +88,10 @@ public class AutoGrabCube extends CommandBase {
             rSpeed = rController.calculate(degrees);
             xSpeed = xController.calculate(s_Swerve.getLimelightX());
             double yMeasurement = s_Swerve.getLimelightY();
-            if (s_Swerve.getlimelightLowestYValue() > 195) {
-              yMeasurement = yController.getSetpoint() - 3;
-            }
+
+            // if (s_Swerve.getlimelightLowestYValue() > 195) {
+            //   yMeasurement = yController.getSetpoint() - 3;
+            // }
             ySpeed = yController.calculate(yMeasurement);
             // if (Math.abs(s_Swerve.getLimelightX()) < Constants.Swerve.autoGrabCubeEnableY) { //don't move forward until x is close enough
             //   double centerLaserVal = s_Swerve.getCenterLaserValue();
@@ -99,15 +103,28 @@ public class AutoGrabCube extends CommandBase {
             // else {
             //   ySpeed = 0;
             // }
-            
+            double minLidarReading = s_Swerve.getCenterLaserValue();
+            if (s_Swerve.getLeftLaserValue() < minLidarReading) {
+              minLidarReading = s_Swerve.getLeftLaserValue();
+            }
+            if (s_Swerve.getRightLaserValue() < minLidarReading) {
+              minLidarReading = s_Swerve.getRightLaserValue();
+            }
+            if (minLidarReading < 32) {
+              ySpeed = 0.75;
+            }
             translation = new Translation2d(-ySpeed, xSpeed);
             
-            
+            SmartDashboard.putNumber("rSpeed", rSpeed);
+            SmartDashboard.putNumber("xSpeed", xSpeed);
+            SmartDashboard.putNumber("ySpeed", ySpeed);
             s_Swerve.drive(translation, rSpeed, false, true);
-            if (yController.atSetpoint() && xController.atSetpoint() && currentArmError < 1.75 && currentTarget == Constants.ArmConstants.grabCubePosition) {
+            
+            if ((minLidarReading > 31 && minLidarReading < 43.5 - (ySpeed * 10)) && xController.atSetpoint() && currentArmError < 1.75 && currentTarget == Constants.ArmConstants.grabCubePosition) {             
+              
               grabState++;
-              s_Swerve.stop();
-            }            
+              s_Swerve.stop();                         
+            }                       
         }
         else {
           s_Swerve.stop();
@@ -138,7 +155,7 @@ public class AutoGrabCube extends CommandBase {
   @Override
   public void end(boolean interrupted) {
     s_Swerve.stop();
-    //s_Swerve.setHeadlights(false);
+    s_Swerve.setHeadlights(false);
   }
 
   // Returns true when the command should end.

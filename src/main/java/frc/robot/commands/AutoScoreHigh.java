@@ -181,15 +181,15 @@ public class AutoScoreHigh extends CommandBase {
           s_Arm.setLEDMode(LEDModes.SOLIDRED);
         }
         if (isInPosCnt > waitScoreCnt || (currentTime - timeStart) > 1.85) { //1.75 second time out
-          if (DriverStation.isAutonomous()) {
-            isDone = true;
-          }
           if (isInPosCnt > waitScoreCnt) {
             s_Arm.setLEDMode(LEDModes.SOLIDGREEN);
           }
           else {
             s_Arm.setLEDMode(LEDModes.SOLIDRED);
           }
+          if (DriverStation.isAutonomous()) {
+            isDone = true;
+          }          
           s_Swerve.stop();
         }
         else {
@@ -205,7 +205,7 @@ public class AutoScoreHigh extends CommandBase {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    //s_Swerve.limelightDown();
+    s_Swerve.limelightDown();
     s_Swerve.stop();
     s_Swerve.setLimeLED(false);
     if (!DriverStation.isAutonomous()) {

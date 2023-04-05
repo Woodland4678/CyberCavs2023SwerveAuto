@@ -46,7 +46,7 @@ public class AutoAlignSingleSubstation extends CommandBase {
     rController.reset();
     xController.reset();
     yController.reset();
-    //s_Swerve.setHeadlights(true);
+    s_Swerve.setHeadlights(true);
     isDone = false;
     waitCnt = 0;
     rSpeed = 0;
@@ -71,7 +71,7 @@ public class AutoAlignSingleSubstation extends CommandBase {
       currentTarget = Constants.ArmConstants.grabFromSingleStationPosition;
     }
     else {
-      currentTarget = Constants.ArmConstants.pickupToRestIntermediatePosition;
+      currentTarget = Constants.ArmConstants.restToSingleSubstationIntermediatePosition;
     }
     grabState = 0;
   }
@@ -83,7 +83,7 @@ public class AutoAlignSingleSubstation extends CommandBase {
       
       switch(grabState) {
         case 0:
-          if (currentArmError < 4) {
+          if (currentArmError < 2) {
             currentTarget = Constants.ArmConstants.grabFromSingleStationPosition;
           }
           if (s_Swerve.limelightHasTarget() == 1) {
@@ -101,7 +101,7 @@ public class AutoAlignSingleSubstation extends CommandBase {
               //whats here
             }
             if (boundingBoxXY[1] > 100 && boundingBoxXY[1] < 220) { //don't move forward until x is close enough
-              ySpeed = 2; 
+              ySpeed = 2; //2
             }
             else if (boundingBoxXY[1] <= 100) {
               xSpeed = 1.5;
@@ -153,7 +153,7 @@ public class AutoAlignSingleSubstation extends CommandBase {
   @Override
   public void end(boolean interrupted) {
     s_Swerve.stop();
-    //s_Swerve.setHeadlights(false);
+    s_Swerve.setHeadlights(false);
   }
 
   // Returns true when the command should end.

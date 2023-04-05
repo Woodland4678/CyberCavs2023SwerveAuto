@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import java.io.IOException;
+
 import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
@@ -35,7 +37,7 @@ public class RobotContainer {
   //private static final Joystick operator = new Joystick(1);
   private static final Joystick autoBox = new Joystick(2);
 
-    PathPlannerTrajectory goTo2ndGamePiece = PathPlanner.loadPath("Non Bump Path 1", new PathConstraints(4.1, 4));
+    PathPlannerTrajectory goTo2ndGamePiece = PathPlanner.loadPath("Non Bump Path 1", new PathConstraints(4.1, 4.1));
     PathPlannerTrajectory bring2ndGamePieceBack = PathPlanner.loadPath("Non Bump Path 2", new PathConstraints(4.1, 4.5));
     PathPlannerTrajectory goAutoBalance = PathPlanner.loadPath("Non Bump Path Auto Balance After 2", new PathConstraints(3, 2));
   PathPlannerTrajectory[] nonBump2GamePieceAndBalancePaths = {
@@ -133,7 +135,8 @@ public class RobotContainer {
             () -> -driver.getRightX(),
             false,
             driver.rightTrigger(),
-            driver.rightBumper()));
+            driver.rightBumper(),
+            operator.rightTrigger()));
 
 
 
@@ -178,11 +181,12 @@ public class RobotContainer {
     operator.rightBumper().onTrue(new InstantCommand(() -> s_Arm.cubeMode()));
     //operatorBtnRB.onTrue(new GrabGamePiece(s_Arm));
     operator.back().onTrue(new CalibrateArm(s_Arm));
-    operator.rightTrigger().onTrue(new MoveArm(s_Arm,Constants.ArmConstants.grabUprightConePosition, operator));
+    operator.rightTrigger().onTrue(new MoveArm(s_Arm,Constants.ArmConstants.grabFromDoubleSubstationPosition, operator));
     operator.leftTrigger().onTrue(new MoveArm(s_Arm,Constants.ArmConstants.grabFromSingleStationPosition, operator));
     operator.leftStick().onTrue(new InstantCommand(() -> s_Swerve.setToXOrientation()));
     operator.pov(180).whileTrue(new AutoBalance(s_Swerve));
     operator.pov(270).onTrue(new InstantCommand(() -> s_Arm.resetToAbsoluteEncoder()));
+    operator.pov(0).onTrue(new MoveArm(s_Arm, Constants.ArmConstants.restToScoreHighIntermediatePosition, operator));
     //operatorBtnRightStick.onTrue(new MoveArm(s_Arm, Constants.ArmConstants.headTiltForVideoPosition, operator));
     //operatorBtnLeftStick.onTrue(new tempHeadTilt(s_Arm));
   }
@@ -221,11 +225,44 @@ public class RobotContainer {
   public boolean isArmStartOkay() {
     return s_Arm.isArmStartOkay();
   }
+  public void setLEDsForDiagnostics(int bVal) {
+    s_Arm.setLEDsForDiagnostics(bVal);
+  }
   public void setArmMayMove(boolean mayMove) {
     s_Arm.setArmCanMove(mayMove);
   }
   public void setLEDsToDisabledMode() {
     s_Arm.setLEDMode(LEDModes.ROBOTDISABLEDPATTERN);
+  }
+  public boolean isElbowReady() {
+    return s_Arm.isElbowReady();
+  }
+  public boolean isShoulderReady() {
+    return s_Arm.isShoulderReady();
+  }
+  public boolean isFrontLeftSwerveReady() {
+    return s_Swerve.isModuleReady(0);
+  }
+  public boolean isFrontRightSwerveReady() {
+    return s_Swerve.isModuleReady(1);
+  }
+  public boolean isBackLeftSwerveReady() {
+    return s_Swerve.isModuleReady(2);
+  }
+  public boolean isBackRightSwerveReady() {
+    return s_Swerve.isModuleReady(3);
+  }
+  public boolean isLimelightReady() {
+    return s_Swerve.isLimelightReady();
+  }
+  public boolean isGyroReady() {
+    return s_Swerve.isGyroReady();
+  }
+  public void indicateRobotReady() {
+    s_Arm.setLEDMode(LEDModes.SOLIDBLUE);
+  }
+  public void indicateRobotNotReady() {
+    s_Arm.setLEDMode(LEDModes.SOLIDRED);
   }
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.

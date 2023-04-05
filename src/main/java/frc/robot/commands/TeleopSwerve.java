@@ -29,9 +29,11 @@ public class TeleopSwerve extends CommandBase {
 
   PIDController rController = new PIDController(0.02, 0.0, 0.0015);
   PIDController rControllerLoading = new PIDController(rController.getP(), rController.getI(), rController.getD());
+  PIDController rControllerShelf = new PIDController(rController.getP(), rController.getI(), rController.getD());
 
   Trigger turnToDrivers;
   Trigger turnToLoading;
+  Trigger turnToShelf;
   boolean robotCentric;
 
   double rotationVal = 0;
@@ -43,7 +45,8 @@ public class TeleopSwerve extends CommandBase {
       DoubleSupplier rotationSup,
       boolean robotCentric,
       Trigger turnToDrivers,
-      Trigger turnToLoading
+      Trigger turnToLoading,
+      Trigger turnToShelf
       ) { //BooleanSupplier robotCentricSup
     this.s_Swerve = s_Swerve;
     addRequirements(s_Swerve);
@@ -56,6 +59,7 @@ public class TeleopSwerve extends CommandBase {
       
     this.turnToDrivers = turnToDrivers;
     this.turnToLoading = turnToLoading;
+    this.turnToShelf = turnToShelf;
   }
 
   @Override
@@ -111,6 +115,14 @@ public class TeleopSwerve extends CommandBase {
       else {
         rControllerLoading.setSetpoint(90);
       }
+    }
+    if (turnToShelf.getAsBoolean()) {
+      var degrees = s_Swerve.getYaw().getDegrees();        
+      
+      rotationVal = rControllerShelf.calculate(degrees);     
+    }
+    else if (!turnToLoading.getAsBoolean()) {
+      rControllerShelf.setSetpoint(0);
     }
     // else if (turnToLoading.getAsBoolean()) {
     //   rController.setSetpoint(0);

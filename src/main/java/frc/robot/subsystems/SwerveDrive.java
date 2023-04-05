@@ -1,5 +1,9 @@
 package frc.robot.subsystems;
 
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
 import com.ctre.phoenix.sensors.Pigeon2;
 
 import edu.wpi.first.math.controller.PIDController;
@@ -88,6 +92,11 @@ public class SwerveDrive extends SubsystemBase {
   private static double boundingBoxWidth = 0;
   private static double boundingBoxHeight = 0;
   private static double lowestLimelightTargetY = 0;
+
+  private static double chkGyroCurrentValue = 0;
+  private static double chkGyroMaxValue = -360;
+  private static double chkGyroMinValue = 360;
+  private static int chkGyroCnt = 0;
   public SwerveDrive() {
     rpi = NetworkTableInstance.getDefault().getTable("rpi");
     limelight = NetworkTableInstance.getDefault().getTable("limelight");
@@ -350,6 +359,59 @@ public class SwerveDrive extends SubsystemBase {
   }
   public float getGyroPitch() {
     return gyro.getPitch();
+  }
+  public boolean isModuleReady(int module) {
+    double degrees = mSwerveMods[module].getCanCoder().getDegrees();
+    if ( degrees != 0) {
+      return true;
+    }
+    return false;
+  }
+  public boolean isGyroReady() {
+    return gyro.isConnected();
+    // double curGyro = getYaw().getDegrees();
+    // if (curGyro < chkGyroMinValue) {
+    //   chkGyroMinValue = curGyro;
+    // }
+    // else if (curGyro > chkGyroMaxValue) {
+    //   chkGyroMaxValue = curGyro;
+    // }
+    // if (Math.abs(Math.abs(chkGyroMaxValue) - Math.abs(chkGyroMaxValue)) > 0.5) {
+    //   return false;
+    // }
+    // if (Math.abs(getYaw().getDegrees() - chkGyroCurrentValue) != 0) {
+    //   chkGyroCnt = 50;
+    //   return true;
+    // }
+    // else {
+    //   chkGyroCnt--;
+    // }
+    // if (chkGyroCnt == 0) {
+    //   chkGyroCnt = 50;
+    //   return false;
+    // }
+    // chkGyroCurrentValue = curGyro;
+    // return false;
+  }
+  public boolean isLimelightReady() {
+    InetAddress limelightIP;
+    try {
+      limelightIP = InetAddress.getByName("10.46.78.11");
+      boolean reachable = limelightIP.isReachable(3000);
+      if (reachable) {
+        return true;
+      }
+      else {
+        return false;
+      }
+    } catch (UnknownHostException e) {
+      // TODO Auto-generated catch block
+      return false;
+    } catch (IOException e) {
+      // TODO Auto-generated catch block
+      return false;
+    }
+    
   }
   public LimelightTarget_Retro getBestLimelightTarget() {
     int bestResult = 0;

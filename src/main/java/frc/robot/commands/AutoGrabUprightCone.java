@@ -120,7 +120,7 @@ public class AutoGrabUprightCone extends CommandBase {
         xSpeed = xController.calculate(boundingBoxXY[1]); 
         ySpeed = yController.calculate(s_Swerve.getLimelightY()); 
         if (rController.getPositionError() < 3.5) {
-          rController.setP(0.025);
+          rController.setP(0.065); //0.025
           rController.setD(0);
         }
         else {
@@ -135,12 +135,20 @@ public class AutoGrabUprightCone extends CommandBase {
           ySpeed = ySpeed * 0.8;
         }
         SmartDashboard.putNumber("rSpeed", rSpeed);
+        SmartDashboard.putNumber("xSpeed", xSpeed);
+        SmartDashboard.putNumber("ySpeed", ySpeed);
         translation = new Translation2d(-ySpeed, xSpeed); //-yspeed
         
         if (s_Swerve.limelightHasTarget() == 1) {
           s_Swerve.drive(translation, rSpeed, false, true);
         }
-        if (xController.atSetpoint() && rController.atSetpoint() && (yController.atSetpoint() || s_Swerve.getLimelightY() < yController.getSetpoint() + 3.5)) {
+        SmartDashboard.putBoolean(
+          "upright cone limelight score y controller",yController.atSetpoint());
+        SmartDashboard.putBoolean(
+                  "upright cone limelight x controller",xController.atSetpoint());
+        SmartDashboard.putBoolean(
+                  "upright cone limelight r controller",rController.atSetpoint());
+        if (xController.atSetpoint() && rController.atSetpoint() && (yController.atSetpoint() || s_Swerve.getLimelightY() < yController.getSetpoint() + 3)) {
             if (currentArmError < 3) {
               grabState++;
               waitCnt = 0;
@@ -185,7 +193,7 @@ public class AutoGrabUprightCone extends CommandBase {
         }
         else if (s_Swerve.getRightLaserValue() - s_Swerve.getCenterLaserValue() < -20) {
           xSpeed = -0.5;
-          ySpeed = -ySpeed * 0.7;
+          ySpeed = ySpeed * 0.7;
         }
         else if (Math.abs(s_Swerve.getLeftLaserValue() - s_Swerve.getCenterLaserValue()) < 12) {
           xSpeed = 0.25;
@@ -203,11 +211,12 @@ public class AutoGrabUprightCone extends CommandBase {
         translation = new Translation2d(-ySpeed, xSpeed); //-ySpeed
         SmartDashboard.putNumber("rSpeed", rSpeed);
         SmartDashboard.putNumber("xSpeed", xSpeed);
+        SmartDashboard.putNumber("ySpeed", ySpeed);
         
         s_Swerve.drive(translation, rSpeed, false, true);
         if (yController.atSetpoint() && currentArmError < 1.5) {
           isInPositionCnt++;
-          if (isInPositionCnt > 7) {
+          if (isInPositionCnt > 3) {
             grabState++;
           }
         }
@@ -225,7 +234,7 @@ public class AutoGrabUprightCone extends CommandBase {
       break;
       case 4:
         waitCnt++;
-        if (waitCnt > 13) {
+        if (waitCnt > 20) {
           grabState++;
         }
       break;

@@ -168,11 +168,11 @@ public final class Constants {
     public static double autoScoreHighYTarget = 1;
     public static double autoScoreMediumYTarget = -5;
 
-    public static double autoDriveConePickupXP = 0.015;
+    public static double autoDriveConePickupXP = 0.018;
     public static double autoDriveConePickupXI = 0.0;
     public static double autoDriveConePickupXD = 0.0;
     public static double autoDriveConePickupXTolerance = 1;
-    public static double autoDriveConePickupYP = 0.5;
+    public static double autoDriveConePickupYP = 0.8;
     public static double autoDriveConePickupYI = 0.0;
     public static double autoDriveConePickupYD = 0.0;
     public static double autoDriveConePickupYTolerance = 1;
@@ -184,7 +184,7 @@ public final class Constants {
     public static double autoDriveCubePickupXP = 0.05;
     public static double autoDriveCubePickupXI = 0.0;
     public static double autoDriveCubePickupXD = 0.0;
-    public static double autoDriveCubePickupXTolerance = 3;
+    public static double autoDriveCubePickupXTolerance = 4;
     public static double autoDriveCubePickupYP = 0.15;
     public static double autoDriveCubePickupYI = 0.0;
     public static double autoDriveCubePickupYD = 0.0015;
@@ -220,13 +220,13 @@ public final class Constants {
     public static final double autoGrabUprightConeYSwitchToLidar = 42;
     public static final double autoGrabUprightConeRTolerance = 2.5;
     public static final double autoGrabUprightConeYLimelightTolerance = 0.25;
-    public static final double autoGrabUprightConeYLimelightTarget = 10.5;
-    public static final double autoGrabUprightConeXLimelightTolerance = 9;
+    public static final double autoGrabUprightConeYLimelightTarget = 11;
+    public static final double autoGrabUprightConeXLimelightTolerance = 10;
     public static final double autoGrabUprightConeLidarYP = 0.03;
     public static final double autoGrabUprightConeLidarYI = 0.0;
     public static final double autoGrabUprightConeLidarYD = 0.0;
     public static final double autoGrabUprightConeLidarYTarget = 53.5; //cm distance we want to be to the cone
-    public static final double autoGrabUprightConeLidarYTolerance = 8;
+    public static final double autoGrabUprightConeLidarYTolerance = 6;
 
     public static final double AutobalanceRollTolerance = 9.5;
 
@@ -339,12 +339,14 @@ public final class Constants {
     public static final ArmPosition scoreConeMediumPosition = new ArmPosition(35.8, 25.5, 0, 10, false);
     public static final ArmPosition scoreLowPosition = new ArmPosition(26, 3, 0, -10, false);
     public static ArmPosition grabConePosition = new ArmPosition(31.27, 1.2, 0, -110, false);
-    public static ArmPosition grabCubePosition = new ArmPosition(33.1, 8, 0, -127.6, false);    
+    public static ArmPosition grabCubePosition = new ArmPosition(33.1, 9, 0, -127.6, false);    
     public static final ArmPosition yeetCubePosition = new ArmPosition(22.8, 47.8, 0, 0, false);
     public static final ArmPosition grabUprightConePosition = new ArmPosition(32.7, -2, 0, -17, false);
     public static final ArmPosition restToScoreHighIntermediatePosition = new ArmPosition(18.205, 36, 0, 0, false);
     public static final ArmPosition scoreHighToRestIntermediatePosition = new ArmPosition(18.205, 50, 0, 0, false);
     public static final ArmPosition restToScoreMediumIntermediatePosition = new ArmPosition(21.4, 24.2, 0, -38.51, false);
+    public static final ArmPosition restToSingleSubstationIntermediatePosition = new ArmPosition(8.17, 10.27, 0, -23, false);
+    public static final ArmPosition grabFromDoubleSubstationPosition = new ArmPosition(17.5, 34.4, 0, -88, false);
 
     public static final ArmPosition scoreCubeHighPosition = new ArmPosition(45, 45, 0, -100, false);
     public static final ArmPosition scoreCubeMediumPosition = new ArmPosition(40, 32, 0, -100, false);
