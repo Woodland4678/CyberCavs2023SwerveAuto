@@ -66,7 +66,7 @@ public class RobotContainer {
 
 
     PathPlannerTrajectory bumpGoTo2ndGamePiece = PathPlanner.loadPath("Bump Auto Path 1", new PathConstraints(3, 4.1));
-    PathPlannerTrajectory bumpBring2ndGamePieceBack = PathPlanner.loadPath("Bump Auto Path 2", new PathConstraints(3, 3));
+    PathPlannerTrajectory bumpBring2ndGamePieceBack = PathPlanner.loadPath("Bump Auto Path 2", new PathConstraints(3, 4));
     PathPlannerTrajectory bumpGoAutoBalance = PathPlanner.loadPath("Bump Auto Balance After 2", new PathConstraints(2.5, 2));
     PathPlannerTrajectory[] bumpTwoGamePieceAndBalancePaths = {
       bumpGoTo2ndGamePiece,
@@ -75,7 +75,7 @@ public class RobotContainer {
     };
 
     PathPlannerTrajectory bumpGoTo3rdGamePiece = PathPlanner.loadPath("Bump Go To 3rd Piece", new PathConstraints(3, 4.1));
-    PathPlannerTrajectory bumpBring3rdGamePieceBack = PathPlanner.loadPath("Bump Bring 3rd Piece Back", new PathConstraints(2,3));
+    PathPlannerTrajectory bumpBring3rdGamePieceBack = PathPlanner.loadPath("Bump Bring 3rd Piece Back", new PathConstraints(3,4));
     PathPlannerTrajectory[] bumpThreeGamePiecePaths = {
       bumpGoTo2ndGamePiece,
       bumpBring2ndGamePieceBack,

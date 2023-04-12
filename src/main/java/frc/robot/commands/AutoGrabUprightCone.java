@@ -234,7 +234,7 @@ public class AutoGrabUprightCone extends CommandBase {
       break;
       case 4:
         waitCnt++;
-        if (waitCnt > 20) {
+        if (waitCnt > 17) {
           grabState++;
         }
       break;
@@ -245,7 +245,7 @@ public class AutoGrabUprightCone extends CommandBase {
         else {
           currentTarget = Constants.ArmConstants.pickupToRestIntermediatePosition;
         }
-        if (currentArmError < 2) {
+        if (currentArmError < 5) {
           grabState++;
         }
       break;

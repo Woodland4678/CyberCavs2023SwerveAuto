@@ -49,7 +49,7 @@ public class NonBump2AndAHalfAndBalance extends SequentialCommandGroup {
          new ParallelCommandGroup(s_Swerve.followTrajectoryCommand(PathPlannerTrajectory.transformTrajectoryForAlliance(paths[0], DriverStation.getAlliance()), true), new CalibrateArm(s_Arm), new InstantCommand(() -> s_Swerve.setHeadlights(true))),
          new AutoGrabUprightCone(s_Arm, s_Swerve, 0, true),
          s_Swerve.followTrajectoryCommand(PathPlannerTrajectory.transformTrajectoryForAlliance(paths[1], DriverStation.getAlliance()), true),
-         new AutoScoreHigh(s_Arm, s_Swerve, true, operatorJoystick, true, 17),
+         new AutoScoreHigh(s_Arm, s_Swerve, true, operatorJoystick, true, 8),
          new InstantCommand(() -> s_Arm.openClaw()),
          new ParallelCommandGroup(s_Swerve.followTrajectoryCommand(PathPlannerTrajectory.transformTrajectoryForAlliance(paths[2], DriverStation.getAlliance()), true), new MoveArm(s_Arm, Constants.ArmConstants.restPositionAuto, null)),
          new AutoGrabUprightCone(s_Arm, s_Swerve, thirdGamePieceGrabAngle, true),

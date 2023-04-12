@@ -165,10 +165,10 @@ public final class Constants {
     public static double autoDriveScoreRD = 0.005;
     public static double autoDriveScoreRTolerance = 1.2;
 
-    public static double autoScoreHighYTarget = 1;
+    public static double autoScoreHighYTarget = 1.2; //1
     public static double autoScoreMediumYTarget = -5;
 
-    public static double autoDriveConePickupXP = 0.018;
+    public static double autoDriveConePickupXP = 0.02;
     public static double autoDriveConePickupXI = 0.0;
     public static double autoDriveConePickupXD = 0.0;
     public static double autoDriveConePickupXTolerance = 1;

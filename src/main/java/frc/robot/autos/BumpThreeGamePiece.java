@@ -47,19 +47,18 @@ public class BumpThreeGamePiece extends SequentialCommandGroup {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     addCommands(
-        new InstantCommand(() -> s_Swerve.zeroGyro()), 
-         new InstantCommand(() -> s_Swerve.resetSwerveModuleAngles()),
-         new YeetCube(s_Arm),         
+      new ParallelCommandGroup(new InstantCommand(() -> s_Swerve.zeroGyro()), new InstantCommand(() -> s_Swerve.resetSwerveModuleAngles()), new InstantCommand(() -> s_Swerve.limelightDown()), new InstantCommand(() -> s_Swerve.setLimelightPipeline(6)), new YeetCube(s_Arm)),           
          new ParallelCommandGroup(s_Swerve.followTrajectoryCommand(PathPlannerTrajectory.transformTrajectoryForAlliance(paths[0], DriverStation.getAlliance()), true), new CalibrateArm(s_Arm), new InstantCommand(() -> s_Swerve.setHeadlights(true)), new InstantCommand(() -> s_Swerve.limelightDown())),
          new AutoGrabUprightCone(s_Arm, s_Swerve, 0, false),
          s_Swerve.followTrajectoryCommand(PathPlannerTrajectory.transformTrajectoryForAlliance(paths[1], DriverStation.getAlliance()), true),
-         new AutoScoreHigh(s_Arm, s_Swerve, true, operatorJoystick, true, 10),
+         new AutoScoreHigh(s_Arm, s_Swerve, true, operatorJoystick, true, 5),
          new InstantCommand(() -> s_Arm.openClaw()),
          new ParallelCommandGroup(s_Swerve.followTrajectoryCommand(PathPlannerTrajectory.transformTrajectoryForAlliance(paths[2], DriverStation.getAlliance()), true), new MoveArm(s_Arm, Constants.ArmConstants.restPositionAuto, null)),
          new AutoGrabUprightCone(s_Arm, s_Swerve, thirdGamePieceGrabAngle, false),
-         s_Swerve.followTrajectoryCommand(PathPlannerTrajectory.transformTrajectoryForAlliance(paths[3], DriverStation.getAlliance()), true)
-        //  new AutoScoreHigh(s_Arm, s_Swerve, true, operatorJoystick, true, 20),
-        //  new InstantCommand(() -> s_Arm.openClaw()),
+         s_Swerve.followTrajectoryCommand(PathPlannerTrajectory.transformTrajectoryForAlliance(paths[3], DriverStation.getAlliance()), true),
+         new AutoScoreHigh(s_Arm, s_Swerve, false, operatorJoystick, true, 5),
+         new InstantCommand(() -> s_Arm.openClaw())
+         //  new InstantCommand(() -> s_Arm.openClaw()),
         //  new MoveArm(s_Arm, Constants.ArmConstants.restPositionAuto, null)
         //  s_Swerve.followTrajectoryCommand(bring2ndGamePieceBack, true),
         //  new AutoScoreHigh(s_Arm, s_Swerve, true, 0.0),

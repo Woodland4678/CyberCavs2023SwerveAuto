@@ -96,7 +96,7 @@ public class AutoScoreHigh extends CommandBase {
       }
       
     }
-    yController.setSetpoint(7.35); //nice
+    yController.setSetpoint(8.2); //nice
     xController.setTolerance(Constants.Swerve.autoDriveScoreXTolerance);
     yController.setTolerance(Constants.Swerve.autoDriveScoreYTolerance);
     rController.setTolerance(Constants.Swerve.autoDriveScoreRTolerance);
