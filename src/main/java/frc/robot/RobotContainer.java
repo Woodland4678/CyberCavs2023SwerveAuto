@@ -37,7 +37,7 @@ public class RobotContainer {
   //private static final Joystick operator = new Joystick(1);
   private static final Joystick autoBox = new Joystick(2);
 
-    PathPlannerTrajectory goTo2ndGamePiece = PathPlanner.loadPath("Non Bump Path 1", new PathConstraints(4.1, 4.1));
+    PathPlannerTrajectory goTo2ndGamePiece = PathPlanner.loadPath("Non Bump Path 1", new PathConstraints(3.7, 3.7));
     PathPlannerTrajectory bring2ndGamePieceBack = PathPlanner.loadPath("Non Bump Path 2", new PathConstraints(4.1, 4.5));
     PathPlannerTrajectory goAutoBalance = PathPlanner.loadPath("Non Bump Path Auto Balance After 2", new PathConstraints(3, 2));
   PathPlannerTrajectory[] nonBump2GamePieceAndBalancePaths = {
@@ -66,8 +66,8 @@ public class RobotContainer {
 
 
     PathPlannerTrajectory bumpGoTo2ndGamePiece = PathPlanner.loadPath("Bump Auto Path 1", new PathConstraints(3, 4.1));
-    PathPlannerTrajectory bumpBring2ndGamePieceBack = PathPlanner.loadPath("Bump Auto Path 2", new PathConstraints(3, 4));
-    PathPlannerTrajectory bumpGoAutoBalance = PathPlanner.loadPath("Bump Auto Balance After 2", new PathConstraints(2.5, 2));
+    PathPlannerTrajectory bumpBring2ndGamePieceBack = PathPlanner.loadPath("Bump Auto Path 2", new PathConstraints(3, 4.1));
+    PathPlannerTrajectory bumpGoAutoBalance = PathPlanner.loadPath("Bump Auto Balance After 2", new PathConstraints(2.7, 2));
     PathPlannerTrajectory[] bumpTwoGamePieceAndBalancePaths = {
       bumpGoTo2ndGamePiece,
       bumpBring2ndGamePieceBack,
@@ -75,7 +75,7 @@ public class RobotContainer {
     };
 
     PathPlannerTrajectory bumpGoTo3rdGamePiece = PathPlanner.loadPath("Bump Go To 3rd Piece", new PathConstraints(3, 4.1));
-    PathPlannerTrajectory bumpBring3rdGamePieceBack = PathPlanner.loadPath("Bump Bring 3rd Piece Back", new PathConstraints(3,4));
+    PathPlannerTrajectory bumpBring3rdGamePieceBack = PathPlanner.loadPath("Bump Bring 3rd Piece Back", new PathConstraints(3,4.1));
     PathPlannerTrajectory[] bumpThreeGamePiecePaths = {
       bumpGoTo2ndGamePiece,
       bumpBring2ndGamePieceBack,
@@ -160,7 +160,7 @@ public class RobotContainer {
     //driver.rightTrigger().whileTrue(new YeetCube(s_Arm));
     //driver.rightTrigger().whileTrue(new AutoBalance(s_Swerve));
     driver.pov(180).whileTrue(new orientationTest(s_Swerve, s_Arm));
-    driver.leftTrigger().whileTrue(new AutoAlignSingleSubstation(s_Swerve, s_Arm));
+    driver.leftTrigger().whileTrue(new AutoAlignSingleSubstationGreen(s_Swerve, s_Arm));
     //driver.pov(180).onTrue(new InstantCommand(() -> s_Swerve.setToXOrientation()));
     driver.pov(0).whileTrue(new AutoGrabUprightCone(s_Arm, s_Swerve, 0, false));
     

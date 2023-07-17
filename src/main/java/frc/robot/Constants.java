@@ -51,7 +51,7 @@ public final class Constants {
     public static final double openLoopRamp = 0.25;
     public static final double closedLoopRamp = 0.0;
 
-    public static final double driveGearRatio = (6.75 / 1.0); // 6.75:1
+    public static final double driveGearRatio = (5.90625 / 1.0); // 6.75:1 //6.75 * (14/16):1 after upgrade made
     public static final double angleGearRatio = (21.42857 / 1.0); // 12.8:1
 
     public static final SwerveDriveKinematics swerveKinematics =
@@ -152,14 +152,14 @@ public final class Constants {
     /////////////////////////////////////////////////////////////
     //**Auto drive values (for scoring and game piece pickup) */
     /////////////////////////////////////////////////////////////
-    public static double autoDriveScoreXP = 0.08;
+    public static double autoDriveScoreXP = 0.05;
     public static double autoDriveScoreXI = 0.0000;
     public static double autoDriveScoreXD = 0.00;
-    public static double autoDriveScoreXTolerance = 1.55; //was 1.4
+    public static double autoDriveScoreXTolerance = 2; //was 1.55
     public static double autoDriveScoreYP = 0.16;
     public static double autoDriveScoreYI = 0.0000;
     public static double autoDriveScoreYD = 0.00;
-    public static double autoDriveScoreYTolerance = 1; //was 0.9
+    public static double autoDriveScoreYTolerance = 0.7; //was 0.9
     public static double autoDriveScoreRP = 0.07;
     public static double autoDriveScoreRI = 0.0001;
     public static double autoDriveScoreRD = 0.005;
@@ -184,10 +184,10 @@ public final class Constants {
     public static double autoDriveCubePickupXP = 0.05;
     public static double autoDriveCubePickupXI = 0.0;
     public static double autoDriveCubePickupXD = 0.0;
-    public static double autoDriveCubePickupXTolerance = 4;
+    public static double autoDriveCubePickupXTolerance = 3;
     public static double autoDriveCubePickupYP = 0.15;
     public static double autoDriveCubePickupYI = 0.0;
-    public static double autoDriveCubePickupYD = 0.0015;
+    public static double autoDriveCubePickupYD = 0.0025;
     public static double autoDriveCubePickupYTolerance = 0.75;
     public static double autoDriveCubePickupRP = 0.07;
     public static double autoDriveCubePickupRI = 0.0001;
@@ -220,9 +220,9 @@ public final class Constants {
     public static final double autoGrabUprightConeYSwitchToLidar = 42;
     public static final double autoGrabUprightConeRTolerance = 2.5;
     public static final double autoGrabUprightConeYLimelightTolerance = 0.25;
-    public static final double autoGrabUprightConeYLimelightTarget = 11;
+    public static final double autoGrabUprightConeYLimelightTarget = 12;
     public static final double autoGrabUprightConeXLimelightTolerance = 10;
-    public static final double autoGrabUprightConeLidarYP = 0.03;
+    public static final double autoGrabUprightConeLidarYP = 0.027;
     public static final double autoGrabUprightConeLidarYI = 0.0;
     public static final double autoGrabUprightConeLidarYD = 0.0;
     public static final double autoGrabUprightConeLidarYTarget = 53.5; //cm distance we want to be to the cone
@@ -329,14 +329,14 @@ public final class Constants {
     public static final int wristPitchLimitSwitchChannel = 9;
 
     
-    public static final ArmPosition scoreConeHighPosition = new ArmPosition(48.5, 44.5, 0, -35, false);
+    public static final ArmPosition scoreConeHighPosition = new ArmPosition(46, 47, 0, -35, false);
     public static ArmPosition pickupPosition = new ArmPosition(28.84, 11.5, 0, -127.6, false);//wrist roll position needs to change so this shouldn't be "final"
     public static final ArmPosition pos2 = new ArmPosition(20, 20, 0, 0, false);
     public static final ArmPosition restPosition = new ArmPosition(107.3, -170.46, 90, 15, true);
     public static final ArmPosition restPositionAuto = new ArmPosition(107.3, -170.46, 0, 20, true);
     public static final ArmPosition pickupToRestIntermediatePosition = new ArmPosition(17.44, 10.2, 90, 15, false);
     public static final ArmPosition pickupToRestIntermediatePositionAuto = new ArmPosition(17.44, 10.2, 0, 15, false);
-    public static final ArmPosition scoreConeMediumPosition = new ArmPosition(35.8, 25.5, 0, 10, false);
+    public static final ArmPosition scoreConeMediumPosition = new ArmPosition(35.8, 28.5, 0, 10, false);
     public static final ArmPosition scoreLowPosition = new ArmPosition(26, 3, 0, -10, false);
     public static ArmPosition grabConePosition = new ArmPosition(31.27, 1.2, 0, -110, false);
     public static ArmPosition grabCubePosition = new ArmPosition(33.1, 9, 0, -127.6, false);    
@@ -351,7 +351,7 @@ public final class Constants {
     public static final ArmPosition scoreCubeHighPosition = new ArmPosition(45, 45, 0, -100, false);
     public static final ArmPosition scoreCubeMediumPosition = new ArmPosition(40, 32, 0, -100, false);
     public static final ArmPosition pickupUprightIntermediatePosition = new ArmPosition(15.44, 10.2, 0, 0, false);
-    public static final ArmPosition grabFromSingleStationPosition = new ArmPosition(15.5, 18.5, 0, -23, false);
+    public static final ArmPosition grabFromSingleStationPosition = new ArmPosition(15.5, 17.5, 0, -23, false);
     //17.5 19.5
     public static ArmPosition headTiltForVideoPosition = new ArmPosition(18.205, 35, 90, -90, false);
   }

@@ -43,6 +43,8 @@ public class AutoScoreHigh extends CommandBase {
   CommandXboxController operatorJoystick;
   int waitScoreCnt = 0;
   double timeStart = 0;
+  double xSpeed = 0;
+  double rSpeed = 0;
   /** Creates a new ScoreHigh. */
   public AutoScoreHigh(Arm s_Arm, SwerveDrive s_Swerve, boolean isHigh, CommandXboxController operatorJoystick, boolean isAutoMode, int waitScoreCnt) {
     this.s_Arm = s_Arm;
@@ -61,6 +63,8 @@ public class AutoScoreHigh extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    xSpeed = 0;
+    rSpeed = 0;
     timeStart = Timer.getFPGATimestamp();
     xController.reset();
     yController.reset();
@@ -96,7 +100,7 @@ public class AutoScoreHigh extends CommandBase {
       }
       
     }
-    yController.setSetpoint(8.2); //nice
+    yController.setSetpoint(7.5); //8.2 
     xController.setTolerance(Constants.Swerve.autoDriveScoreXTolerance);
     yController.setTolerance(Constants.Swerve.autoDriveScoreYTolerance);
     rController.setTolerance(Constants.Swerve.autoDriveScoreRTolerance);
@@ -111,6 +115,12 @@ public class AutoScoreHigh extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    if (s_Swerve.getLimeLighttvert() < 18) {
+      yController.setSetpoint(4.9);
+    }
+    else {
+      yController.setSetpoint(7.5);
+    }
     double currentTime = Timer.getFPGATimestamp();
     if (operatorJoystick.getRawAxis(1) > 0.1 && isMainArmPositionSet) {
       if (currentTarget.wristPitchTarget > -120) { 
@@ -127,7 +137,8 @@ public class AutoScoreHigh extends CommandBase {
     if (currentArmError < 8 && !isMainArmPositionSet) {
       if (isHigh) {
         currentTarget = Constants.ArmConstants.scoreConeHighPosition;
-        currentTarget.wristPitchTarget = -35;
+        currentTarget.wristPitchTarget = -
+        48;
       }
       else {
         currentTarget = Constants.ArmConstants.scoreConeMediumPosition;
@@ -147,12 +158,26 @@ public class AutoScoreHigh extends CommandBase {
         else if (rController.getSetpoint() < 0 && degrees > 0) {
           degrees = degrees - 360;
         }
+        
         var ySpeed = yController.calculate(s_Swerve.getLimelightY());
+        //if (yController.atSetpoint()) {
+        //  ySpeed = 0;
+       // }
         // if (Math.abs(xController.getPositionError()) > 7.5) {
         //   ySpeed = 0;
         // }
-        var rSpeed = rController.calculate(degrees);
-        var xSpeed = xController.calculate(s_Swerve.getLimelightX());
+        //if (!rController.atSetpoint()) {
+          rSpeed = rController.calculate(degrees);
+        //}
+        //else {
+        //  rSpeed = 0;
+       // }
+        //if (!xController.atSetpoint()) {
+          xSpeed = xController.calculate(s_Swerve.getLimelightX());
+        //}
+        //else {
+         // xSpeed = 0;
+        //}
         
         // if (Math.abs(rSpeed) < 0.7) {
         //   xSpeed = rLimiter.calculate(rController.calculate(s_Swerve.getYaw().getDegrees()));
@@ -170,9 +195,15 @@ public class AutoScoreHigh extends CommandBase {
                       "Auto score x controller",xController.atSetpoint());
         SmartDashboard.putBoolean(
                       "Auto score r controller",rController.atSetpoint());
+        SmartDashboard.putNumber(
+                        "Auto score x Speed",xSpeed);
+        SmartDashboard.putNumber(
+                      "Auto score y Speed",ySpeed);
+        SmartDashboard.putNumber(
+                      "Auto score r Speed",rSpeed);
         
         
-        if (xController.atSetpoint() && yController.atSetpoint() && rController.atSetpoint() && currentArmError < 12) {
+        if (xController.atSetpoint() && yController.atSetpoint() && rController.atSetpoint() && currentArmError < 10) {
           isInPosCnt++;
           s_Arm.setLEDMode(LEDModes.SOLIDGREEN);
         }
@@ -180,9 +211,10 @@ public class AutoScoreHigh extends CommandBase {
           isInPosCnt = 0;
           s_Arm.setLEDMode(LEDModes.SOLIDRED);
         }
-        if (isInPosCnt > waitScoreCnt || (currentTime - timeStart) > 1.85) { //1.75 second time out
+        if (isInPosCnt > waitScoreCnt || (currentTime - timeStart) > 1.45) { //1.75 second time out
           if (isInPosCnt > waitScoreCnt) {
             s_Arm.setLEDMode(LEDModes.SOLIDGREEN);
+            s_Swerve.stop();
           }
           else {
             s_Arm.setLEDMode(LEDModes.SOLIDRED);
@@ -193,7 +225,9 @@ public class AutoScoreHigh extends CommandBase {
           s_Swerve.stop();
         }
         else {
+          
           s_Swerve.drive(translation, rSpeed, false, true);
+          
         }
       }
     }

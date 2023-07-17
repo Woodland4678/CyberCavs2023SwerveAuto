@@ -209,8 +209,11 @@ public class SwerveDrive extends SubsystemBase {
     }
   }
   public void stop() {
-    Translation2d translation = new Translation2d(0, 0);
-    drive(translation, 0, false, false);
+    //Translation2d translation = new Translation2d(0, 0);
+    //drive(translation, 0, false, false);
+    for(SwerveModule mod : mSwerveMods){
+      mod.stopMotors();
+  }
    // ChassisSpeeds.fromFieldRelativeSpeeds(0, 0, 0, new Pose2d().getRotation());
   }
   public Pose2d getPose() {
@@ -221,6 +224,9 @@ public class SwerveDrive extends SubsystemBase {
   }
   public LimelightResults getLimelightResults() {
     return LimelightHelpers.getLatestResults("limelight");
+  }
+  public double getLimeLighttvert() {
+    return limelight.getEntry("tvert").getDouble(0);
   }
   public void resetOdometry(Pose2d pose) {
     swerveOdometry.resetPosition(getYaw(), getModulePositions(), pose);

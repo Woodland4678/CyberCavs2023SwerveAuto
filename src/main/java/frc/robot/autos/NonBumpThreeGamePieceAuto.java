@@ -50,7 +50,7 @@ public class NonBumpThreeGamePieceAuto extends SequentialCommandGroup {
          new ParallelCommandGroup(s_Swerve.followTrajectoryCommand(PathPlannerTrajectory.transformTrajectoryForAlliance(paths[0], DriverStation.getAlliance()), true), new CalibrateArm(s_Arm), new InstantCommand(() -> s_Swerve.setHeadlights(true)), new InstantCommand(() -> s_Swerve.limelightDown())),
          new AutoGrabUprightCone(s_Arm, s_Swerve, 0, false),
          s_Swerve.followTrajectoryCommand(PathPlannerTrajectory.transformTrajectoryForAlliance(paths[1], DriverStation.getAlliance()), true),
-         new AutoScoreHigh(s_Arm, s_Swerve, true, operatorJoystick, true, 8),
+         new AutoScoreHigh(s_Arm, s_Swerve, true, operatorJoystick, true, 10),
          new InstantCommand(() -> s_Arm.openClaw()),
          new WaitCommand(0.1),
          new ParallelCommandGroup(s_Swerve.followTrajectoryCommand(PathPlannerTrajectory.transformTrajectoryForAlliance(paths[2], DriverStation.getAlliance()), true), new MoveArm(s_Arm, Constants.ArmConstants.restPositionAuto, null)),
@@ -58,6 +58,7 @@ public class NonBumpThreeGamePieceAuto extends SequentialCommandGroup {
          s_Swerve.followTrajectoryCommand(PathPlannerTrajectory.transformTrajectoryForAlliance(paths[3], DriverStation.getAlliance()), true),
          new AutoScoreHigh(s_Arm, s_Swerve, true, operatorJoystick, true, 7),
          new InstantCommand(() -> s_Arm.openClaw()),
+         new WaitCommand(0.2),
          new MoveArm(s_Arm, Constants.ArmConstants.restPositionAuto, null)
         //  s_Swerve.followTrajectoryCommand(bring2ndGamePieceBack, true),
         //  new AutoScoreHigh(s_Arm, s_Swerve, true, 0.0),

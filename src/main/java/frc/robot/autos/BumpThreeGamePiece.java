@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants;
 import frc.robot.commands.AutoBalance;
@@ -51,8 +52,9 @@ public class BumpThreeGamePiece extends SequentialCommandGroup {
          new ParallelCommandGroup(s_Swerve.followTrajectoryCommand(PathPlannerTrajectory.transformTrajectoryForAlliance(paths[0], DriverStation.getAlliance()), true), new CalibrateArm(s_Arm), new InstantCommand(() -> s_Swerve.setHeadlights(true)), new InstantCommand(() -> s_Swerve.limelightDown())),
          new AutoGrabUprightCone(s_Arm, s_Swerve, 0, false),
          s_Swerve.followTrajectoryCommand(PathPlannerTrajectory.transformTrajectoryForAlliance(paths[1], DriverStation.getAlliance()), true),
-         new AutoScoreHigh(s_Arm, s_Swerve, true, operatorJoystick, true, 5),
+         new AutoScoreHigh(s_Arm, s_Swerve, true, operatorJoystick, true, 7),
          new InstantCommand(() -> s_Arm.openClaw()),
+         new WaitCommand(0.1),
          new ParallelCommandGroup(s_Swerve.followTrajectoryCommand(PathPlannerTrajectory.transformTrajectoryForAlliance(paths[2], DriverStation.getAlliance()), true), new MoveArm(s_Arm, Constants.ArmConstants.restPositionAuto, null)),
          new AutoGrabUprightCone(s_Arm, s_Swerve, thirdGamePieceGrabAngle, false),
          s_Swerve.followTrajectoryCommand(PathPlannerTrajectory.transformTrajectoryForAlliance(paths[3], DriverStation.getAlliance()), true),

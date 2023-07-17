@@ -212,9 +212,10 @@ public class AutoGrabUprightCone extends CommandBase {
         SmartDashboard.putNumber("rSpeed", rSpeed);
         SmartDashboard.putNumber("xSpeed", xSpeed);
         SmartDashboard.putNumber("ySpeed", ySpeed);
+        SmartDashboard.putNumber("Auto grab cone arm error", currentArmError);
         
         s_Swerve.drive(translation, rSpeed, false, true);
-        if (yController.atSetpoint() && currentArmError < 1.5) {
+        if (yController.atSetpoint() && currentArmError < 3) {
           isInPositionCnt++;
           if (isInPositionCnt > 3) {
             grabState++;

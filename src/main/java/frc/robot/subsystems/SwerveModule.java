@@ -77,7 +77,10 @@ public class SwerveModule {
     setAngle(desiredState);
     setSpeed(desiredState, isOpenLoop);
   }
-
+  public void stopMotors() {
+    driveMotor.stopMotor();
+    angleMotor.stopMotor();
+  }
   public void resetToAbsolute() {
     //System.out.println(getCanCoder().getDegrees());
     double absolutePosition = getCanCoder().getDegrees() - angleOffset.getDegrees();

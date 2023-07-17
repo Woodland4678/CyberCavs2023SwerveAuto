@@ -24,6 +24,7 @@ public class AutoGrabCube extends CommandBase {
   double xSpeed = 0;
   double ySpeed = 0;
   double rSpeed = 0;
+  int isInPositionCnt = 0;
   ArmPosition currentTarget;
   int grabState = 0;
   double degrees = 0;
@@ -40,6 +41,7 @@ public class AutoGrabCube extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    yController.setPID(Constants.Swerve.autoDriveCubePickupYP, Constants.Swerve.autoDriveCubePickupYI, Constants.Swerve.autoDriveCubePickupYD);
     maxLidarValue = 50;
     s_Arm.openClaw();
     rController.reset();
@@ -52,7 +54,7 @@ public class AutoGrabCube extends CommandBase {
     xSpeed = 0;
     ySpeed = 0;
     s_Swerve.limelightDown();
-    s_Swerve.setLimelightPipeline(0);
+    s_Swerve.setLimelightPipeline(0); //was 0
     s_Swerve.setLimelightLED(false);
     xController.setSetpoint(0);
     xController.setTolerance(Constants.Swerve.autoDriveCubePickupXTolerance);
@@ -62,6 +64,7 @@ public class AutoGrabCube extends CommandBase {
     rController.setTolerance(Constants.Swerve.autoGrabUprightConeRTolerance);
     currentTarget = Constants.ArmConstants.pickupToRestIntermediatePosition;
     grabState = 0;
+    isInPositionCnt = 0;
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -88,7 +91,7 @@ public class AutoGrabCube extends CommandBase {
             rSpeed = rController.calculate(degrees);
             xSpeed = xController.calculate(s_Swerve.getLimelightX());
             double yMeasurement = s_Swerve.getLimelightY();
-
+            
             // if (s_Swerve.getlimelightLowestYValue() > 195) {
             //   yMeasurement = yController.getSetpoint() - 3;
             // }
@@ -120,29 +123,80 @@ public class AutoGrabCube extends CommandBase {
             SmartDashboard.putNumber("ySpeed", ySpeed);
             s_Swerve.drive(translation, rSpeed, false, true);
             
-            if ((minLidarReading > 31 && minLidarReading < 43.5 - (ySpeed * 10)) && xController.atSetpoint() && currentArmError < 1.75 && currentTarget == Constants.ArmConstants.grabCubePosition) {             
+            // if ((minLidarReading > 31 && minLidarReading < 43.5 - (ySpeed * 10)) && xController.atSetpoint() && currentArmError < 1.75 && currentTarget == Constants.ArmConstants.grabCubePosition) {             
               
+            //   grabState++;
+            //   s_Swerve.stop();                         
+            // }    
+            if (xController.atSetpoint() && yMeasurement < 6) {
               grabState++;
-              s_Swerve.stop();                         
-            }                       
+              yController.setPID(0.05, Constants.Swerve.autoGrabUprightConeLidarYI, Constants.Swerve.autoGrabUprightConeLidarYD);
+              yController.setSetpoint(Constants.Swerve.autoGrabUprightConeLidarYTarget);
+              yController.setTolerance(Constants.Swerve.autoGrabUprightConeLidarYTolerance);
+              yController.setSetpoint(34);
+              yController.setTolerance(4);
+            }                   
         }
         else {
           s_Swerve.stop();
         }
       break;
       case 1:
+        if (currentArmError < 4) {
+          if (currentTarget != Constants.ArmConstants.grabCubePosition) {
+            currentTarget = Constants.ArmConstants.grabCubePosition;
+            currentArmError = 20;
+          }
+        }
+        degrees =s_Swerve.getYaw().getDegrees();
+        if (rController.getSetpoint() > 160 && degrees < 0) {
+          degrees = 360 + degrees;
+        }
+        else if (rController.getSetpoint() < -160 && degrees > 0) {
+          degrees = degrees - 360;
+        }
+        //var boundingBoxXY = s_Swerve.getBoundingBoxX();
+        rSpeed = rController.calculate(degrees);   
+        double minLidarReading = s_Swerve.getCenterLaserValue();
+        if (s_Swerve.getLeftLaserValue() < minLidarReading) {
+          minLidarReading = s_Swerve.getLeftLaserValue();
+        }
+        if (s_Swerve.getRightLaserValue() < minLidarReading) {
+          minLidarReading = s_Swerve.getRightLaserValue();
+        }
+
+        ySpeed = yController.calculate(minLidarReading); 
+        
+        xSpeed = xController.calculate(s_Swerve.getLimelightX());
+        translation = new Translation2d(-ySpeed, xSpeed); //-ySpeed
+        SmartDashboard.putNumber("rSpeed", rSpeed);
+        SmartDashboard.putNumber("xSpeed", xSpeed);
+        SmartDashboard.putNumber("ySpeed", ySpeed);
+        
+        s_Swerve.drive(translation, rSpeed, false, true);
+        if (yController.atSetpoint() && currentArmError < 2) {
+          isInPositionCnt++;
+          if (isInPositionCnt > 5) {
+            grabState++;
+          }
+        }
+        else {
+          isInPositionCnt = 0;
+        }
+      break;
+      case 2:
           s_Arm.closeClaw();
           waitCnt = 0;
           grabState++;
       break;
-      case 2:
+      case 3:
           waitCnt++;
           if (waitCnt > 10) {
             currentTarget = Constants.ArmConstants.pickupToRestIntermediatePosition;
             grabState++;
           }
       break;
-      case 3:
+      case 4:
           if (currentArmError < 3) {
             currentTarget = Constants.ArmConstants.restPosition;
             isDone = true;
